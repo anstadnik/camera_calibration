@@ -1,8 +1,21 @@
 import numpy as np
+from icecream import ic
 
 
-def solve_intrinsic(x, X, H) -> np.ndarray:
-    r_11, r_21, r_31, r_12, r_22, r_32, t_1, t_2, t_3 = H
+def solve_intrinsic(
+    x: np.ndarray, X: np.ndarray, H: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Solve for intrinsic parameters
+
+    Args:
+        x: nx2 matrix of points in image space
+        X: nx2 matrix of points in board space
+        H: [r_11, r_21, r_31, r_12, r_22, r_32, t_1, t_2, 0]
+
+    Returns:
+        lambdas, t_3
+    """
+    r_11, r_12, t_1, r_21, r_22, t_2, r_31, r_32, _ = H.flatten()
 
     def A(X):
         return r_21 * X[0] + r_22 * X[1] + t_2
@@ -26,27 +39,35 @@ def solve_intrinsic(x, X, H) -> np.ndarray:
     C_vec = np.array([C(X[k]) for k in range(K)])
 
     # Interleaving A
-    A_C_vec = np.hstack((A_vec, C_vec)).T.ravel()
+    A_C_vec_ = np.empty(K * 2)
+    A_C_vec_[::2] = A_vec
+    A_C_vec_[1::2] = C_vec
 
-    ρ_vals = np.array([ρ(x[k]) for k in range(K)])
+    A_C_vec = np.c_[A_vec, C_vec].flatten()
+
+    np.testing.assert_array_equal(A_C_vec, A_C_vec_)
+
+    p_vals = np.array([ρ(x_) for x_ in x])
     # Duplicate values [ρ₁, ρ₁, ρ₂, ρ₂, ..., ρₖ, ρₖ]
-    ρ_vals = np.hstack((ρ_vals, ρ_vals)).T.ravel()
-    # Create the matrix with ρ^0, ρ^1, ..., ρ^n in each row
-    ρ_mat = np.vstack([ρ_vals**i for i in range(N + 1)]).T
+    p_vals = p_vals.repeat(2)
+    p_vals = p_vals.reshape(-1, 1) ** np.arange(N + 1).reshape(1, -1)
 
-    A_C_ρ_mat = ρ_mat * A_C_vec.reshape(-1, 1)
+    A_C_p_mat = A_C_vec[:, None] * p_vals
 
     # Change it if we have multiple images
-    v_u_mat = np.vstack([x[k][:2] for k in range(K)])
+    v_u_mat = -x.reshape(-1)
 
-    M = np.hstack((A_C_ρ_mat, v_u_mat))
+    M = np.c_[A_C_p_mat, v_u_mat]
 
     B_vec = np.array([B(X[k], x[k]) for k in range(K)])
     D_vec = np.array([D(X[k], x[k]) for k in range(K)])
 
     # Interleaving B and D
-    B_D_vec = np.hstack((B_vec, D_vec)).T.ravel()
+    B_D_vec = np.c_[B_vec, D_vec].flatten()
 
-    a_t = np.linalg.solve(M, B_D_vec)
+    ic(M.shape)
+    ic(B_D_vec.shape)
+    a_t = np.linalg.lstsq(M, B_D_vec, rcond=None)[0]
+    print(a_t)
 
-    return a_t[: N + 1], a_t[N + 1 :]
+    return a_t[: N + 1], a_t[N + 1]

@@ -21,6 +21,7 @@ def solve_extrinsic(
     )
 
     _, _, V = svd(M, full_matrices=False)
+    assert isinstance(V, np.ndarray)
     H = V[:, -1]
     r_11, r_12, r_21, r_22, t_1, t_2 = H
     ic(H)
@@ -61,7 +62,7 @@ def solve_extrinsic(
                 i2
                 * Lb
                 * np.array(
-                    [[r_11, r_12, t_1], [r_21, r_22, t_2], [r_31[i1], r_32[i1], 0]]
+                    [[r_11, r_12, t_1], [r_21, r_22, t_2], [r_31[i1], r_32[i1], 0.0]]
                 )
             )
 

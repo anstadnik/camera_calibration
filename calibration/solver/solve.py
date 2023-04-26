@@ -1,7 +1,13 @@
-from .extrinsics import solve_extrinsic
-from .intrinsics import solve_intrinsic
 import numpy as np
 
-def solve(x: np.ndarray, X: np.ndarray) -> np.ndarray:
-    H = solve_extrinsic(x, X)
-    return solve_intrinsic(x, X, H)
+from .extrinsics import solve_extrinsic
+from .intrinsics import solve_intrinsic
+
+
+def solve(
+    x: np.ndarray, X: np.ndarray, image_center: tuple[float, float]
+) -> tuple[np.ndarray, np.ndarray]:
+    p = solve_extrinsic(x, X, image_center)
+    lambdas, t_3 = solve_intrinsic(x, X, p)
+    p[2, 2] = t_3
+    return lambdas, p
