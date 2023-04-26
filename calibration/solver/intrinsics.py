@@ -29,7 +29,7 @@ def solve_intrinsic(
     def D(X, x):
         return x[0] * (r_31 * X[0] + r_32 * X[1])
 
-    def ρ(x):
+    def p(x):
         return np.linalg.norm(x[:2])
 
     K = len(x)
@@ -47,8 +47,8 @@ def solve_intrinsic(
 
     np.testing.assert_array_equal(A_C_vec, A_C_vec_)
 
-    p_vals = np.array([ρ(x_) for x_ in x])
-    # Duplicate values [ρ₁, ρ₁, ρ₂, ρ₂, ..., ρₖ, ρₖ]
+    p_vals = np.array([p(x_) for x_ in x])
+    # Duplicate values [p_1, p_1, p_2, p_2, ..., p_k, p_k]
     p_vals = p_vals.repeat(2)
     p_vals = p_vals.reshape(-1, 1) ** np.arange(N + 1).reshape(1, -1)
 
