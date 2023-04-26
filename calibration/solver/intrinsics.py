@@ -5,16 +5,6 @@ from icecream import ic
 def solve_intrinsic(
     x: np.ndarray, X: np.ndarray, H: np.ndarray
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Solve for intrinsic parameters
-
-    Args:
-        x: nx2 matrix of points in image space
-        X: nx2 matrix of points in board space
-        H: [r_11, r_21, r_31, r_12, r_22, r_32, t_1, t_2, 0]
-
-    Returns:
-        lambdas, t_3
-    """
     r_11, r_12, t_1, r_21, r_22, t_2, r_31, r_32, _ = H.flatten()
 
     def A(X):

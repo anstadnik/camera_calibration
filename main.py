@@ -1,19 +1,22 @@
 import numpy as np
 from icecream import ic
 
-from calibration.simulator.board import gen_charuco_grid
+from calibration.simulator.board import (gen_charuco_grid)
 from calibration.simulator.simul import SimulParams, simul_projection
 from calibration.solver.solve import solve
 
 
 def test_solver():
-    # params = SimulParams(R=np.eye(3), t=np.array([0, 0, 3]))
     params = SimulParams(
-        R=np.eye(3), t=np.array([0, 0, 1]), lambdas=np.array([0.0, 0.0])
+        R=np.eye(3), t=np.array([0, 0, 5]), lambdas=np.array([0.0, 0.0])
     )
     # draw_board(simul_projection(gen_charuco_grid(5, 7, 0.4, 0.2))[1])
     X, x, lambdas, R, t = simul_projection(gen_charuco_grid(7, 9, 0.4, 0.2), params)
 
+    assert (x > 0).all()
+    assert (x < params.camera.resolution).all()
+    # draw_board(X)
+    # draw_board(x)
     # X += 1
     lambdas_, rt = solve(X, x, params.camera.image_center)
     ic(R)

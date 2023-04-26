@@ -3,18 +3,23 @@ from icecream import ic
 from scipy.linalg import svd
 
 
+
 def solve_extrinsic(
     x: np.ndarray, X: np.ndarray, image_center: tuple[float, float]
 ) -> np.ndarray:
-    """Solve for extrinsic parameters
+    """
+    Computes the extrinsic parameters of a camera, given the 2D image points and the 3D world points.
 
     Args:
-        x: mx2 matrix of points in image space
-        X: mx2 matrix of points in board space
+        x (np.ndarray): Points in image space, with shape (n, 2),
+            where n is the number of points and each point is represented as [x, y].
+        X (np.ndarray): Points in the board space, with shape (n, 2),
+            where n is the number of points and each point is represented as [y, x].
+        image_center (tuple[float, float]): A tuple representing the
+            image center coordinates (x, y).
 
     Returns:
-        H: mx6 matrix of extrinsic parameters
-    """
+        np.ndarray: A 3x3 array representing the extrinsic parameters of the camera."""
     x -= image_center
     M = np.vstack(
         [[-v * X_, -v * Y, u * X_, u * Y, -v, u] for (u, v), (X_, Y) in zip(x, X)]

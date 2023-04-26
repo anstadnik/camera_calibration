@@ -1,5 +1,5 @@
-from collections import namedtuple
 from dataclasses import dataclass, field
+from typing import NamedTuple
 
 import numpy as np
 from numpy.linalg import qr
@@ -10,6 +10,24 @@ from .camera import Camera
 
 @dataclass
 class SimulParams:
+    """
+    A data class to store the simulation parameters for the projection of 3D points
+    onto a 2D image plane.
+
+    Attributes:
+        R (np.ndarray):
+            A 3x3 orthogonal matrix representing the rotation matrix (default: random).
+        t (np.ndarray):
+            A 3D vector representing the translation vector (default: random).
+        lambdas (np.ndarray):
+            A 1D array of radial distortion coefficients (default: random).
+        camera (Camera):
+            A Camera object representing the camera intrinsics (default: Camera()).
+        distortion_center (np.ndarray | None):
+            A 3D vector representing the distortion center
+            (default: None, calculated as the mean of input points X).
+    """
+
     R: np.ndarray = field(default_factory=lambda: qr(np.random.randn(3, 3))[0])
     t: np.ndarray = field(
         default_factory=lambda: np.random.uniform([-5.0, -5, 5.0], [5.0, 5, 15.0])
@@ -21,11 +39,49 @@ class SimulParams:
     distortion_center: np.ndarray | None = None
 
 
-SimulOut = namedtuple("SimulOut", ["X_board", "X_image", "lambdas", "R", "t"])
+class SimulOut(NamedTuple):
+    """
+    A named tuple to store the output of the simul_projection function.
+
+    Attributes:
+        X_board (np.ndarray): The points in the board space (n, 2)
+            where n is the number of points and each point is represented as [y, x].
+        X_image (np.ndarray): The points in the image space (n, 2)
+            where n is the number of points and each point is represented as [y, x].
+        lambdas (np.ndarray): The radial distortion coefficients.
+        R (np.ndarray): The rotation matrix.
+        t (np.ndarray): The translation vector.
+    """
+
+    X_board: np.ndarray
+    X_image: np.ndarray
+    lambdas: np.ndarray
+    R: np.ndarray
+    t: np.ndarray
+
+
 EPS = np.finfo(np.float64).eps
 
 
 def simul_projection(X: np.ndarray, p: SimulParams | None = None) -> SimulOut:
+    """
+    Simulates the projection of board points (X) onto a image plane,
+    given the simulation parameters (p).
+
+    Args:
+
+    X (np.ndarray):
+        An array of point in the board space, with shape (n, 2),
+        where n is the number of points and each point is represented as [x, y].
+    p (SimulParams | None):
+        A SimulParams object containing the simulation parameters. If None,
+        default values will be used (default: None).
+
+    Returns:
+        SimulOut: A SimulOut object containing the projected points
+            and other relevant information.
+    """
+
     if p is None:
         p = SimulParams()
     if p.distortion_center is None:
