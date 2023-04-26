@@ -8,7 +8,8 @@ def solve_extrinsic(
     x: np.ndarray, X: np.ndarray, image_center: tuple[float, float]
 ) -> np.ndarray:
     """
-    Computes the extrinsic parameters of a camera, given the 2D image points and the 3D world points.
+    Computes the extrinsic parameters of a camera, given the 2D image points and
+    the 3D world points.
 
     Args:
         x (np.ndarray): Points in image space, with shape (n, 2),

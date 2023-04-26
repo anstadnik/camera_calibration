@@ -5,6 +5,22 @@ from icecream import ic
 def solve_intrinsic(
     x: np.ndarray, X: np.ndarray, H: np.ndarray
 ) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Computes the intrinsic parameters of a camera, given the 2D image points,
+    the 3D world points, and the extrinsic parameters.
+
+    Args:
+        x (np.ndarray): Points in image space, with shape (n, 2),
+            where n is the number of points and each point is represented as [x, y].
+        X (np.ndarray): Points in the board space, with shape (n, 2),
+            where n is the number of points and each point is represented as [y, x].
+        H (np.ndarray): A 3x3 array representing the extrinsic parameters of the camera.
+
+    Returns:
+        tuple[np.ndarray, np.ndarray]: A tuple containing the intrinsic parameters
+            (lambdas) and the updated extrinsic parameters (H)
+            with the third translation component (t_3).
+    """
     r_11, r_12, t_1, r_21, r_22, t_2, r_31, r_32, _ = H.flatten()
 
     def A(X):

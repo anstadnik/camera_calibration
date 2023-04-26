@@ -18,7 +18,7 @@ def test_solver():
     # draw_board(X)
     # draw_board(x)
     # X += 1
-    lambdas_, rt = solve(X, x, params.camera.image_center)
+    lambdas_, rt = solve(x, X, params.camera.image_center)
     ic(R)
     ic(t)
     ic(rt)
