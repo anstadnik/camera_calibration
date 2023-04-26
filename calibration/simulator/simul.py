@@ -5,7 +5,7 @@ import numpy as np
 from numpy.linalg import qr
 from scipy.optimize import root_scalar
 
-from .camera import generate_intrinsic_matrix
+from .camera import Camera
 
 
 @dataclass
@@ -17,7 +17,7 @@ class SimulParams:
     lambdas: np.ndarray = field(
         default_factory=lambda: np.random.uniform([-1.9, -1.9], [-0.1, -0.1])
     )
-    K: np.ndarray = field(default_factory=generate_intrinsic_matrix)
+    camera: Camera = field(default_factory=Camera)
     distortion_center: np.ndarray | None = None
 
 
@@ -53,7 +53,7 @@ def simul_projection(X: np.ndarray, p: SimulParams | None = None) -> SimulOut:
     x *= (r_hat / r)[:, np.newaxis]
 
     x[:, 2] = 1
-    x = (p.K @ x.T).T
+    x = (p.camera.intrinsic_matrix @ x.T).T
     x /= x[:, 2][:, None]
     x = x[:, :2]
 

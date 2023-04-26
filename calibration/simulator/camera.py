@@ -1,20 +1,40 @@
+from dataclasses import dataclass
+
 import numpy as np
-import pysnooper
 
 
-# @pysnooper.snoop()
-def generate_intrinsic_matrix(
-    focal_length=35.0, sensor_size=(36.0, 24.0), resolution=(1200, 800), skew=0.0
-):
-    # Compute the pixel size in millimeters
-    pixel_size = (sensor_size[0] / resolution[0], sensor_size[1] / resolution[1])
+@dataclass
+class Camera:
+    focal_length: float = 35.0
+    sensor_size: tuple = (36.0, 24.0)
+    resolution: tuple = (1200, 800)
+    skew: float = 0.0
 
-    # Compute the focal length in pixels
-    fx = focal_length / pixel_size[0]
-    fy = focal_length / pixel_size[1]
+    @property
+    def pixel_size(self) -> tuple:
+        return (
+            self.sensor_size[0] / self.resolution[0],
+            self.sensor_size[1] / self.resolution[1],
+        )
 
-    # Compute the principal point (optical center) in pixels
-    cx = resolution[0] / 2
-    cy = resolution[1] / 2
+    @property
+    def fx(self) -> float:
+        return self.focal_length / self.pixel_size[0]
 
-    return np.array([[fx, skew, cx], [0, fy, cy], [0, 0, 1]])
+    @property
+    def fy(self) -> float:
+        return self.focal_length / self.pixel_size[1]
+
+    @property
+    def image_center(self) -> tuple[float, float]:
+        return self.resolution[0] / 2, self.resolution[1] / 2
+
+    @property
+    def intrinsic_matrix(self) -> np.ndarray:
+        return np.array(
+            [
+                [self.fx, self.skew, self.image_center[0]],
+                [0, self.fy, self.image_center[1]],
+                [0, 0, 1],
+            ]
+        )

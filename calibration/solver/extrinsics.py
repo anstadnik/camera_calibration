@@ -3,7 +3,9 @@ from icecream import ic
 from scipy.linalg import svd
 
 
-def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> np.ndarray:
+def solve_extrinsic(
+    x: np.ndarray, X: np.ndarray, image_center: tuple[float, float]
+) -> np.ndarray:
     """Solve for extrinsic parameters
 
     Args:
@@ -13,8 +15,9 @@ def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> np.ndarray:
     Returns:
         H: mx6 matrix of extrinsic parameters
     """
+    x -= image_center
     M = np.vstack(
-        [[-v * X, -v * Y, u * X, u * Y, -v, u] for (u, v), (X, Y) in zip(x, X)]
+        [[-v * X_, -v * Y, u * X_, u * Y, -v, u] for (u, v), (X_, Y) in zip(x, X)]
     )
 
     _, _, V = svd(M, full_matrices=False)
@@ -61,6 +64,9 @@ def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> np.ndarray:
                     [[r_11, r_12, t_1], [r_21, r_22, t_2], [r_31[i1], r_32[i1], 0]]
                 )
             )
+
+    for i in range(RR.shape[2]):
+        ic(RR[:, :, i])
 
     minRR = np.inf
     minRR_ind = -1

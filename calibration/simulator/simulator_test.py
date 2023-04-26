@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 
 from .board import gen_charuco_grid, gen_checkerboard_grid
-from .camera import generate_intrinsic_matrix
+from .camera import Camera
 
 
 class TestBoard(unittest.TestCase):
@@ -56,7 +56,7 @@ class TestIntrinsicMatrix(unittest.TestCase):
         expected_matrix = np.array(
             [[1166.66667, 0, 600], [0, 1166.66667, 400], [0, 0, 1]]
         )
-        result_matrix = generate_intrinsic_matrix()
+        result_matrix = Camera().intrinsic_matrix
         print(result_matrix)
         np.testing.assert_array_almost_equal(result_matrix, expected_matrix, decimal=5)
 
@@ -69,5 +69,7 @@ class TestIntrinsicMatrix(unittest.TestCase):
         expected_matrix = np.array(
             [[6480.0, 1.0, 960.0], [0.0, 4860.0, 540.0], [0.0, 0.0, 1.0]]
         )
-        result_matrix = generate_intrinsic_matrix(f, sensor_size, resolution, skew)
+        result_matrix = Camera(
+            focal_length=f, sensor_size=sensor_size, resolution=resolution, skew=skew
+        ).intrinsic_matrix
         np.testing.assert_array_almost_equal(result_matrix, expected_matrix, decimal=5)
