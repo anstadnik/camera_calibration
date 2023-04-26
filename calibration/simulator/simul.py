@@ -84,16 +84,19 @@ def simul_projection(X: np.ndarray, p: SimulParams | None = None) -> SimulOut:
 
     if p is None:
         p = SimulParams()
-    if p.distortion_center is None:
-        p.distortion_center = X.mean(axis=0)
 
     n = X.shape[0]
-    X_h = np.c_[X - p.distortion_center, np.ones(n)]
+    X_h = np.c_[X, np.ones(n)]
 
     P = np.c_[p.R[:, :2], p.t]
 
     x = (P @ X_h.T).T
     x /= x[:, 2][:, None] + EPS
+
+    if p.distortion_center is None:
+        p.distortion_center = x[:, :2].mean(axis=0)
+
+    x[:, :2] -= p.distortion_center
 
     r = np.linalg.norm(x[:, :2], axis=1) + EPS
 
@@ -112,5 +115,6 @@ def simul_projection(X: np.ndarray, p: SimulParams | None = None) -> SimulOut:
     x = (p.camera.intrinsic_matrix @ x.T).T
     x /= x[:, 2][:, None]
     x = x[:, :2]
+    x += p.distortion_center
 
     return SimulOut(X, x, p.lambdas, p.R, p.t)

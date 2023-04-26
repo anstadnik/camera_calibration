@@ -2,6 +2,7 @@ import numpy as np
 from icecream import ic
 from scipy.linalg import svd
 
+from calibration.solver.closed_form import orthonormality_closed_form
 
 
 def solve_extrinsic(
@@ -15,7 +16,7 @@ def solve_extrinsic(
         x (np.ndarray): Points in image space, with shape (n, 2),
             where n is the number of points and each point is represented as [x, y].
         X (np.ndarray): Points in the board space, with shape (n, 2),
-            where n is the number of points and each point is represented as [y, x].
+            where n is the number of points and each point is represented as [x, y].
         image_center (tuple[float, float]): A tuple representing the
             image center coordinates (x, y).
 
@@ -39,12 +40,11 @@ def solve_extrinsic(
     r_32_2 = np.roots([1, CC - BB, -AA])
     r_32_2 = r_32_2[(r_32_2 >= 0) & (r_32_2 <= 2000)]
 
-    # r_32_2_closed_form = [
-    #     r for r in orthonormality_closed_form(r_11, r_12, r_21, r_22)
-    #     if 0 <= r <= 2000
-    # ]
+    r_32_2_closed_form = [
+        r for r in orthonormality_closed_form(r_11, r_12, r_21, r_22) if 0 <= r <= 2000
+    ]
 
-    # assert np.allclose(r_32_2, r_32_2_closed_form)
+    assert np.allclose(r_32_2, r_32_2_closed_form)
     assert len(r_32_2) != 0
 
     r_31, r_32 = [], []

@@ -33,5 +33,7 @@ def gen_charuco_grid(h: int, w: int, s1: float, s2: float | None = None) -> np.n
     return np.array([[x[j], y[i]] for i in range(h) for j in range(w)])
 
 
-def draw_board(board: np.ndarray):
-    px.scatter(x=board[:, 0], y=board[:, 1]).show()
+def draw_board(board: np.ndarray, max_xy: tuple[float, float] | None = None):
+    range_x = None if max_xy is None else (0, max_xy[0])
+    range_y = None if max_xy is None else (0, max_xy[1])
+    px.scatter(x=board[:, 0], y=board[:, 1], range_x=range_x, range_y=range_y).show()

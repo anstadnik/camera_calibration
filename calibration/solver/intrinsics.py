@@ -13,7 +13,7 @@ def solve_intrinsic(
         x (np.ndarray): Points in image space, with shape (n, 2),
             where n is the number of points and each point is represented as [x, y].
         X (np.ndarray): Points in the board space, with shape (n, 2),
-            where n is the number of points and each point is represented as [y, x].
+            where n is the number of points and each point is represented as [x, y].
         H (np.ndarray): A 3x3 array representing the extrinsic parameters of the camera.
 
     Returns:
