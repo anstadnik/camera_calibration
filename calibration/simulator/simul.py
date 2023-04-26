@@ -5,6 +5,8 @@ import numpy as np
 from numpy.linalg import qr
 from scipy.optimize import root_scalar
 
+from .camera import generate_intrinsic_matrix
+
 
 @dataclass
 class SimulParams:
@@ -15,11 +17,7 @@ class SimulParams:
     lambdas: np.ndarray = field(
         default_factory=lambda: np.random.uniform([-1.9, -1.9], [-0.1, -0.1])
     )
-    K: np.ndarray = field(
-        default_factory=lambda: np.array(
-            [[1166.67, 0.0, 600.0], [0.0, 1166.67, 400.0], [0.0, 0.0, 1.0]]
-        )
-    )
+    K: np.ndarray = field(default_factory=generate_intrinsic_matrix)
     distortion_center: np.ndarray | None = None
 
 
@@ -38,7 +36,6 @@ def simul_projection(X: np.ndarray, p: SimulParams | None = None) -> SimulOut:
 
     P = np.c_[p.R[:, :2], p.t]
 
-    # x = np.matmul(P, X_h.T).T
     x = (P @ X_h.T).T
     x /= x[:, 2][:, None] + EPS
 
@@ -56,9 +53,7 @@ def simul_projection(X: np.ndarray, p: SimulParams | None = None) -> SimulOut:
     x *= (r_hat / r)[:, np.newaxis]
 
     x[:, 2] = 1
-    # x = np.matmul(K, x.T).T
     x = (p.K @ x.T).T
-    # x = np.array([vgtk.project(xi) for xi in x])
     x /= x[:, 2][:, None]
     x = x[:, :2]
 
