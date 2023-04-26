@@ -6,7 +6,7 @@ from calibration.solver.closed_form import orthonormality_closed_form
 
 
 def solve_extrinsic(
-    x: np.ndarray, X: np.ndarray, image_center: tuple[float, float]
+    x: np.ndarray, X: np.ndarray, image_center: np.ndarray
 ) -> np.ndarray:
     """
     Computes the extrinsic parameters of a camera, given the 2D image points and
@@ -22,9 +22,9 @@ def solve_extrinsic(
 
     Returns:
         np.ndarray: A 3x3 array representing the extrinsic parameters of the camera."""
-    x -= image_center
+    # np.testing.assert_array_equal(x.mean(axis=0), (0, 0))
     M = np.vstack(
-        [[-v * X_, -v * Y, u * X_, u * Y, -v, u] for (u, v), (X_, Y) in zip(x, X)]
+        [[-v * X_, -v * Y_, u * X_, u * Y_, -v, u] for (u, v), (X_, Y_) in zip(x, X)]
     )
 
     _, _, V = svd(M, full_matrices=False)

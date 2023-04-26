@@ -5,7 +5,7 @@ from .intrinsics import solve_intrinsic
 
 
 def solve(
-    x: np.ndarray, X: np.ndarray, image_center: tuple[float, float]
+    x: np.ndarray, X: np.ndarray, image_center: np.ndarray
 ) -> tuple[np.ndarray, np.ndarray]:
     p = solve_extrinsic(x, X, image_center)
     lambdas, t_3 = solve_intrinsic(x, X, p)
