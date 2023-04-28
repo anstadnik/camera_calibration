@@ -8,7 +8,7 @@ from calibration.solver.solve import solve
 
 def test_solver():
     # params = SimulParams(
-    #     R=np.eye(3), t=np.array([0, 0, 10]), lambdas=np.array([0.0, 0.0])
+    #     R=np.eye(3), t=np.array([-4, -3, 15]), lambdas=np.array([0.0, 0.0])
     # )
     params = SimulParams(R=np.eye(3), t=np.array([-4, -3, 15]))
     # params.t[:2] = params.camera.principal_point
@@ -22,12 +22,17 @@ def test_solver():
 
     assert (x > 0).all()
     assert (x < params.camera.resolution).all()
-    lambdas_, rt = solve(x, X, params.camera.image_center)
-    ic(R)
-    ic(t)
-    ic(rt)
-    ic(lambdas, lambdas_)
+    lambdas_, R_, t_ = solve(x, X, params.camera.image_center)
+    ic(R.round(3))
+    ic(R_.round(3))
+    ic(t.round(3))
+    ic(t_.round(3))
+    ic(lambdas.round(3), lambdas_.round(3))
 
 
 if __name__ == "__main__":
+    np.random.seed(44)
     test_solver()
+    # df = gen_data()
+    # # df.to_pickle("/tmp/data.pkl")
+    # # df = pd.read_pickle("/tmp/data.pkl")

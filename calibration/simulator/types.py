@@ -32,7 +32,8 @@ class SimulParams:
         default_factory=lambda: np.random.uniform([-5.0, -5, 5.0], [5.0, 5, 15.0])
     )
     lambdas: np.ndarray = field(
-        default_factory=lambda: np.random.uniform([-1.9, -1.9], [-0.1, -0.1])
+        # default_factory=lambda: np.random.uniform([-3, 0], [3, 3])
+        default_factory=lambda: np.random.uniform([-3, -3], [3, 3])
     )
     camera: Camera = field(default_factory=Camera)
     distortion_center: np.ndarray | None = None

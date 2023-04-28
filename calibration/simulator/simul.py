@@ -3,7 +3,6 @@ import numpy as np
 from .helpers import apply_distortion, apply_extrinsics, apply_intrinsics
 from .types import SimulOut, SimulParams
 
-
 def simul_projection(X: np.ndarray, p: SimulParams | None = None) -> SimulOut:
     """
     Simulates the projection of board points (X) onto a image plane,

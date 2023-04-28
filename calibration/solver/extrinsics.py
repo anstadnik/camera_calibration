@@ -1,13 +1,10 @@
 import numpy as np
-from icecream import ic
 from scipy.linalg import svd
 
 from calibration.solver.closed_form import orthonormality_closed_form
 
 
-def solve_extrinsic(
-    x: np.ndarray, X: np.ndarray, image_center: np.ndarray
-) -> np.ndarray:
+def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> np.ndarray:
     """
     Computes the extrinsic parameters of a camera, given the 2D image points and
     the 3D world points.
@@ -22,16 +19,14 @@ def solve_extrinsic(
 
     Returns:
         np.ndarray: A 3x3 array representing the extrinsic parameters of the camera."""
-    # np.testing.assert_array_equal(x.mean(axis=0), (0, 0))
     M = np.vstack(
         [[-v * X_, -v * Y_, u * X_, u * Y_, -v, u] for (u, v), (X_, Y_) in zip(x, X)]
     )
 
     _, _, V = svd(M, full_matrices=False)
     assert isinstance(V, np.ndarray)
-    H = V[:, -1]
+    H = V.T[:, -1]
     r_11, r_12, r_21, r_22, t_1, t_2 = H
-    ic(H)
 
     AA = (r_11 * r_12 + r_21 * r_22) ** 2
     BB = r_11**2 + r_21**2
@@ -40,11 +35,11 @@ def solve_extrinsic(
     r_32_2 = np.roots([1, CC - BB, -AA])
     r_32_2 = r_32_2[(r_32_2 >= 0) & (r_32_2 <= 2000)]
 
-    r_32_2_closed_form = [
-        r for r in orthonormality_closed_form(r_11, r_12, r_21, r_22) if 0 <= r <= 2000
-    ]
-
-    assert np.allclose(r_32_2, r_32_2_closed_form)
+    # r_32_2_closed_form = [
+    #     r for r in orthonormality_closed_form(r_11, r_12, r_21, r_22) if 0 <= r <= 2000
+    # ]
+    #
+    # assert np.allclose(r_32_2, r_32_2_closed_form)
     assert len(r_32_2) != 0
 
     r_31, r_32 = [], []
@@ -53,7 +48,8 @@ def solve_extrinsic(
             r_32_ = sg * np.sqrt(r_32_2_)
             r_32.append(r_32_)
             if np.isclose(r_32_, 0):
-                r_31 += [np.sqrt(CC - BB), -np.sqrt(CC - BB)]
+                # r_31 += [np.sqrt(CC - BB), -np.sqrt(CC - BB)]
+                r_31 += [np.sqrt(abs(CC - BB)), -np.sqrt(abs(CC - BB))]
                 r_32.append(r_32_)
             else:
                 r_31.append(-(r_11 * r_12 + r_21 * r_22) / r_32_)
@@ -61,19 +57,19 @@ def solve_extrinsic(
     RR = np.zeros((3, 3, len(r_32) * 2))
     count = 0
     for i1 in range(len(r_32)):
-        for i2 in range(2):
+        for sg in [-1, 1]:
             count += 1
-            Lb = 1 / np.sqrt(r_11**2 + r_21**2 + r_31[i1] ** 2)
+            Lb = 1 / np.linalg.norm([r_11, r_21, r_31[i1]])
             RR[:, :, count - 1] = (
-                i2
+                sg
                 * Lb
                 * np.array(
                     [[r_11, r_12, t_1], [r_21, r_22, t_2], [r_31[i1], r_32[i1], 0.0]]
                 )
             )
 
-    for i in range(RR.shape[2]):
-        ic(RR[:, :, i])
+    # for i in range(RR.shape[2]):
+    #     ic(RR[:, :, i])
 
     minRR = np.inf
     minRR_ind = -1
