@@ -3,6 +3,7 @@ import numpy as np
 from .helpers import apply_distortion, apply_extrinsics, apply_intrinsics
 from .types import SimulOut, SimulParams
 
+
 def simul_projection(X: np.ndarray, p: SimulParams | None = None) -> SimulOut:
     """
     Simulates the projection of board points (X) onto a image plane,
@@ -23,11 +24,6 @@ def simul_projection(X: np.ndarray, p: SimulParams | None = None) -> SimulOut:
     """
 
     p = p if p is not None else SimulParams()
-    p.distortion_center = (
-        p.distortion_center
-        if p.distortion_center is not None
-        else p.camera.principal_point
-    )
 
     x = apply_extrinsics(X, p)
     x = apply_distortion(x, p)

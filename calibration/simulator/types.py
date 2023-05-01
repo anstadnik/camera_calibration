@@ -8,23 +8,23 @@ from .camera import Camera
 
 
 def _gen_lambdas() -> np.ndarray:
-    l1 = np.random.uniform(-5, 5)
-    l2 = (
-        np.random.uniform(
-            -1.92307692307692 * l1 - 3.69822485207101e-6,
-            -1.92307692307692 * l1 + 0.00154514730705414,
-        )
-        / 1e6
-    )
-    print(l1, l2)
-    r = 301
-
-    def psi(r):
-        return 1 + l1 * r**2 + l2 * r**4
-
-    print(psi(r))
-    assert psi(r) <= 721
-    return np.array([l1, l2])
+    # l1 = np.random.uniform(-5, 5)
+    # l2 = (
+    #     np.random.uniform(
+    #         -1.92307692307692 * l1 - 3.69822485207101e-6,
+    #         -1.92307692307692 * l1 + 0.00154514730705414,
+    #     )
+    #     / 1e6
+    # )
+    # print(l1, l2)
+    # r = 301
+    #
+    # def psi(r):
+    #     return 1 + l1 * r**2 + l2 * r**4
+    #
+    # print(psi(r))
+    # assert psi(r) <= 721
+    return np.array([np.random.uniform(-100.0, 0.0), 0.0])
 
 
 @dataclass
@@ -55,7 +55,6 @@ class SimulParams:
     )
     lambdas: np.ndarray = field(default_factory=_gen_lambdas)
     camera: Camera = field(default_factory=Camera)
-    distortion_center: np.ndarray | None = None
 
 
 class SimulOut(NamedTuple):

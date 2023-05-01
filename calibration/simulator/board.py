@@ -38,6 +38,6 @@ def draw_board(
 ):
     range_x = None if max_xy is None else (0, max_xy[0])
     range_y = None if max_xy is None else (0, max_xy[1])
-    px.scatter(
+    return px.scatter(
         x=board[:, 0], y=board[:, 1], title=title, range_x=range_x, range_y=range_y
-    ).show()
+    )
