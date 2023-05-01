@@ -1,5 +1,0 @@
-numpy
-tqdm
-scipy
-plotly
-pandas
