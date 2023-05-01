@@ -14,6 +14,7 @@ dependencies:
 - pandas
 - plotly
 - python-lsp-server
+- ruff
 - scipy
 - tqdm
 
