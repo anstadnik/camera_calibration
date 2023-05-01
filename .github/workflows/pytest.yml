@@ -8,16 +8,27 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11"]
+    defaults:
+      run:
+        shell: bash -el {0}
 
     steps:
       - uses: actions/checkout@v3
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          mamba-version: "*"
           python-version: ${{ matrix.python-version }}
+          mamba-version: "*"
+          channels: conda-forge,defaults
+          channel-priority: true
           environment-file: environment.yml
           activate-environment: camera_calibration
+      - run: |
+          conda info
+          conda list
+          conda config --show-sources
+          conda config --show
+          printenv | sort
       - name: Lint with ruff
         run: |
           # stop the build if there are Python syntax errors or undefined names
