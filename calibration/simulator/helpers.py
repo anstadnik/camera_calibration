@@ -1,13 +1,14 @@
 import numpy as np
+from icecream import ic
 from scipy.optimize import root_scalar
 
 from .types import SimulParams
-from icecream import ic
+
 
 def apply_extrinsics(X: np.ndarray, p: SimulParams) -> np.ndarray:
     X_h = np.c_[X, np.ones(X.shape[0])]
     P = np.c_[p.R[:, :2], p.t]
-    ic(P )
+    ic(P)
     x = (P @ X_h.T).T
     x /= x[:, 2][:, None]
     return x
@@ -23,8 +24,9 @@ def apply_distortion(x: np.ndarray, p: SimulParams) -> np.ndarray:
     def f(r, x):
         return np.linalg.norm(x[:2]) * psi(r) - x[2] * r
 
+    max_r = np.linalg.norm(p.camera.resolution)
     r_hat = np.array(
-        [root_scalar(f, args=(xi,), bracket=(0, 1000)).root for xi in x[idx]]
+        [root_scalar(f, args=(xi,), bracket=(0, max_r)).root for xi in x[idx]]
     )
 
     x[idx] *= (r_hat / r[idx])[:, np.newaxis]

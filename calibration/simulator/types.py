@@ -7,6 +7,26 @@ from numpy.linalg import qr
 from .camera import Camera
 
 
+def _gen_lambdas() -> np.ndarray:
+    l1 = np.random.uniform(-5, 5)
+    l2 = (
+        np.random.uniform(
+            -1.92307692307692 * l1 - 3.69822485207101e-6,
+            -1.92307692307692 * l1 + 0.00154514730705414,
+        )
+        / 1e6
+    )
+    print(l1, l2)
+    r = 301
+
+    def psi(r):
+        return 1 + l1 * r**2 + l2 * r**4
+
+    print(psi(r))
+    assert psi(r) <= 721
+    return np.array([l1, l2])
+
+
 @dataclass
 class SimulParams:
     """
@@ -29,12 +49,11 @@ class SimulParams:
 
     R: np.ndarray = field(default_factory=lambda: qr(np.random.randn(3, 3))[0])
     t: np.ndarray = field(
-        default_factory=lambda: np.random.uniform([-5.0, -5, 5.0], [5.0, 5, 15.0])
+        default_factory=lambda: np.random.uniform(
+            [-6.0, -4.0, 20.0], [-2.0, -2.0, 100.0]
+        )
     )
-    lambdas: np.ndarray = field(
-        # default_factory=lambda: np.random.uniform([-3, 0], [3, 3])
-        default_factory=lambda: np.random.uniform([-3, -3], [3, 3])
-    )
+    lambdas: np.ndarray = field(default_factory=_gen_lambdas)
     camera: Camera = field(default_factory=Camera)
     distortion_center: np.ndarray | None = None
 

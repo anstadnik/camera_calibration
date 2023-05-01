@@ -10,7 +10,7 @@ def test_solver():
     # params = SimulParams(
     #     R=np.eye(3), t=np.array([-4, -3, 15]), lambdas=np.array([0.0, 0.0])
     # )
-    params = SimulParams(R=np.eye(3), t=np.array([-4, -3, 15]))
+    params = SimulParams(R=np.eye(3), t=np.array([-2, -2, 20]))
     # params.t[:2] = params.camera.principal_point
     # params = SimulParams()
 
@@ -31,7 +31,7 @@ def test_solver():
 
 
 if __name__ == "__main__":
-    np.random.seed(44)
+    # np.random.seed(44)
     test_solver()
     # df = gen_data()
     # # df.to_pickle("/tmp/data.pkl")
