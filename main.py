@@ -1,4 +1,5 @@
 import numpy as np
+import plotly.express as px
 import pandas as pd
 from icecream import ic
 
@@ -6,6 +7,7 @@ from calibration.benchmark.benchmark import gen_data
 from calibration.simulator.board import gen_checkerboard_grid
 from calibration.simulator.simul import SimulParams, simul_projection
 from calibration.solver.solve import solve
+from calibration.data.babelcalib.orpc import load_babelcalib
 
 
 def test_solver():
@@ -35,6 +37,14 @@ def test_solver():
 if __name__ == "__main__":
     # np.random.seed(44)
     # test_solver()
-    df = gen_data()
-    df.to_pickle("/tmp/data.pkl")
-    df = pd.read_pickle("/tmp/data.pkl")
+    # df = gen_data()
+    # df.to_pickle("/tmp/data.pkl")
+    # df = pd.read_pickle("/tmp/data.pkl")
+    datasets = load_babelcalib()
+    for ds in datasets:
+        pass
+        # print(ds.name)
+        # print(len(ds.test))
+        # print(len(ds.train))
+        # px.imshow(ds.test[0].image).show()
+        # break
