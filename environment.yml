@@ -1,0 +1,23 @@
+name: camera_calibration
+channels:
+- conda-forge
+dependencies:
+- black
+- icecream
+- ipdb
+- ipython
+- ipywidgets
+- isort
+- jupyterlab-git
+- jupyterlab-katex
+- jupyterlab-lsp
+- jupyterlab_code_formatter
+- numpy
+- pandas
+- plotly
+- pytest
+- python-lsp-server
+- ruff
+- scipy
+- tqdm
+
