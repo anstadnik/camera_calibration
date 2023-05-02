@@ -72,8 +72,8 @@ def gen_data(n=int(1e6)) -> pd.DataFrame:
         + list(R_.flatten())
         + list(t)
         + list(t_)
-        + [out_of_img, had_ve, not_enough_points]
-        for lambdas, lambdas_, R, R_, t, t_, out_of_img, had_ve, not_enough_points in results
+        + [n_out, had_ve, not_enough_pts]
+        for lambdas, lambdas_, R, R_, t, t_, n_out, had_ve, not_enough_pts in results
     ]
     if any(r[-1] is None for r in results):
         __import__("ipdb").set_trace()
