@@ -8,13 +8,13 @@ from .camera import Camera
 
 
 def _gen_lambdas() -> np.ndarray:
-    # l1 = np.random.uniform(-5, 5)
-    # l2 = np.random.uniform(
-    #     -2.61752136752137 * l1 - 6.85141810943093,
-    #     -2.61752136752137 * l1 - 4.39190876941321,
-    # )
-    # return np.array([l1, l2])
-    return np.random.uniform(-5, 5, size=2)
+    l1 = np.random.uniform(-5, 5)
+    l2 = np.random.uniform(
+        -2.61752136752137 * l1 - 6.85141810943093,
+        -2.61752136752137 * l1 - 4.39190876941320,
+    )
+    return np.array([l1, l2])
+    # return np.random.uniform(-5, 5, size=2)
 
 
 @dataclass
