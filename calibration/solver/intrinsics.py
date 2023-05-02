@@ -1,5 +1,4 @@
 import numpy as np
-import plotly.express as px
 
 
 def solve_intrinsic(
@@ -46,7 +45,7 @@ def solve_intrinsic(
     p_vals = np.linalg.norm(x[:, :2], axis=1)
     # Duplicate values [p_1, p_1, p_2, p_2, ..., p_k, p_k]
     p_vals = p_vals.repeat(2)
-    p_vals = p_vals.reshape(-1, 1) ** np.arange(N + 1).reshape(1, -1)
+    p_vals = p_vals.reshape(-1, 1) ** (2 * np.arange(1, N + 1).reshape(1, -1))
 
     A_C_p_mat = A_C_vec[:, None] * p_vals
 
@@ -60,6 +59,7 @@ def solve_intrinsic(
 
     # Interleaving B and D
     B_D_vec = np.c_[B_vec, D_vec].flatten()
+    B_D_vec -= A_C_vec
     # __import__("ipdb").set_trace()
 
     a_t = np.linalg.lstsq(M, B_D_vec, rcond=None)[0]
@@ -72,4 +72,4 @@ def solve_intrinsic(
     # px.bar(a_t).show()
     # px.bar(M @ a_t - B_D_vec).show()
 
-    return a_t[: N + 1], a_t[N + 1]
+    return a_t[:N], a_t[N]
