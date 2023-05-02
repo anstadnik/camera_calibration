@@ -60,16 +60,7 @@ def solve_intrinsic(
     # Interleaving B and D
     B_D_vec = np.c_[B_vec, D_vec].flatten()
     B_D_vec -= A_C_vec
-    # __import__("ipdb").set_trace()
 
     a_t = np.linalg.lstsq(M, B_D_vec, rcond=None)[0]
-    # print(M)
-    # print(B_D_vec)
-    # print(a_t)
-    # print(M @ a_t - B_D_vec)
-    # px.imshow(M).show()
-    # px.bar(B_D_vec).show()
-    # px.bar(a_t).show()
-    # px.bar(M @ a_t - B_D_vec).show()
 
     return a_t[:N], a_t[N]

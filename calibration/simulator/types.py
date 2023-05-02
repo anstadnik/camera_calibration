@@ -8,21 +8,13 @@ from .camera import Camera
 
 
 def _gen_lambdas() -> np.ndarray:
-    l1 = np.random.uniform(-5, 5)
-    l2 = np.random.uniform(
-        -2.61752136752137 * l1 - 6.85141810943093,
-        -2.61752136752137 * l1 - 4.39190876941321,
-    )
-    # print(l1, l2)
-    # r = 301
-    #
-    # def psi(r):
-    #     return 1 + l1 * r**2 + l2 * r**4
-    #
-    # print(psi(r))
-    # assert psi(r) <= 721
-    return np.array([l1, l2])
-    # return np.array([np.random.uniform(-100.0, 0.0), 0.0])
+    # l1 = np.random.uniform(-5, 5)
+    # l2 = np.random.uniform(
+    #     -2.61752136752137 * l1 - 6.85141810943093,
+    #     -2.61752136752137 * l1 - 4.39190876941321,
+    # )
+    # return np.array([l1, l2])
+    return np.random.uniform(-5, 5, size=2)
 
 
 @dataclass

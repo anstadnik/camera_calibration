@@ -1,8 +1,6 @@
 import numpy as np
 from scipy.linalg import svd
 
-from calibration.solver.closed_form import orthonormality_closed_form
-
 
 def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> np.ndarray:
     """
@@ -32,11 +30,13 @@ def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> np.ndarray:
     BB = r_11**2 + r_21**2
     CC = r_12**2 + r_22**2
 
+    # TODO: Use resolution
     r_32_2 = np.roots([1, CC - BB, -AA])
-    r_32_2 = r_32_2[(r_32_2 >= 0) & (r_32_2 <= 2000)]
+    r_32_2 = r_32_2[(r_32_2 >= 0) & (r_32_2 <= 1000)]
 
     # r_32_2_closed_form = [
-    #     r for r in orthonormality_closed_form(r_11, r_12, r_21, r_22) if 0 <= r <= 2000
+    #     r for r in orthonormality_closed_form(r_11, r_12, r_21, r_22)
+    #     if 0 <= r <= 1000
     # ]
     #
     # assert np.allclose(r_32_2, r_32_2_closed_form)

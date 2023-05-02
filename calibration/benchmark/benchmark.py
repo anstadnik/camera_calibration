@@ -45,11 +45,14 @@ def gen_sample(_):
         ]
         assert ret[-1] is not None
         return ret
-    lambdas_, R_, t_ = solve(x, X, params.camera.image_center)
+    lambdas_, R_, t_ = solve(x, X, params.camera.intrinsic_matrix)
     # Should be the case
     # assert lambdas_[0] == 1
-    lambdas_ = lambdas[1:]
+    # lambdas_ = lambdas[1:]
 
+    assert lambdas.shape == lambdas_.shape == (2,)
+    assert R.shape == R_.shape == (3, 3)
+    assert t.shape == t_.shape == (3,)
     ret = [lambdas, lambdas_, R, R_, t, t_, out_of_img.sum(), False, False]
     assert ret[-1] is not None
     return ret
