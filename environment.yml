@@ -4,7 +4,9 @@ channels:
 dependencies:
 - black
 - icecream
+- ipdb
 - ipython
+- ipywidgets
 - isort
 - jupyterlab-git
 - jupyterlab-katex
@@ -13,6 +15,7 @@ dependencies:
 - numpy
 - pandas
 - plotly
+- pytest
 - python-lsp-server
 - ruff
 - scipy
