@@ -13,6 +13,9 @@ def apply_extrinsics(X: np.ndarray, p: SimulParams) -> np.ndarray:
 
 
 def apply_distortion(x: np.ndarray, p: SimulParams) -> np.ndarray:
+    # x_norm = x.max(axis=0)
+    # x /= x_norm
+
     r = np.linalg.norm(x[:, :2], axis=1)
     idx = r > 0
 
@@ -31,6 +34,8 @@ def apply_distortion(x: np.ndarray, p: SimulParams) -> np.ndarray:
     )
 
     x[idx] *= (r_hat / r[idx])[:, np.newaxis]
+
+    # x *= x_norm
 
     x[:, 2] = 1
     return x
