@@ -1,4 +1,4 @@
-name: Python package
+name: Build, lint and test
 
 on: [pull_request]
 
