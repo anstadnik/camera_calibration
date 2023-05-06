@@ -1,0 +1,6 @@
+[submodule "deltille"]
+	path = others/deltille
+	url = https://github.com/facebookarchive/deltille
+[submodule "others/OCamCalib"]
+	path = others/OCamCalib
+	url = git@github.com:anstadnik/OCamCalib.git
