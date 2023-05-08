@@ -1,6 +1,15 @@
 [submodule "deltille"]
 	path = others/deltille
-	url = https://github.com/facebookarchive/deltille
+	url = git@github.com:anstadnik/deltille.git
 [submodule "others/OCamCalib"]
 	path = others/OCamCalib
 	url = git@github.com:anstadnik/OCamCalib.git
+[submodule "others/tartancalib"]
+	path = others/tartancalib
+	url = https://github.com/castacks/tartancalib
+[submodule "others/kalibr"]
+	path = others/kalibr
+	url = https://github.com/ethz-asl/kalibr
+[submodule "others/camera_calibration"]
+	path = others/camera_calibration
+	url = https://github.com/puzzlepaint/camera_calibration
