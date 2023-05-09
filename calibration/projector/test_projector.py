@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from calibration.simulator.simulator import Projector
+from calibration.projector.projector import Projector
 
 from .board import gen_charuco_grid, gen_checkerboard_grid
 from .camera import Camera

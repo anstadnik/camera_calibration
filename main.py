@@ -1,9 +1,8 @@
 import numpy as np
 from icecream import ic
 
-from calibration.simulator.board import draw_board, gen_checkerboard_grid
-from calibration.simulator.simulator import Projector
-from calibration.solver.reproject import reprojectpoints
+from calibration.projector.board import draw_board, gen_checkerboard_grid
+from calibration.projector.projector import Projector
 from calibration.solver.solve import solve
 
 
@@ -33,8 +32,6 @@ def test_solver():
     ic(projector.t.round(3))
     ic(t_inv_.round(3))
     ic(projector.lambdas.round(3), lambdas_.round(3))
-
-    reprojectpoints(x, X, projector.lambdas, projector.R, projector.t)
 
 
 if __name__ == "__main__":
