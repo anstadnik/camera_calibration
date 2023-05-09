@@ -2,50 +2,49 @@ import numpy as np
 import pandas as pd
 from tqdm.contrib.concurrent import process_map
 
-from calibration.simulator.board import gen_checkerboard_grid
-from calibration.simulator.simul import simul_projection
-from calibration.simulator.types import Projector
+from calibration.projector.board import gen_checkerboard_grid
+from calibration.projector.projector import Projector
 from calibration.solver.solve import solve
 
 
 def gen_sample(_):
-    params = Projector()
+    projector = Projector()
     board = gen_checkerboard_grid(7, 9)
     try:
-        X, x, lambdas, R, t = simul_projection(board, params)
+        X, x, lambdas, R, t = projector.project(board)
     except ValueError as e:
         assert str(e) == "f(a) and f(b) must have different signs"
         ret = [
-            params.lambdas,
-            np.full_like(params.lambdas, np.nan),
-            params.R,
-            np.full_like(params.R, np.nan),
-            params.t,
-            np.full_like(params.t, np.nan),
+            projector.lambdas,
+            np.full_like(projector.lambdas, np.nan),
+            projector.R,
+            np.full_like(projector.R, np.nan),
+            projector.t,
+            np.full_like(projector.t, np.nan),
             np.nan,
             True,
             False,
         ]
         assert ret[-1] is not None
         return ret
-    out_of_img = ((x < 0) | (x > params.camera.resolution)).any(axis=1)
+    out_of_img = ((x < 0) | (x > projector.camera.resolution)).any(axis=1)
     X = X[~out_of_img]
     x = x[~out_of_img]
     if len(X) < 6:
         ret = [
-            params.lambdas,
-            np.full_like(params.lambdas, np.nan),
-            params.R,
-            np.full_like(params.R, np.nan),
-            params.t,
-            np.full_like(params.t, np.nan),
+            projector.lambdas,
+            np.full_like(projector.lambdas, np.nan),
+            projector.R,
+            np.full_like(projector.R, np.nan),
+            projector.t,
+            np.full_like(projector.t, np.nan),
             out_of_img.sum(),
             False,
             True,
         ]
         assert ret[-1] is not None
         return ret
-    lambdas_, R_, t_ = solve(x, X, params.camera.intrinsic_matrix)
+    lambdas_, R_, t_ = solve(x, X, projector.camera.intrinsic_matrix)
     # Should be the case
     # assert lambdas_[0] == 1
     # lambdas_ = lambdas[1:]
