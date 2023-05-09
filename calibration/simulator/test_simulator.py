@@ -2,6 +2,8 @@ import unittest
 
 import numpy as np
 
+from calibration.simulator.simulator import Projector
+
 from .board import gen_charuco_grid, gen_checkerboard_grid
 from .camera import Camera
 
@@ -51,7 +53,7 @@ class TestBoard(unittest.TestCase):
         gen_charuco_grid(3, 5, 0.4, 0.2)
 
 
-class TestIntrinsicMatrix(unittest.TestCase):
+class TestCamera(unittest.TestCase):
     def test_default_values(self):
         expected_matrix = np.array(
             [[1166.66667, 0, 600], [0, 1166.66667, 400], [0, 0, 1]]
@@ -73,3 +75,29 @@ class TestIntrinsicMatrix(unittest.TestCase):
             focal_length=f, sensor_size=sensor_size, resolution=resolution, skew=skew
         ).intrinsic_matrix
         np.testing.assert_array_almost_equal(result_matrix, expected_matrix, decimal=5)
+
+
+class TestProjector(unittest.TestCase):
+    def test_proj_equal_backproj(self):
+        R_ = np.eye(3)
+        t_ = np.array([-4, -3, 15])
+        lambdas_ = np.array([0.0, 0.0])
+
+        sensor_size_ = np.array([40, 30])
+        res = np.array([1920, 1080])
+
+        boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
+        cameras = [Camera(), Camera(135.0, sensor_size_, res, 1.0)]
+        for b_i, X in enumerate(boards):
+            for c_i, camera in enumerate(cameras):
+                projectors = [
+                    Projector(R=R_, t=t_, lambdas=lambdas_, camera=camera),
+                    Projector(R=R_, t=t_, camera=camera),
+                    # Projector(camera=camera),
+                ]
+                for p_i, projector in enumerate(projectors):
+                    with self.subTest(board_i=b_i, camera_i=c_i, projector_i=p_i):
+                        x = projector.project(X)
+                        X_ = projector.backproject(x)
+                        # self.assertTrue(False)
+                        np.testing.assert_array_almost_equal(X_, X, decimal=5)
