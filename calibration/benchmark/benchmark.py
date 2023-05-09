@@ -4,12 +4,12 @@ from tqdm.contrib.concurrent import process_map
 
 from calibration.simulator.board import gen_checkerboard_grid
 from calibration.simulator.simul import simul_projection
-from calibration.simulator.types import SimulParams
+from calibration.simulator.types import Projector
 from calibration.solver.solve import solve
 
 
 def gen_sample(_):
-    params = SimulParams()
+    params = Projector()
     board = gen_checkerboard_grid(7, 9)
     try:
         X, x, lambdas, R, t = simul_projection(board, params)
