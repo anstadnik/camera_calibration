@@ -14,8 +14,8 @@ dependencies:
 - jupyterlab_code_formatter
 - numpy
 - pandas
+- pillow
 - plotly
-- pytest
 - python-lsp-server
 - ruff
 - scipy
