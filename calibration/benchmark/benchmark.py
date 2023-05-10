@@ -1,6 +1,6 @@
 import numpy as np
-import pandas as pd
 from tqdm.contrib.concurrent import process_map
+import pandas as pd
 
 from calibration.projector.board import gen_checkerboard_grid
 from calibration.projector.projector import Projector
@@ -9,11 +9,11 @@ from calibration.solver.solve import solve
 
 def gen_sample(_):
     projector = Projector()
-    board = gen_checkerboard_grid(7, 9)
+    X = gen_checkerboard_grid(7, 9)
     try:
-        X, x, lambdas, R, t = projector.project(board)
+        x = projector.project(X)
     except ValueError as e:
-        assert str(e) == "f(a) and f(b) must have different signs"
+        assert str(e) == "f(a) and f(b) must have different signs", str(e)
         ret = [
             projector.lambdas,
             np.full_like(projector.lambdas, np.nan),
@@ -49,10 +49,20 @@ def gen_sample(_):
     # assert lambdas_[0] == 1
     # lambdas_ = lambdas[1:]
 
-    assert lambdas.shape == lambdas_.shape == (2,)
-    assert R.shape == R_.shape == (3, 3)
-    assert t.shape == t_.shape == (3,)
-    ret = [lambdas, lambdas_, R, R_, t, t_, out_of_img.sum(), False, False]
+    assert projector.lambdas.shape == lambdas_.shape == (2,)
+    assert projector.R.shape == R_.shape == (3, 3)
+    assert projector.t.shape == t_.shape == (3,)
+    ret = [
+        projector.lambdas,
+        lambdas_,
+        projector.R,
+        R_,
+        projector.t,
+        t_,
+        out_of_img.sum(),
+        False,
+        False,
+    ]
     assert ret[-1] is not None
     return ret
 

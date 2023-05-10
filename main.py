@@ -1,5 +1,6 @@
 import numpy as np
 from icecream import ic
+from calibration.benchmark.benchmark import gen_data
 
 from calibration.projector.board import draw_board, gen_checkerboard_grid
 from calibration.projector.projector import Projector
@@ -36,9 +37,9 @@ def test_solver():
 
 if __name__ == "__main__":
     # np.random.seed(44)
-    test_solver()
-    # df = gen_data()
-    # df.to_pickle("/tmp/data.pkl")
+    # test_solver()
+    df = gen_data()
+    df.to_pickle("/tmp/data.pkl")
     # df = pd.read_pickle("/tmp/data.pkl")
     # datasets = load_babelcalib()
     # for ds in datasets:
