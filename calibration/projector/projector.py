@@ -50,14 +50,6 @@ class Projector:
     lambdas: np.ndarray = field(default_factory=_gen_lambdas)
     camera: Camera = field(default_factory=Camera)
 
-    # @property
-    # def R_inv(self) -> np.ndarray:
-    #     return np.linalg.inv(self.R)
-    #
-    # @property
-    # def t_inv(self) -> np.ndarray:
-    #     return -self.t
-
     def project(self, X: np.ndarray) -> np.ndarray:
         """
         Simulates the projection of board points (X) onto a image plane,
@@ -79,6 +71,7 @@ class Projector:
         P_inv = np.linalg.inv(P)
         x = (P_inv @ X_h.T).T
         x /= x[:, 2][:, None]
+        np.testing.assert_almost_equal(x[:, 2], 1)
 
         # Distortion
         idx = np.linalg.norm(x[:, :2], axis=1) > 0
@@ -89,7 +82,7 @@ class Projector:
 
         # psi(r) / r == x[2] / norm(x[:2]) => psi(r) * norm(x:[2]) - r * x[2] == 0
         def f(r, x):
-            # x[2] == 0
+            # x[2] == 1
             return np.linalg.norm(x[:2]) * self.psi(r) - r
 
         max_r = np.linalg.norm(self.camera.resolution) / 2
@@ -98,7 +91,10 @@ class Projector:
         )
 
         # x[idx] *= (self.psi(r_hat) / x[idx, 2])[:, np.newaxis]
-        x[idx] *= self.psi(r_hat)[:, np.newaxis]
+        x[idx] *= (r_hat / np.linalg.norm(x[:, :2], axis=1))[:, np.newaxis]
+        np.testing.assert_almost_equal(
+            self.psi(np.linalg.norm(x[:, :2], axis=1)), x[:, 2]
+        )
         x[:, 2] = 1
 
         # Intrinsics
