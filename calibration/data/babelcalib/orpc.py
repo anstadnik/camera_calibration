@@ -1,11 +1,12 @@
 import os
-import plotly.express as px
-import pandas as pd
-
-from tqdm.auto import tqdm
-from typing import List
+import pickle
 from dataclasses import dataclass
+
+import pandas as pd
+import plotly.express as px
 from PIL import Image
+from plotly.graph_objs import Figure
+from tqdm.auto import tqdm
 
 
 @dataclass
@@ -24,37 +25,57 @@ class CalibrationData:
     height: int
     num_corners: int
     encoding: str
-    corners: List[Corner]
-    image: Image.Image
+    corners: list[Corner]
+    image: Image.Image | None
 
 
 @dataclass
 class Dataset:
     name: str
-    train: List[CalibrationData]
-    test: List[CalibrationData]
+    train: list[CalibrationData]
+    test: list[CalibrationData]
 
     @classmethod
     def from_dir(cls, dir_path: str, name: str) -> "Dataset":
-        train_dir = os.path.join(dir_path, "train")
-        test_dir = os.path.join(dir_path, "test")
-        train = cls._load(train_dir)
-        test = cls._load(test_dir)
+        train = cls._load(os.path.join(dir_path, "train"))
+        test = cls._load(os.path.join(dir_path, "test"))
         return cls(name, train, test)
 
     @staticmethod
-    def _load(dir_path: str) -> List[CalibrationData]:
-        calibration_data = []
-        if os.path.isdir(dir_path):
-            for file in os.listdir(dir_path):
-                if file.endswith(".orpc"):
-                    orpc_file = os.path.join(dir_path, file)
-                    calibration_data.append(Dataset._load_file(orpc_file))
-        return calibration_data
+    def _load(dir_path: str) -> list[CalibrationData]:
+        files = sorted(os.listdir(dir_path))
+        data = [
+            Dataset._load_orpc(os.path.join(dir_path, path))
+            for path in files
+            if path.endswith(".orpc")
+        ]
+
+        img_extensions = [".pgm", ".jpg", ".png", ""]
+
+        possible_img_name = os.path.join(dir_path, data[0].name)
+        possible_image_names = [possible_img_name + ext for ext in img_extensions]
+        try:
+            ext_id = list(map(os.path.isfile, possible_image_names)).index(True)
+            ext = img_extensions[ext_id]
+            assert all(
+                os.path.isfile(os.path.join(dir_path, f"{cd.name}{ext}")) for cd in data
+            )
+        except ValueError:
+            img_extensions.remove("")
+            img_pathes = sorted(
+                [f for f in files if any(map(f.endswith, img_extensions))]
+            )
+            assert len({p.split(".")[-1] for p in img_pathes}) == 1
+            for cal, img_path in zip(data, img_pathes):
+                img_path = os.path.join(dir_path, img_path)
+                with Image.open(img_path) as image:
+                    image.load()
+                    cal.image = image
+        return data
 
     @staticmethod
-    def _load_file(orpc_file: str) -> CalibrationData:
-        with open(orpc_file) as f:
+    def _load_orpc(orpc_path: str) -> CalibrationData:
+        with open(orpc_path) as f:
             lines = f.readlines()
             name = lines[0].split(":")[1].strip()
             width = int(lines[1].split(":")[1].strip())
@@ -72,29 +93,33 @@ class Dataset:
                     float(data[4]),
                 )
                 corners.append(corner)
-        jpeg_file = os.path.join(os.path.dirname(orpc_file), name + ".jpg")
-        image = Image.open(jpeg_file)
         return CalibrationData(
-            name, width, height, num_corners, encoding, corners, image
+            name, width, height, num_corners, encoding, corners, None
         )
 
 
-def load_babelcalib(data_dir="./data/BabelCalib", root_dir=None) -> List[Dataset]:
-    root_dir = root_dir or data_dir
+def load_babelcalib(data_dir="./data/BabelCalib", root_dir=None) -> list[Dataset]:
+    pkl_path = os.path.join(data_dir, "ds.pkl")
+    if root_dir is None and os.path.exists(pkl_path):
+        with open(pkl_path, "rb") as f:
+            return pickle.load(f)
     datasets = []
     for file in tqdm(os.listdir(data_dir), leave=False):
         full_path = os.path.join(data_dir, file)
         if os.path.isdir(full_path):
             dirs = os.listdir(full_path)
             if "train" in dirs and "test" in dirs:
-                name = os.path.relpath(full_path, start=root_dir)
+                name = os.path.relpath(full_path, start=root_dir or data_dir)
                 datasets.append(Dataset.from_dir(full_path, name=name))
             else:
-                datasets.extend(load_babelcalib(full_path, root_dir))
+                datasets.extend(load_babelcalib(full_path, root_dir or data_dir))
+    if root_dir is None:
+        with open(pkl_path, "wb") as f:
+            pickle.dump(datasets, f)
     return datasets
 
 
-def visualize(calibration_data: CalibrationData):
+def visualize(calibration_data: CalibrationData) -> Figure:
     df = pd.DataFrame(
         [[corner.x, corner.y] for corner in calibration_data.corners],
         columns=["x", "y"],
@@ -121,4 +146,4 @@ def visualize(calibration_data: CalibrationData):
             )
         ]
     )
-    fig.show()
+    return fig

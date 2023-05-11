@@ -1,7 +1,8 @@
 import numpy as np
 from icecream import ic
-from calibration.benchmark.benchmark import gen_data
+from tqdm.auto import tqdm
 
+from calibration.data.babelcalib.orpc import load_babelcalib, visualize
 from calibration.projector.board import draw_board, gen_checkerboard_grid
 from calibration.projector.projector import Projector
 from calibration.solver.solve import solve
@@ -38,8 +39,8 @@ def test_solver():
 if __name__ == "__main__":
     # np.random.seed(44)
     # test_solver()
-    df = gen_data()
-    df.to_pickle("/tmp/data.pkl")
+    # df = gen_data()
+    # df.to_pickle("/tmp/data.pkl")
     # df = pd.read_pickle("/tmp/data.pkl")
     # datasets = load_babelcalib()
     # for ds in datasets:
@@ -49,3 +50,14 @@ if __name__ == "__main__":
     # print(len(ds.train))
     # px.imshow(ds.test[0].image).show()
     # break
+    datasets = load_babelcalib()
+    for dataset in datasets:
+        name = dataset.name.replace("/", "_")
+        print(name)
+        for i, ds in tqdm(enumerate((dataset.train, dataset.test))):
+            visualize(ds[0]).show()
+            visualize(ds[3]).show()
+            visualize(ds[-1]).show()
+
+        if input() == "y":
+            break
