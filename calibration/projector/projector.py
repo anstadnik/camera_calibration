@@ -76,50 +76,35 @@ class Projector:
         P = np.c_[self.R[:, :2], self.t]
         x = (P @ X_h.T).T
         x /= x[:, 2][:, None]
-        x.copy()
 
         # Distortion
-        # distortion_center = (
-        #     np.linalg.inv(self.camera.intrinsic_matrix)
-        #     @ np.r_[self.camera.resolution, 1]
-        # ) / 2
-        # x[:, :2] -= distortion_center[:2]
-
         idx = np.linalg.norm(x[:, :2], axis=1) > 0
 
-        def f(lbd, x):
+        def f(r, x):
             # x[2] == 1
-            return self.psi(np.linalg.norm(x[:2]) / lbd) - x[2] / lbd
+            return np.linalg.norm(self.psi(r) * x[:2]) - r
 
-        max_lambda = np.linalg.norm(self.camera.resolution) / 2
-        lambdas = np.array(
-            [
-                root_scalar(
-                    f, args=(xi,), bracket=(0 + np.finfo(float).eps, max_lambda)
-                ).root
-                for xi in x[idx]
-            ]
+        max_point_img_space = np.r_[self.camera.resolution, 1]
+        max_point = np.linalg.inv(self.camera.intrinsic_matrix) @ max_point_img_space
+        max_r = np.linalg.norm(max_point[:2]) / 2
+        rs = np.array(
+            [root_scalar(f, args=(xi,), bracket=(0, max_r)).root for xi in x[idx]]
         )
 
         assert np.linalg.norm(x[:, :2], axis=1).shape == (63,)
-        assert lambdas.shape == (63,)
-        x[idx] /= lambdas[:, np.newaxis]
-        # np.testing.assert_array_almost_equal(x[:, 1] / x[:, 0], x1[:, 1] / x1[:, 0])
+        assert rs.shape == (63,)
+        x[idx] *= self.psi(rs)[:, np.newaxis]
         # print(np.c_[x[:, 1] / x[:, 0], x1[:, 1] / x1[:, 0]][:20])
-        # np.testing.assert_almost_equal(
-        #     self.psi(np.linalg.norm(x[:, :2], axis=1)), x[:, 2], decimal=5
-        # )
+        np.testing.assert_almost_equal(
+            self.psi(np.linalg.norm(x[:, :2], axis=1)), x[:, 2], decimal=5
+        )
         x[:, 2] = 1
-        # x[:, :2] += distortion_center[:2]
-        x.copy()
-        # np.testing.assert_array_almost_equal(x2[:, 1] / x2[:, 0], x1[:, 1] / x1[:, 0])
 
         # Intrinsics
         x = (self.camera.intrinsic_matrix @ x.T).T
         # Pyright bug
         x /= x[:, 2][:, None]  # type: ignore
         return x[:, :2]
-        # return x1[:, :2], x2[:, :2], x[:, :2]
 
     def backproject(self, x: np.ndarray) -> np.ndarray:
         """
