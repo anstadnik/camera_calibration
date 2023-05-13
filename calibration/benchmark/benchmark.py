@@ -88,12 +88,12 @@ def gen_data(n=int(1e6)) -> pd.DataFrame:
         __import__("ipdb").set_trace()
     df = pd.DataFrame(
         results,
-        columns=[f"lambda_gt_{i}" for i in range(n_lambdas)]
-        + [f"lambda_{i}" for i in range(n_lambdas)]
-        + [f"R_gt_{i}{j}" for i in range(3) for j in range(3)]
+        columns=[f"lambda_{i+1}" for i in range(n_lambdas)]
+        + [f"lambda_{i+1}_" for i in range(n_lambdas)]
         + [f"R_{i}{j}" for i in range(3) for j in range(3)]
-        + [f"t_gt_{i}" for i in range(3)]
+        + [f"R_{i}{j}_" for i in range(3) for j in range(3)]
         + [f"t_{i}" for i in range(3)]
+        + [f"t_{i}_" for i in range(3)]
         + ["out_of_img", "had_ve", "not_enough_points"],
     )
     if df["not_enough_points"].isna().sum() != 0:
