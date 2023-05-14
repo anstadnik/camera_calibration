@@ -37,12 +37,45 @@ def test_solver():
     ic(t_inv_.round(3))
     ic(projector.lambdas.round(3), lambdas_.round(3))
 
+def hm():
+    rez = []
+
+
+    for t1 in np.arange(-0.3, 0.31, 0.3):
+        for t2 in np.arange(-0.3, 0.31, 0.3):
+            for t3 in np.arange(-3, -1.5, 0.3):
+                for l1 in np.arange(-1.5, 1.51, 0.3):
+                    for l2 in np.arange(
+                        -2.61752136752137 * l1 - 6.85141810943093,
+                        -2.61752136752137 * l1 - 4.39190876941320,
+                        0.1,
+                    ):
+                        t = np.array([t1, t2, t3])
+                        lambdas = np.array([l1, l2])
+
+                        key = [*t, *lambdas]
+                        proj = Projector(R=np.eye(3), t=t, lambdas=lambdas)
+                        X = gen_checkerboard_grid(7, 9)
+                        try:
+                            x = proj.project(X)
+
+                            if all(x > 0) and all(x < proj.camera.resolution):
+                                rez.append(key + [0])
+                            else:
+                                rez.append(key + [1])
+
+                        except ValueError as e:
+                            if str(e) != "f(a) and f(b) must have different signs":
+                                raise
+                            # self.fail(f"Value error for {t=}, {lambdas=}")
+                            rez.append(key + [2])
 
 if __name__ == "__main__":
     # np.random.seed(44)
-    # test_solver()
-    df = gen_data()
-    df.to_pickle("/tmp/data.pkl")
+    hm()
+    test_solver()
+    # df = gen_data()
+    # df.to_pickle("/tmp/data.pkl")
     # df = pd.read_pickle("/tmp/data.pkl")
     # datasets = load_babelcalib()
     # for ds in datasets:
