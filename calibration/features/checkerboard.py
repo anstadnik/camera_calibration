@@ -6,9 +6,9 @@ from scipy.cluster.vq import kmeans
 import cv2
 
 try:
-    import gputools
+    import gputools # type: ignore
     GPUTOOLS = True
-except:
+except ImportError:
     GPUTOOLS = False
 
 
