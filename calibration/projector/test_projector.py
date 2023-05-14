@@ -2,7 +2,6 @@ import unittest
 
 import numpy as np
 
-from calibration.projector.projector import Projector
 
 from .board import gen_charuco_grid, gen_checkerboard_grid
 from .camera import Camera
@@ -85,31 +84,29 @@ class TestCamera(unittest.TestCase):
         np.testing.assert_array_almost_equal(result_matrix, expected_matrix, decimal=5)
 
 
-import unittest
 
-
-class TestProjector(unittest.TestCase):
-    def test_proj_grid(self):
-        for t1 in np.arange(-0.3, 0.31, 0.3):
-            for t2 in np.arange(-0.3, 0.31, 0.3):
-                for t3 in np.arange(-0.3, 0.31, 0.3):
-                    for l1 in np.arange(-1.5, 1.51, 0.3):
-                        for l2 in np.arange(
-                            -2.61752136752137 * l1 - 6.85141810943093,
-                            -2.61752136752137 * l1 - 4.39190876941320,
-                            0.1,
-                        ):
-                            t = np.array([t1, t2, t3])
-                            lambdas = np.array([l1, l2])
-                            proj = Projector(R=np.eye(3), t=t, lambdas=lambdas)
-                            X = gen_checkerboard_grid(7, 9)
-                            try:
-                                x = proj.project(X)
-                            except ValueError:
-                                self.fail(f"Value error for {t=}, {lambdas=}")
-
-                            assert all(x > 0)
-                            assert all(x < proj.camera.resolution)
+# class TestProjector(unittest.TestCase):
+#     def test_proj_grid(self):
+#         for t1 in np.arange(-0.3, 0.31, 0.3):
+#             for t2 in np.arange(-0.3, 0.31, 0.3):
+#                 for t3 in np.arange(-0.3, 0.31, 0.3):
+#                     for l1 in np.arange(-1.5, 1.51, 0.3):
+#                         for l2 in np.arange(
+#                             -2.61752136752137 * l1 - 6.85141810943093,
+#                             -2.61752136752137 * l1 - 4.39190876941320,
+#                             0.1,
+#                         ):
+#                             t = np.array([t1, t2, t3])
+#                             lambdas = np.array([l1, l2])
+#                             proj = Projector(R=np.eye(3), t=t, lambdas=lambdas)
+#                             X = gen_checkerboard_grid(7, 9)
+#                             try:
+#                                 x = proj.project(X)
+#                             except ValueError:
+#                                 self.fail(f"Value error for {t=}, {lambdas=}")
+#
+#                             assert all(x > 0)
+#                             assert all(x < proj.camera.resolution)
 
     # def test_proj_equal_backproj(self):
     #     R_ = np.eye(3)

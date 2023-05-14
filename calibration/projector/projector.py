@@ -29,11 +29,6 @@ class Projector:
         t (np.ndarray):
             A 3D vector representing the backprojection translation vector
             (default: random).
-        # R_inv (np.ndarray):
-        #     A 3x3 orthogonal matrix representing the projection rotation matrix
-        #     (inv(R)).
-        # t_inv (np.ndarray):
-        #     A 3D vector representing the projection translation vector (-t).
         lambdas (np.ndarray):
             A 1D array of radial distortion coefficients (default: random).
         camera (Camera):
@@ -62,8 +57,9 @@ class Projector:
             where n is the number of points and each point is represented as [x, y].
 
         Returns:
-            SimulOut: A SimulOut object containing the projected points
-                and other relevant information.
+            x (np.ndarray):
+                An array of point in the image space, with shape (n, 2),
+                where n is the number of points and each point is represented as [x, y].
         """
         # Extrinsics
         X_h = np.c_[X, np.ones(X.shape[0])]
@@ -78,8 +74,7 @@ class Projector:
 
         def f(r, x):
             # x[2] == 1
-            return np.linalg.norm(self.psi(r) * x[:2]) - r
-
+            return self.psi(r) * np.linalg.norm(x[:2]) - r
 
         max_point_img_space = np.r_[self.camera.resolution, 1]
         max_point = np.linalg.inv(self.camera.intrinsic_matrix) @ max_point_img_space
@@ -116,8 +111,9 @@ class Projector:
             where n is the number of points and each point is represented as [x, y].
 
         Returns:
-            SimulOut: A SimulOut object containing the projected points
-                and other relevant information.
+            X (np.ndarray):
+                An array of point in the board space, with shape (n, 2),
+                where n is the number of points and each point is represented as [x, y].
         """
         # Intrinsics
         x = np.c_[x, np.ones(x.shape[0])]

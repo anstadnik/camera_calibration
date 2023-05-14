@@ -2,8 +2,8 @@ import numpy as np
 from icecream import ic
 from tqdm.auto import tqdm
 from calibration.benchmark.benchmark import gen_data
+from calibration.data.babelcalib.babelcalib import load_babelcalib
 
-from calibration.data.babelcalib.orpc import load_babelcalib, visualize
 from calibration.projector.board import draw_board, gen_checkerboard_grid
 from calibration.projector.projector import Projector
 from calibration.solver.solve import solve
@@ -72,12 +72,12 @@ def hm():
 
 if __name__ == "__main__":
     # np.random.seed(44)
-    hm()
-    test_solver()
+    # hm()
+    # test_solver()
     # df = gen_data()
     # df.to_pickle("/tmp/data.pkl")
     # df = pd.read_pickle("/tmp/data.pkl")
-    # datasets = load_babelcalib()
+    datasets = load_babelcalib()
     # for ds in datasets:
     #     pass
     # print(ds.name)
