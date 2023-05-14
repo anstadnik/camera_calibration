@@ -16,7 +16,7 @@ class Camera:
         return self.sensor_size / self.resolution
 
     @property
-    def focal_lenght_pixels(self) -> np.ndarray:
+    def focal_length_pixels(self) -> np.ndarray:
         return self.focal_length / self.pixel_size
 
     @property
@@ -25,7 +25,7 @@ class Camera:
 
     @property
     def intrinsic_matrix(self) -> np.ndarray:
-        fx, fy = self.focal_lenght_pixels
+        fx, fy = self.focal_length_pixels
         cx, cy = self.image_center
         return np.array([[fx, self.skew, cx], [0, fy, cy], [0, 0, 1]])
 
