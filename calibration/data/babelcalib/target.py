@@ -90,7 +90,6 @@ def load_from_dsc_file_tp_file(dsc_file, tp_file) -> list[Target]:
         ofs += nodes
 
     with open(tp_file) as fid2:
-        # fid2.readline()
         for _ in range(len(targets)):
             line = fid2.readline()
             if line.startswith("#"):

@@ -38,23 +38,26 @@ class Dataset:
 
         possible_img_name = os.path.join(dir_path, data[0].name)
         possible_image_names = [possible_img_name + ext for ext in img_extensions]
+
         try:
             ext_id = list(map(os.path.isfile, possible_image_names)).index(True)
             ext = img_extensions[ext_id]
             assert all(
-                os.path.isfile(os.path.join(dir_path, f"{cd.name}{ext}")) for cd in data
+                os.path.isfile(os.path.join(dir_path, f"{d.name}{ext}")) for d in data
             )
+            img_names = [f"{d.name}{ext}" for d in data]
         except ValueError:
             img_extensions.remove("")
-            img_pathes = sorted(
+            img_names = sorted(
                 [f for f in files if any(map(f.endswith, img_extensions))]
             )
-            assert len({p.split(".")[-1] for p in img_pathes}) == 1
-            for cal, img_path in zip(data, img_pathes):
-                img_path = os.path.join(dir_path, img_path)
-                with Image.open(img_path) as image:
-                    image.load()
-                    cal.image = image
+            assert len({p.split(".")[-1] for p in img_names}) == 1
+
+        for cal, img_path in zip(data, img_names):
+            img_path = os.path.join(dir_path, img_path)
+            with Image.open(img_path) as image:
+                image.load()
+                cal.image = image
         return data
 
 
@@ -95,8 +98,6 @@ def load_babelcalib(
                 assert targets is not None
                 if isinstance(targets, dict):
                     try:
-                        # if "Fisheye2" in full_path:
-                        #     __import__("ipdb").set_trace()
                         target = targets[path]
                     except KeyError:
                         logging.warning(f"no target for {full_path}")
