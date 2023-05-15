@@ -1,8 +1,11 @@
 import numpy as np
+from tqdm.auto import tqdm
 import os
 from icecream import ic
 from calibration.benchmark.benchmark import gen_data
 from calibration.data.babelcalib.babelcalib import load_babelcalib
+from cbdetect_py import CornerType, Params, boards_from_corners, find_corners
+from calibration.features.visualization import show_corners
 
 from calibration.projector.board import draw_board, gen_checkerboard_grid
 from calibration.projector.projector import Projector
@@ -71,40 +74,47 @@ def hm():
                             rez.append(key + [2])
 
 
-if __name__ == "__main__":
-    # np.random.seed(44)
-    # hm()
-    # test_solver()
-    # df = gen_data()
-    # df.to_pickle("/tmp/data.pkl")
-    # df = pd.read_pickle("/tmp/data.pkl")
+def gen_features():
     datasets = load_babelcalib()
-    for ds in datasets:
-        os.system("clear")
-        print(
-            f"Dataset: {ds.name} has {len(ds.train)} train and {len(ds.test)} test and {len(ds.targets)} targets"
-        )
-        print(
-            f"First target is {ds.targets[0].rows}x{ds.targets[0].cols} of type {ds.targets[0].type} and family {ds.targets[0].tfam}"
-        )
-        ds.train[0].image.show()
-        input()
-        # cv2.imshow("{ds.name} train", ds.train[0].image)
-        # cv2.waitKey(0)
-    #     pass
-    # print(ds.name)
-    # print(len(ds.test))
-    # print(len(ds.train))
-    # px.imshow(ds.test[0].image).show()
-    # break
-    # datasets = load_babelcalib()
-    # for dataset in datasets:
-    #     name = dataset.name.replace("/", "_")
-    #     print(name)
-    #     for i, ds in tqdm(enumerate((dataset.train, dataset.test))):
-    #         visualize(ds[0]).show()
-    #         visualize(ds[3]).show()
-    #         visualize(ds[-1]).show()
-    #
-    #     if input() == "y":
-    #         break
+    for ds in tqdm(datasets):
+        for t in ds.targets:
+            print(f"Ds: {ds.name}, {t.type} board {t.rows}x{t.cols}")
+            if not all(p[2] == 0 for p in t.pts):
+                print(" Has weird points")
+                # for i, t in enumerate(ds.targets):
+                #     for j, p in enumerate(t.pts):
+                #         if p[2] != 0:
+                #             print(f"{i=}, {j=}, {p=}")
+                # break
+        continue
+        for subds in tqdm([ds.train, ds.test]):
+            for entry in subds:
+                img = np.array(entry.image)
+                # corners = Corner()
+                # boards = []
+                params = Params()
+                params.show_processing = False
+                params.corner_type = (
+                    CornerType.SaddlePoint
+                    if ds.targets[0].type == 0
+                    else CornerType.MonkeySaddlePoint
+                )
+
+                # img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+
+                corners = find_corners(img, params)
+                # plot_corners(img, corners)
+                boards = boards_from_corners(img, corners, params)
+                # plot_boards(img, corners, boards, params)
+
+                if not corners.p:
+                    print("No corners found")
+                if not boards:
+                    show_corners(img, corners).show()
+                    return
+                assert corners.p
+                assert boards
+
+
+if __name__ == "__main__":
+    gen_features()

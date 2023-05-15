@@ -9,18 +9,18 @@ from PIL import Image
 from tqdm.auto import tqdm
 
 from .entry import Entry
-from .target import load_from_dsc_file_tp_file, Board
+from .target import load_from_dsc_file_tp_file, Target
 
 
 @dataclass
 class Dataset:
     name: str
-    targets: list[Board]
+    targets: list[Target]
     train: list[Entry]
     test: list[Entry]
 
     @classmethod
-    def from_dir(cls, dir_path: str, name: str, targets: list[Board]) -> "Dataset":
+    def from_dir(cls, dir_path: str, name: str, targets: list[Target]) -> "Dataset":
         train = cls._load(os.path.join(dir_path, "train"))
         test = cls._load(os.path.join(dir_path, "test"))
         return cls(name, targets, train, test)
@@ -61,7 +61,7 @@ class Dataset:
 def load_babelcalib(
     data_dir="./data/BabelCalib",
     root_dir=None,
-    targets: list[Board] | dict[str, list[Board]] | None = None,
+    targets: list[Target] | dict[str, list[Target]] | None = None,
 ) -> list[Dataset]:
     pkl_path = os.path.join(data_dir, "ds.pkl")
     if root_dir is None and os.path.exists(pkl_path):
