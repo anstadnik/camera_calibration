@@ -105,8 +105,6 @@ class TestProjector(unittest.TestCase):
                             except ValueError:
                                 self.fail(f"Value error for {t=}, {lambdas=}")
 
-                            # assert all(x > 0)
-                            # assert all(x < proj.camera.resolution)
                             assert (x > 0).all()
                             assert (x < proj.camera.resolution).all()
 
