@@ -24,12 +24,6 @@ class Board:
     Rt: np.ndarray | None = None  # Rotation and translation matrix for the board
 
 
-# class TargetPlane:
-#
-#     def __init__(self):
-#         self.target_id_ = ""
-
-
 def load_from_dsc_file_tp_file(dsc_file, tp_file) -> list[Board]:
     boards = []
     target_id_ = os.path.splitext(os.path.basename(dsc_file))[0]
@@ -85,7 +79,10 @@ def load_from_dsc_file_tp_file(dsc_file, tp_file) -> list[Board]:
     with open(tp_file) as fid2:
         # fid2.readline()
         for _ in range(len(boards)):
-            bid = int(fid2.readline())
+            line = fid2.readline()
+            if line.startswith("#"):
+                continue
+            bid = int(line)
 
             if not bid:
                 break

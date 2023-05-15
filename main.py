@@ -1,6 +1,6 @@
 import numpy as np
+import os
 from icecream import ic
-from tqdm.auto import tqdm
 from calibration.benchmark.benchmark import gen_data
 from calibration.data.babelcalib.babelcalib import load_babelcalib
 
@@ -37,9 +37,9 @@ def test_solver():
     ic(t_inv_.round(3))
     ic(projector.lambdas.round(3), lambdas_.round(3))
 
+
 def hm():
     rez = []
-
 
     for t1 in np.arange(-0.3, 0.31, 0.3):
         for t2 in np.arange(-0.3, 0.31, 0.3):
@@ -70,6 +70,7 @@ def hm():
                             # self.fail(f"Value error for {t=}, {lambdas=}")
                             rez.append(key + [2])
 
+
 if __name__ == "__main__":
     # np.random.seed(44)
     # hm()
@@ -78,7 +79,18 @@ if __name__ == "__main__":
     # df.to_pickle("/tmp/data.pkl")
     # df = pd.read_pickle("/tmp/data.pkl")
     datasets = load_babelcalib()
-    # for ds in datasets:
+    for ds in datasets:
+        os.system("clear")
+        print(
+            f"Dataset: {ds.name} has {len(ds.train)} train and {len(ds.test)} test and {len(ds.targets)} targets"
+        )
+        print(
+            f"First target is {ds.targets[0].rows}x{ds.targets[0].cols} of type {ds.targets[0].type} and family {ds.targets[0].tfam}"
+        )
+        ds.train[0].image.show()
+        input()
+        # cv2.imshow("{ds.name} train", ds.train[0].image)
+        # cv2.waitKey(0)
     #     pass
     # print(ds.name)
     # print(len(ds.test))
