@@ -30,7 +30,7 @@ class Target:
 
 
 def load_from_dsc_file_tp_file(dsc_file, tp_file) -> list[Target]:
-    target_id_ = os.path.splitext(os.path.basename(dsc_file))[0]
+    # target_id_ = os.path.splitext(os.path.basename(dsc_file))[0]
 
     targets = []
     ofs = 0

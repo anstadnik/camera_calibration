@@ -57,7 +57,7 @@ class Dataset:
             img_path = os.path.join(dir_path, img_path)
             with Image.open(img_path) as image:
                 image.load()
-                cal.image = image
+            cal.image = image
         return data
 
 
