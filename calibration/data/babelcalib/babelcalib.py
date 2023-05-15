@@ -1,4 +1,6 @@
 import os
+import logging
+from pathlib import Path
 import pickle
 from dataclasses import dataclass
 from glob import glob
@@ -57,7 +59,9 @@ class Dataset:
 
 
 def load_babelcalib(
-    data_dir="./data/BabelCalib", root_dir=None, targets: list[Board] | None = None
+    data_dir="./data/BabelCalib",
+    root_dir=None,
+    targets: list[Board] | dict[str, list[Board]] | None = None,
 ) -> list[Dataset]:
     pkl_path = os.path.join(data_dir, "ds.pkl")
     if root_dir is None and os.path.exists(pkl_path):
@@ -68,24 +72,46 @@ def load_babelcalib(
 
     if glob(os.path.join(data_dir, "*.dsc")):
         assert targets is None
-        dsc_paths = glob(os.path.join(data_dir, "*.dsc"))
-        tp_paths = glob(os.path.join(data_dir, "*.tp"))
-        assert len(dsc_paths) == 1 and len(tp_paths) == 1
-        print(dsc_paths[0])
-        targets = load_from_dsc_file_tp_file(dsc_paths[0], tp_paths[0])
+        dsc_paths = sorted(glob(os.path.join(data_dir, "*.dsc")))
+        tp_paths = sorted(glob(os.path.join(data_dir, "*.tp")))
+        if len(dsc_paths) == 1:
+            assert len(tp_paths) == 1
+            targets = load_from_dsc_file_tp_file(dsc_paths[0], tp_paths[0])
+        else:
+            assert len(dsc_paths) == len(tp_paths)
+            targets = {}
+            for dsc_path, tp_path in zip(dsc_paths, tp_paths):
+                assert Path(dsc_path).stem == Path(tp_path).stem
+                key = Path(dsc_path).stem
+                assert key not in targets
+                targets[key] = load_from_dsc_file_tp_file(dsc_path, tp_path)
 
-    for file in tqdm(os.listdir(data_dir), leave=False):
-        full_path = os.path.join(data_dir, file)
+    for path in tqdm(os.listdir(data_dir), leave=False):
+        full_path = os.path.join(data_dir, path)
 
         if os.path.isdir(full_path):
             dirs = os.listdir(full_path)
             if "train" in dirs and "test" in dirs:
                 assert targets is not None
+                if isinstance(targets, dict):
+                    try:
+                        # if "Fisheye2" in full_path:
+                        #     __import__("ipdb").set_trace()
+                        target = targets[path]
+                    except KeyError:
+                        logging.warning(f"no target for {full_path}")
+                        continue
+                else:
+                    target = targets
                 name = os.path.relpath(full_path, start=root_dir or data_dir)
-                datasets.append(Dataset.from_dir(full_path, name=name, targets=targets))
+                datasets.append(Dataset.from_dir(full_path, name=name, targets=target))
             else:
+                if isinstance(targets, dict) and path in targets:
+                    target = targets[path]
+                else:
+                    target = targets
                 datasets.extend(
-                    load_babelcalib(full_path, root_dir or data_dir, targets)
+                    load_babelcalib(full_path, root_dir or data_dir, target)
                 )
     if root_dir is None:
         with open(pkl_path, "wb") as f:
