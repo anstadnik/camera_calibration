@@ -40,9 +40,7 @@ class Projector:
 
     R: np.ndarray = field(default_factory=lambda: qr(np.random.randn(3, 3))[0])
     t: np.ndarray = field(
-        # default_factory=lambda: np.random.uniform([-0.3, -0.3, -1.5], [0.3, 0.3, -3.0])
-        default_factory=lambda: np.random.uniform([-0.1, -0.1, -0.4], [0.1, 0.1,
-                                                                       -0.01])
+        default_factory=lambda: np.random.uniform([-0.1, -0.1, -0.4], [0.1, 0.1, -0.01])
     )
     lambdas: np.ndarray = field(default_factory=_gen_lambdas)
     camera: Camera = field(default_factory=Camera)
@@ -69,7 +67,6 @@ class Projector:
         P_inv = np.linalg.inv(P)
         x = (P_inv @ X_h.T).T
         x /= x[:, 2][:, None]
-        # yield x.copy()
 
         # Distortion
         idx = np.linalg.norm(x[:, :2], axis=1) > np.finfo(float).eps
@@ -85,16 +82,11 @@ class Projector:
             [root_scalar(f, args=(xi,), bracket=(0, max_r)).root for xi in x[idx]]
         )
 
-        # assert np.linalg.norm(x[:, :2], axis=1).shape == (63,)
-        # assert rs.shape == (63,)
-        # x[idx] *= self.psi(rs)[:, np.newaxis]
         x[idx] *= (rs / np.linalg.norm(x[idx, :2], axis=1))[:, np.newaxis]
-        # print(np.c_[x[:, 1] / x[:, 0], x1[:, 1] / x1[:, 0]][:20])
         np.testing.assert_almost_equal(
             self.psi(np.linalg.norm(x[idx, :2], axis=1)), x[idx, 2], decimal=5
         )
         x[:, 2] = 1
-        # yield x.copy()
 
         # Intrinsics
         x = (self.camera.intrinsic_matrix @ x.T).T
