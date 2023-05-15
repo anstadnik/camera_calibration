@@ -77,7 +77,7 @@ class Projector:
 
         max_point_img_space = np.r_[self.camera.resolution, 1]
         max_point = np.linalg.inv(self.camera.intrinsic_matrix) @ max_point_img_space
-        max_r = np.linalg.norm(max_point) / 2
+        max_r = np.linalg.norm(max_point[:2])
         rs = np.array(
             [root_scalar(f, args=(xi,), bracket=(0, max_r)).root for xi in x[idx]]
         )
