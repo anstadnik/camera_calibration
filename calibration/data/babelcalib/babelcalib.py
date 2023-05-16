@@ -8,6 +8,8 @@ from glob import glob
 from PIL import Image
 from tqdm.auto import tqdm
 
+from calibration.data.babelcalib.download import assure_babelcalib_downloaded
+
 from .entry import Entry
 from .target import load_from_dsc_file_tp_file, Target
 
@@ -70,6 +72,9 @@ def load_babelcalib(
     if root_dir is None and os.path.exists(pkl_path):
         with open(pkl_path, "rb") as f:
             return pickle.load(f)
+
+    if root_dir is None:
+        assure_babelcalib_downloaded(data_dir)
 
     datasets = []
 
