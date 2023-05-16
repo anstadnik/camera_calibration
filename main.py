@@ -31,7 +31,7 @@ def process_entry(entry: Entry):
 def gen_features():
     datasets = load_babelcalib()
     results = []
-    for ds in tqdm(datasets[32:]):
+    for ds in tqdm(datasets):
         # for t in ds.targets:
         #     print(f"Ds: {ds.name}, {t.type} board {t.rows}x{t.cols}")
         #     if not all(p[2] == 0 for p in t.pts):
