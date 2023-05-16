@@ -66,6 +66,7 @@ def assure_babelcalib_downloaded(data_dir: str):
             os.path.join(data_dir, "**", ".DS_Store"), recursive=True
         )
         files_to_remove += glob(os.path.join(data_dir, "**", "Icon?"), recursive=True)
+        files_to_remove += glob(os.path.join(data_dir, "*.zip"))
         for path in files_to_remove:
             if os.path.isdir(path):
                 shutil.rmtree(path)

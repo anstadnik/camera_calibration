@@ -51,7 +51,7 @@ jobs:
       - name: Cache data directory
         uses: actions/cache@v3
         with:
-          path: data
+          path: ./data
           key: dataset-${{ hashFiles('calibration/data/babelcalib/download.py') }}
       - name: Download Babelcalib
         run: python calibration/data/babelcalib/download.py
