@@ -1,0 +1,3 @@
+[submodule "calibration/feature_detector/libcbdetect"]
+	path = calibration/feature_detector/libcbdetect
+	url = git@github.com:anstadnik/libcbdetect.git

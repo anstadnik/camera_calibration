@@ -2,7 +2,10 @@ name: camera_calibration
 channels:
 - conda-forge
 dependencies:
+- beautifulsoup4
 - black
+- build
+- cxx-compiler
 - icecream
 - ipdb
 - ipython
@@ -13,11 +16,17 @@ dependencies:
 - jupyterlab-lsp
 - jupyterlab_code_formatter
 - numpy
+- opencv
 - pandas
+- pillow
+- pip
+- pkg-config
 - plotly
+- pybind11
 - pytest
 - python-lsp-server
 - ruff
 - scipy
 - tqdm
-
+- pip:
+  - calibration/feature_detector/libcbdetect
