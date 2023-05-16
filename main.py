@@ -1,10 +1,6 @@
-import os
-from sys import exc_info
-
 import numpy as np
 import pandas as pd
 from cbdetect_py import CornerType, Params, boards_from_corners, find_corners
-from icecream import ic
 from tqdm.auto import tqdm
 from tqdm.contrib.concurrent import process_map
 

@@ -90,7 +90,7 @@ class TestProjector(unittest.TestCase):
         for t1 in [-0.1, 0.1]:
             for t2 in [-0.1, 0.1]:
                 for t3 in [-0.4, -0.01]:
-                    for l1 in np.arange(-0.5, 0.01, 0.03):
+                    for l1 in np.arange(-1.5, 1.51, 0.3):
                         for l2 in np.arange(
                             -2.61752136752137 * l1 - 6.85141810943093,
                             -2.61752136752137 * l1 - 4.39190876941320,
@@ -110,7 +110,7 @@ class TestProjector(unittest.TestCase):
 
     def test_proj_equal_backproj(self):
         R_ = np.eye(3)
-        t_ = np.array([-0.1, -0.1, -0.4])
+        t_ = np.array([-0.01, -0.01, -0.04])
         lambdas_ = np.array([0.0, 0.0])
 
         sensor_size_ = np.array([40, 30])

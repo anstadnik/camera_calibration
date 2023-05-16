@@ -11,3 +11,6 @@ requires-python = ">=3.7"
 [tool.pyright]
 # include = ["src"]
 exclude = ["calibration/features/libcbdetect/external/"]
+
+[tool.ruff]
+exclude = ["calibration/features/libcbdetect/external/"]
