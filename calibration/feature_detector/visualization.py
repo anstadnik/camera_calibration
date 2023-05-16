@@ -20,8 +20,7 @@ def show_corners(img: np.ndarray, corner: Corner) -> go.Figure:
     # )
     assert isinstance(fig1.data, tuple) and isinstance(fig2.data, tuple)
     assert len(fig1.data) == 1 and len(fig2.data) == 1
-    fig = go.Figure(data=[fig1.data[0], fig2.data[0]])
-    return fig
+    return go.Figure(data=[fig1.data[0], fig2.data[0]])
 
 
 def show_boards(img: np.ndarray, corner: Corner, boards: list[Board]) -> go.Figure:
