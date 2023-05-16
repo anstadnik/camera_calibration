@@ -29,4 +29,4 @@ dependencies:
 - scipy
 - tqdm
 - pip:
-  - calibration/feature-detector/libcbdetect
+  - calibration/feature_detector/libcbdetect
