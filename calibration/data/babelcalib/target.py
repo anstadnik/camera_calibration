@@ -1,6 +1,6 @@
 import enum
-import os
 from dataclasses import dataclass
+from typing import Iterator
 
 import numpy as np
 
@@ -29,14 +29,30 @@ class Target:
     Rt: np.ndarray | None = None  # Rotation and translation matrix for the board
 
 
-def load_from_dsc_file_tp_file(dsc_file, tp_file) -> list[Target]:
-    # target_id_ = os.path.splitext(os.path.basename(dsc_file))[0]
+def _load_tp_file(tp_file: str, targets: list[Target]) -> list[Target]:
+    with open(tp_file) as fid2:
+        for _ in targets:
+            line = fid2.readline()
+            if line.startswith("#"):
+                continue
+            bid = int(line)
 
+            if not bid:
+                break
+
+            Rt = np.array([list(map(float, fid2.readline().split())) for _ in range(3)])
+
+            for target__ in targets:
+                if target__.id == bid:
+                    target__.Rt = Rt
+                    break
+
+    return targets
+
+
+def _load_ds_file(lines: Iterator[str]) -> list[Target]:
     targets = []
     ofs = 0
-
-    with open(dsc_file) as fid:
-        lines = iter(fid.readlines())
 
     while True:
         try:
@@ -69,15 +85,9 @@ def load_from_dsc_file_tp_file(dsc_file, tp_file) -> list[Target]:
             else target.rows * target.cols
         )
 
-        if target.type == BoardType.TRIANGULAR:
-            print(dsc_file)
-            print(",".join(map(str, h1)))
-            exit()
-
         t = []
         while nodes:
-            line = next(lines).strip()
-            if line:
+            if line := next(lines).strip():
                 nodes -= 1
                 t.append(list(map(float, line.strip().split(","))))
 
@@ -89,20 +99,16 @@ def load_from_dsc_file_tp_file(dsc_file, tp_file) -> list[Target]:
         targets.append(target)
         ofs += nodes
 
-    with open(tp_file) as fid2:
-        for _ in range(len(targets)):
-            line = fid2.readline()
-            if line.startswith("#"):
-                continue
-            bid = int(line)
+    return targets
 
-            if not bid:
-                break
 
-            Rt = np.array([list(map(float, fid2.readline().split())) for _ in range(3)])
+def load_from_dsc_file_tp_file(dsc_file, tp_file) -> list[Target]:
+    # target_id_ = os.path.splitext(os.path.basename(dsc_file))[0]
 
-            for b in range(len(targets)):
-                if targets[b].id == bid:
-                    targets[b].Rt = Rt
-                    break
+    with open(dsc_file) as fid:
+        lines = iter(fid.readlines())
+
+    targets = _load_ds_file(lines)
+    targets = _load_tp_file(tp_file, targets)
+
     return targets
