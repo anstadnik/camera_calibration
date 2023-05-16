@@ -32,16 +32,6 @@ def gen_features():
     datasets = load_babelcalib()
     results = []
     for ds in tqdm(datasets):
-        # for t in ds.targets:
-        #     print(f"Ds: {ds.name}, {t.type} board {t.rows}x{t.cols}")
-        #     if not all(p[2] == 0 for p in t.pts):
-        #         print(" Has weird points")
-        #         # for i, t in enumerate(ds.targets):
-        #         #     for j, p in enumerate(t.pts):
-        #         #         if p[2] != 0:
-        #         #             print(f"{i=}, {j=}, {p=}")
-        #         # break
-        # continue
         for subds_name, subds in zip(
             tqdm(["train", "test"], leave=False), [ds.train, ds.test]
         ):
