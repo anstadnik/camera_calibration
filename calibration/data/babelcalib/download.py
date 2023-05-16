@@ -10,7 +10,7 @@ import os
 files = {
     "OV.zip": "https://drive.google.com/uc?export=download&id=1KqJqyqmRsBVr-9PnXCV8CuFbasOUobaF",
     "Kalibr.zip": "https://drive.google.com/uc?export=download&id=1KuR_JhC7cB0Ybzxq6Hr6dtn1j3IMjifn",
-    "UZH.zip": "https://drive.google.com/uc?export=download&id=1KuR_JhC7cB0Ybzxq6Hr6dtn1j3IMjifn",
+    "UZH.zip": "https://drive.google.com/uc?export=download&id=1ioCs5mYoUtMaNb4n4GkZbEAR-DJviuZo",
     "OCamCalib.zip": "https://drive.google.com/uc?export=download&id=1tbPfs_c5-scSbqWXoyuLfaadSj1ZK65T",
 }
 
