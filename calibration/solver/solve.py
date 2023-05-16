@@ -1,12 +1,14 @@
 import numpy as np
 
+from calibration.projector.projector import Projector
+
 from .extrinsics import solve_extrinsic
 from .intrinsics import solve_intrinsic
 
 
 def solve(
     x: np.ndarray, X: np.ndarray, intrinsic_matrix: np.ndarray
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> Projector:
     """Find intrinsic and extrinsic parameters for a set of points
 
     Args:
@@ -37,4 +39,4 @@ def solve(
     t = p[:, 2]
     # t *= biggest_r
     R = np.c_[p[:, :2], np.cross(p[:, 0], p[:, 1])]
-    return lambdas, R, t
+    return Projector(R=R, t=t, lambdas=lambdas)

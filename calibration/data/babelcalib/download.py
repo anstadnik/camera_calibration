@@ -1,6 +1,5 @@
 from glob import glob
 import shutil
-from plotly.express import data
 import requests
 from bs4 import BeautifulSoup, Tag
 from tqdm.auto import tqdm
