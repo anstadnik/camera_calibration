@@ -57,13 +57,7 @@ def assure_babelcalib_downloaded(data_dir: str):
 
             if not os.path.isdir(file_path.removesuffix(".zip")):
                 with zipfile.ZipFile(file_path, "r") as zip_ref:
-                    if file_name.removesuffix(".zip") in zip_ref.namelist():
-                        extract_path = data_dir
-                    else:
-                        extract_path = os.path.join(
-                            data_dir, file_name.removesuffix(".zip")
-                        )
-                        os.makedirs(extract_path)
+                    extract_path = data_dir
                     zip_ref.extractall(extract_path)
                     print(f"Extracted {file_name} to {extract_path}")
 
@@ -71,7 +65,7 @@ def assure_babelcalib_downloaded(data_dir: str):
         files_to_remove += glob(
             os.path.join(data_dir, "**", ".DS_Store"), recursive=True
         )
-        files_to_remove += glob(os.path.join(data_dir, "**", "Icon"), recursive=True)
+        files_to_remove += glob(os.path.join(data_dir, "**", "Icon?"), recursive=True)
         for path in files_to_remove:
             if os.path.isdir(path):
                 shutil.rmtree(path)
