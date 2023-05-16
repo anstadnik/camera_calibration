@@ -23,10 +23,7 @@ def process_entry(entry: Entry):
     boards = boards_from_corners(img, corners, params)
 
     return {
-        # "dataset": ds_name,
-        # "subdataset": subds_name,
-        # "image": i,
-        "corners": [(p, s) for p, s in zip(corners.p, corners.score)],
+        "corners": list(zip(corners.p, corners.score)),
         "boards": [b.idx for b in boards],
     }
 
