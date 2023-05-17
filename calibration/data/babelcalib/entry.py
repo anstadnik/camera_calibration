@@ -14,6 +14,8 @@ class Corner:
 
 @dataclass
 class Entry:
+    ds_name: str
+    subds_name: str
     name: str
     width: int
     height: int
@@ -22,11 +24,13 @@ class Entry:
     corners: list[Corner]
     image: Image.Image | None = None
 
-    def __init__(self, orpc_path: str):
+    def __init__(self, ds_name: str, subds_name: str, orpc_path: str):
         with open(orpc_path) as f:
             lines = f.readlines()
             # TODO: Use iterator
             self.name = lines[0].split(":")[1].strip()
+            self.ds_name = ds_name
+            self.subds_name = subds_name
             self.width = int(lines[1].split(":")[1].strip())
             self.height = int(lines[2].split(":")[1].strip())
             self.num_corners = int(lines[3].split(":")[1].strip())

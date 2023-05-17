@@ -3,6 +3,7 @@ import pandas as pd
 from cbdetect_py import CornerType, Params, boards_from_corners, find_corners
 from tqdm.auto import tqdm
 from tqdm.contrib.concurrent import process_map
+from calibration.benchmark.benchmark import benchmark_babelcalib, benchmark_simul
 
 from calibration.data.babelcalib.babelcalib import load_babelcalib
 from calibration.data.babelcalib.entry import Entry
@@ -57,4 +58,5 @@ def gen_features():
 
 
 if __name__ == "__main__":
-    gen_features()
+    benchmark_simul(1000)
+    benchmark_babelcalib()

@@ -1,14 +1,14 @@
+import contextlib
 from dataclasses import dataclass
 
 import numpy as np
 from cbdetect_py import CornerType, Params, boards_from_corners, find_corners
-from tqdm.auto import tqdm
+from tqdm.auto import tqdm, trange
 from tqdm.contrib.concurrent import process_map
 
-from calibration.data.babelcalib.babelcalib import load_babelcalib
+from calibration.data.babelcalib.babelcalib import Dataset
 from calibration.data.babelcalib.entry import Entry
 from calibration.data.babelcalib.target import BoardType
-from calibration.projector.board import gen_checkerboard_grid
 from calibration.projector.projector import Projector
 
 
@@ -18,13 +18,45 @@ class Features:
     corners: np.ndarray
 
 
-# TODO: Add noise
-def gen_simul_features(
-    n=int(1e6), board=gen_checkerboard_grid(7, 9)
-) -> tuple[list[Projector], list[Features]]:
-    projectors = [Projector() for _ in range(n)]
-    features = [Features(board, p.project(board)) for p in projectors]
-    return projectors, features
+# # TODO: Add noise
+# def gen_simul_features(n: int, board: np.ndarray) -> list[tuple[Projector, Features]]:
+#     projectors = [Projector() for _ in range(n)]
+#     ret = []
+#     for p in tqdm(projectors):
+#         with contextlib.suppress(ValueError):
+#             corners = p.project(board)
+#             out_of_img = ((corners < 0) | (corners > p.camera.resolution)).any(axis=1)
+#             board_ = board[~out_of_img]
+#             corners = corners[~out_of_img]
+#             ret.append((p, Features(board_, corners)))
+#     return ret
+
+
+def process_projector(
+    projector_board: tuple[Projector, np.ndarray]
+) -> tuple[Features, Projector] | None:
+    p, board = projector_board
+    with contextlib.suppress(ValueError):
+        corners = p.project(board)
+        out_of_img = ((corners < 0) | (corners > p.camera.resolution)).any(axis=1)
+        board_ = board[~out_of_img]
+        corners = corners[~out_of_img]
+        return Features(board_, corners), p
+    return None
+
+
+def simul_features(n: int, board: np.ndarray) -> list[tuple[Features, Projector]]:
+    projectors = [
+        Projector() for _ in trange(n, leave=False, desc="Generating projectors")
+    ]
+    ret = process_map(
+        process_projector,
+        [(p, board) for p in projectors],
+        chunksize=100,
+        leave=False,
+        desc="Simulating",
+    )
+    return [item for item in ret if item]
 
 
 def process_entry(entry: Entry) -> Features:
@@ -51,18 +83,19 @@ def process_entry(entry: Entry) -> Features:
 
 
 # TODO: Add ds, subds and image index name
-def gen_babelcalib_features(
-    datasets=load_babelcalib(),
-) -> tuple[list[Entry], list[Features]]:
+def babelcalib_features(datasets: list[Dataset]) -> list[tuple[Features, Entry]]:
     results = []
-    for ds in tqdm(datasets):
-        for _, subds in zip(tqdm(["train", "test"], leave=False), [ds.train, ds.test]):
+    for ds in tqdm(datasets, leave=False, desc="Process dataset"):
+        for subds in tqdm([ds.train, ds.test], leave=False):
             assert ds.targets[0].type == BoardType.RECTANGULAR
-            res = process_map(process_entry, subds, leave=False)
+            res = process_map(
+                process_entry,
+                subds,
+                chunksize=100,
+                leave=False,
+                desc="Searching corners",
+            )
             results.extend(res)
 
     entries = (e for ds in datasets for subds in (ds.train, ds.test) for e in subds)
-    entries = [entry for entry, res in zip(entries, results) if res.board]
-    results = [res for res in results if res.board]
-
-    return entries, results
+    return [(res, entry) for res, entry in zip(results, entries) if res.board]
