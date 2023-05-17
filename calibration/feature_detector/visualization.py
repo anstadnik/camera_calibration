@@ -1,20 +1,21 @@
 import itertools
+
 import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
 import plotly.express as px
-from cbdetect_py import Corner, Board
+import plotly.graph_objects as go
+from cbdetect_py import Board, Corner
 
 
-def show_corners(img: np.ndarray, corner: Corner) -> go.Figure:
+def show_corners(
+    img: np.ndarray, corners: np.ndarray, scores: np.ndarray | None = None
+) -> go.Figure:
     fig1 = px.imshow(img, binary_string=True)
-    fig2 = px.scatter(
-        x=[p[0] for p in corner.p], y=[p[1] for p in corner.p], color=corner.score
-    )
+    fig2 = px.scatter(x=corners[:, 0], y=corners[:, 1], color=scores)
     # fig.add_trace(
     #     go.Scatter(
-    #         x=[p[0] for p in corner.p],
-    #         y=[p[1] for p in corner.p],
+    #         x=[p[0] for p in corners],
+    #         y=[p[1] for p in corners],
     #         marker={"color": corner.score},
     #     )
     # )
@@ -23,6 +24,7 @@ def show_corners(img: np.ndarray, corner: Corner) -> go.Figure:
     return go.Figure(data=[fig1.data[0], fig2.data[0]])
 
 
+# TODO: Pass lists of np.ndarray instead of Corner and Board
 def show_boards(img: np.ndarray, corner: Corner, boards: list[Board]) -> go.Figure:
     fig1 = px.imshow(img, binary_string=True)
 

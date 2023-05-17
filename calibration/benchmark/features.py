@@ -18,38 +18,30 @@ class Features:
     corners: np.ndarray
 
 
-# # TODO: Add noise
-# def gen_simul_features(n: int, board: np.ndarray) -> list[tuple[Projector, Features]]:
-#     projectors = [Projector() for _ in range(n)]
-#     ret = []
-#     for p in tqdm(projectors):
-#         with contextlib.suppress(ValueError):
-#             corners = p.project(board)
-#             out_of_img = ((corners < 0) | (corners > p.camera.resolution)).any(axis=1)
-#             board_ = board[~out_of_img]
-#             corners = corners[~out_of_img]
-#             ret.append((p, Features(board_, corners)))
-#     return ret
-
-
+# TODO: Add noise
 def _process_projector(
     projector_board: tuple[Projector, np.ndarray]
-) -> tuple[Features, Projector] | None:
+) -> tuple[Features | None, Projector]:
     p, board = projector_board
     with contextlib.suppress(ValueError):
         corners = p.project(board)
         out_of_img = ((corners < 0) | (corners > p.camera.resolution)).any(axis=1)
         board_ = board[~out_of_img]
         corners = corners[~out_of_img]
-        return Features(board_, corners), p
-    return None
+
+        if corners.size != 0 and not np.isinf(corners).any():
+            return Features(board_, corners), p
+
+    return None, p
 
 
 def _get_Projector(_) -> Projector:
     return Projector()
 
 
-def simul_features(n: int, board: np.ndarray) -> list[tuple[Features, Projector]]:
+def simul_features(
+    n: int, board: np.ndarray
+) -> list[tuple[Features | None, Projector]]:
     projectors = process_map(
         _get_Projector,
         range(n),
@@ -57,17 +49,16 @@ def simul_features(n: int, board: np.ndarray) -> list[tuple[Features, Projector]
         leave=False,
         desc="Generating projectors",
     )
-    ret = process_map(
+    return process_map(
         _process_projector,
         [(p, board) for p in projectors],
         chunksize=100,
         leave=False,
         desc="Simulating",
     )
-    return [item for item in ret if item]
 
 
-def _process_entry(entry: Entry) -> Features:
+def _process_entry(entry: Entry) -> Features | None:
     img = np.array(entry.image)
     params = Params()
     params.show_processing = False
@@ -80,30 +71,36 @@ def _process_entry(entry: Entry) -> Features:
     corners = find_corners(img, params)
     boards = boards_from_corners(img, corners, params)
 
+    if not boards:
+        return None
     best_board_i = np.array([(np.array(b.idx) > 0).sum() for b in boards]).argmax()
     best_board = np.array(boards[best_board_i].idx)
     board = np.transpose(np.nonzero(best_board >= 0))
     # Swap y and x
     board = board[:, [1, 0]]
-    corners = np.array(corners.p)[tuple(best_board[best_board >= 0])]
+    corners = np.array(corners.p)[best_board[best_board >= 0]]
 
-    return Features(board, corners)
+    return None if np.isinf(corners).any() else Features(board, corners)
 
 
 # TODO: Add ds, subds and image index name
-def babelcalib_features(datasets: list[Dataset]) -> list[tuple[Features, Entry]]:
+def babelcalib_features(datasets: list[Dataset]) -> list[tuple[Features | None, Entry]]:
     results = []
     for ds in tqdm(datasets, leave=False, desc="Process dataset"):
-        for subds in tqdm([ds.train, ds.test], leave=False):
-            assert ds.targets[0].type == BoardType.RECTANGULAR
-            res = process_map(
-                _process_entry,
-                subds,
-                chunksize=100,
-                leave=False,
-                desc="Searching corners",
-            )
-            results.extend(res)
+        assert ds.targets[0].type == BoardType.RECTANGULAR
+        res = process_map(
+            _process_entry,
+            iter((*ds.train, *ds.test)),
+            chunksize=10,
+            leave=False,
+            desc="Searching corners",
+        )
+        results.extend(res)
 
     entries = (e for ds in datasets for subds in (ds.train, ds.test) for e in subds)
-    return [(res, entry) for res, entry in zip(results, entries) if res.board]
+    return list(zip(results, entries))
+
+    # Skip entries with no board
+    # return [
+    #     (res, entry) for res, entry in zip(results, entries) if res.board is not None
+    # ]

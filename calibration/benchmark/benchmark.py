@@ -34,7 +34,6 @@ def benchmark_babelcalib(dataset: list[Dataset] | None = None) -> pd.DataFrame:
     cameras = [get_camera_from_entry(e) for _, e in features_and_entries]
     projs_ = calibrate([(f, c) for (f, _), c in zip(features_and_entries, cameras)])
     benchmark_results = [
-        BenchmarkResult((e, c), f, p_)
-        for (f, e), c, p_ in zip(features_and_entries, cameras, projs_)
+        BenchmarkResult(e, f, p_) for (f, e), p_ in zip(features_and_entries, projs_)
     ]
     return eval_simul(benchmark_results)
