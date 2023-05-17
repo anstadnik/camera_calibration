@@ -94,7 +94,7 @@ def load_babelcalib(
                 assert key not in targets
                 targets[key] = load_from_dsc_file_tp_file(dsc_path, tp_path)
 
-    for path in tqdm(os.listdir(data_dir), leave=False):
+    for path in tqdm(os.listdir(data_dir), leave=False, desc="Loading BabelCalib"):
         full_path = os.path.join(data_dir, path)
 
         if os.path.isdir(full_path):
