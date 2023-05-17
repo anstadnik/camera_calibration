@@ -6,9 +6,7 @@ from .extrinsics import solve_extrinsic
 from .intrinsics import solve_intrinsic
 
 
-def solve(
-    x: np.ndarray, X: np.ndarray, intrinsic_matrix: np.ndarray
-) -> Projector:
+def solve(x: np.ndarray, X: np.ndarray, intrinsic_matrix: np.ndarray) -> Projector:
     """Find intrinsic and extrinsic parameters for a set of points
 
     Args:

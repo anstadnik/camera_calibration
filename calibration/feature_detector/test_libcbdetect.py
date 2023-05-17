@@ -17,7 +17,7 @@ class TestFeatures(unittest.TestCase):
         except ImportError:
             self.fail("ImportError: One or more imports failed")
 
-        img_path = "./data/BabelCalib/UZH/DAVIS/outdoor_forward/train/img1188.pgm"
+        img_path = "./data/BabelCalib/OV/cube/ov01/train/0006.pgm"
         with Image.open(img_path) as img:
             img.load()
         img = np.array(img)

@@ -10,7 +10,7 @@ from calibration.data.babelcalib.entry import Entry
 from calibration.data.babelcalib.target import BoardType
 
 
-def process_entry(entry: Entry):
+def _process_entry(entry: Entry):
     img = np.array(entry.image)
     params = Params()
     params.show_processing = False
@@ -43,7 +43,7 @@ def gen_features():
             # process_entry(subds[24])
             assert ds.targets[0].type == BoardType.RECTANGULAR
             try:
-                res = process_map(process_entry, subds, leave=False)
+                res = process_map(_process_entry, subds, leave=False)
             except:
                 # breakpoint()
                 raise

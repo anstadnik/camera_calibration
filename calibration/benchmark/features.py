@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import numpy as np
 from cbdetect_py import CornerType, Params, boards_from_corners, find_corners
-from tqdm.auto import tqdm, trange
+from tqdm.auto import tqdm
 from tqdm.contrib.concurrent import process_map
 
 from calibration.data.babelcalib.babelcalib import Dataset
@@ -32,7 +32,7 @@ class Features:
 #     return ret
 
 
-def process_projector(
+def _process_projector(
     projector_board: tuple[Projector, np.ndarray]
 ) -> tuple[Features, Projector] | None:
     p, board = projector_board
@@ -45,12 +45,20 @@ def process_projector(
     return None
 
 
+def _get_Projector(_) -> Projector:
+    return Projector()
+
+
 def simul_features(n: int, board: np.ndarray) -> list[tuple[Features, Projector]]:
-    projectors = [
-        Projector() for _ in trange(n, leave=False, desc="Generating projectors")
-    ]
+    projectors = process_map(
+        _get_Projector,
+        range(n),
+        chunksize=100,
+        leave=False,
+        desc="Generating projectors",
+    )
     ret = process_map(
-        process_projector,
+        _process_projector,
         [(p, board) for p in projectors],
         chunksize=100,
         leave=False,
@@ -59,7 +67,7 @@ def simul_features(n: int, board: np.ndarray) -> list[tuple[Features, Projector]
     return [item for item in ret if item]
 
 
-def process_entry(entry: Entry) -> Features:
+def _process_entry(entry: Entry) -> Features:
     img = np.array(entry.image)
     params = Params()
     params.show_processing = False
@@ -89,7 +97,7 @@ def babelcalib_features(datasets: list[Dataset]) -> list[tuple[Features, Entry]]
         for subds in tqdm([ds.train, ds.test], leave=False):
             assert ds.targets[0].type == BoardType.RECTANGULAR
             res = process_map(
-                process_entry,
+                _process_entry,
                 subds,
                 chunksize=100,
                 leave=False,
