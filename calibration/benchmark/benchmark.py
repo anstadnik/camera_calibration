@@ -51,7 +51,7 @@ def _eval(arg: tuple[SIMUL_INP | BABELCALIB_INP, Projector | None]) -> Benchmark
 def evaluate(
     inp: list[SIMUL_INP] | list[BABELCALIB_INP], projs: list[Projector | None]
 ) -> list[BenchmarkResult]:
-    kwargs = dict(total=len(inp), leave=False, desc="Calibrating")
+    kwargs = dict(total=len(inp), leave=False, desc="Evaluating")
     return process_map(_eval, map(tuple, zip(inp, projs)), **kwargs)
 
 

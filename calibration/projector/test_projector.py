@@ -1,4 +1,5 @@
 from itertools import product
+from tqdm.auto import tqdm
 from scipy.spatial.transform import Rotation
 import unittest
 
@@ -89,8 +90,11 @@ class TestCamera(unittest.TestCase):
 
 class TestProjector(unittest.TestCase):
     def test_proj_equal_backproj(self):
-        Rs = [np.eye(3), Rotation.from_euler("z", 10, degrees=True).as_matrix()]
-        Rs = [np.eye(3)]
+        Rs = [
+            np.eye(3),
+            Rotation.from_euler("z", 10, degrees=True).as_matrix(),
+            Rotation.from_euler("xyz", [10, 10, 10], degrees=True).as_matrix(),
+        ]
         lambdass = [
             np.array([l1, l2])
             for l1 in np.arange(-1.5, 1.51, 1)
@@ -113,14 +117,19 @@ class TestProjector(unittest.TestCase):
         boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
 
         for camera, ts in zip(cameras, ts_for_cameras):
-            for R, lambdas, t, board in product(Rs, lambdass, ts, boards):
+            for R, lambdas, t, board in tqdm(
+                product(Rs, lambdass, ts, boards),
+                leave=False,
+                total=len(Rs) * len(lambdass) * len(ts) * len(boards),
+                desc="Testing projector",
+            ):
                 with self.subTest(t=t, R=R, lambdas=lambdas, camera=camera):
                     self.assertEqual(board.dtype, np.float64)
                     proj = Projector(R=R, t=t, lambdas=lambdas, camera=camera)
                     try:
                         x = proj.project(board)
                     except ValueError:
-                        self.fail(f"ValueError in project for {proj.lambdas=}")
+                        self.fail("ValueError in project")
 
                     self.assertTrue((x > 0).all())
                     self.assertTrue((x < proj.camera.resolution).all())
