@@ -1,22 +1,66 @@
+from dataclasses import dataclass, field
+from tqdm.auto import tqdm
 import numpy as np
-import pandas as pd
+from tqdm.contrib.concurrent import process_map
 
 from calibration.benchmark.calib import calibrate
-from calibration.benchmark.eval import BenchmarkResult, eval_simul
-from calibration.benchmark.features import babelcalib_features, simul_features
+
+from calibration.benchmark.features import Features, babelcalib_features, simul_features
 from calibration.data.babelcalib.babelcalib import Dataset, load_babelcalib
 from calibration.data.babelcalib.entry import Entry
 from calibration.projector.board import gen_checkerboard_grid
 from calibration.projector.camera import Camera
+from calibration.projector.projector import Projector
 
 
-def benchmark_simul(n=int(1e6), board=gen_checkerboard_grid(7, 9)) -> pd.DataFrame:
-    features_and_proj = simul_features(n, board)
-    projs_ = calibrate([(f, p.camera) for f, p in features_and_proj])
-    benchmark_results = [
-        BenchmarkResult(p, f, p_) for (f, p), p_ in zip(features_and_proj, projs_)
-    ]
-    return eval_simul(benchmark_results)
+@dataclass
+class BenchmarkResult:
+    input: Entry | Projector
+    features: Features | None
+    prediction: Projector | None
+    error: float | None = field(init=False)
+
+    def __post_init__(self):
+        self.error = self._calc_error()
+
+    def _calc_error(self) -> float | None:
+        if self.features is None or self.prediction is None:
+            return None
+        try:
+            max_point_img_space = np.r_[self.prediction.camera.resolution, 1]
+            max_point = (
+                np.linalg.inv(self.prediction.camera.intrinsic_matrix)
+                @ max_point_img_space
+            )
+            max_r = float(np.linalg.norm(max_point[:2]))
+            corners_ = self.prediction.project(self.features.board, max_r * 10)
+        except ValueError:
+            return -1.0
+        return np.sqrt(((corners_ - self.features.corners) ** 2).mean())
+
+
+SIMUL_INP = tuple[Features | None, Projector]
+BABELCALIB_INP = tuple[Features | None, Entry]
+
+
+def _eval(arg: tuple[SIMUL_INP | BABELCALIB_INP, Projector | None]) -> BenchmarkResult:
+    (feats, inp), proj_ = arg
+    return BenchmarkResult(inp, feats, proj_)
+
+
+def evaluate(
+    inp: list[SIMUL_INP] | list[BABELCALIB_INP], projs: list[Projector | None]
+) -> list[BenchmarkResult]:
+    kwargs = dict(total=len(inp), leave=False, desc="Calibrating")
+    return process_map(_eval, map(tuple, zip(inp, projs)), **kwargs)
+
+
+def benchmark_simul(
+    n=int(1e6), board=gen_checkerboard_grid(7, 9)
+) -> list[BenchmarkResult]:
+    feats_and_projs = simul_features(n, board)
+    projs_ = calibrate([(f, p.camera) for f, p in feats_and_projs])
+    return evaluate(feats_and_projs, projs_)
 
 
 def get_camera_from_entry(entry: Entry) -> Camera:
@@ -27,13 +71,9 @@ def get_camera_from_entry(entry: Entry) -> Camera:
     return Camera(focal_length, resolution, sensor_size, skew=0)
 
 
-def benchmark_babelcalib(dataset: list[Dataset] | None = None) -> pd.DataFrame:
+def benchmark_babelcalib(dataset: list[Dataset] | None = None) -> list[BenchmarkResult]:
     if dataset is None:
         dataset = load_babelcalib()
-    features_and_entries = babelcalib_features(dataset)
-    cameras = [get_camera_from_entry(e) for _, e in features_and_entries]
-    projs_ = calibrate([(f, c) for (f, _), c in zip(features_and_entries, cameras)])
-    benchmark_results = [
-        BenchmarkResult(e, f, p_) for (f, e), p_ in zip(features_and_entries, projs_)
-    ]
-    return eval_simul(benchmark_results)
+    feats_and_ents = babelcalib_features(dataset)
+    projs_ = calibrate([(f, get_camera_from_entry(e)) for f, e in feats_and_ents])
+    return evaluate(feats_and_ents, projs_)
