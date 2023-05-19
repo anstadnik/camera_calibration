@@ -116,12 +116,11 @@ class TestProjector(unittest.TestCase):
         ]
         boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
 
-        for camera, ts in zip(cameras, ts_for_cameras):
+        for camera, ts in zip(tqdm(cameras, desc="Testing projector"), ts_for_cameras):
             for R, lambdas, t, board in tqdm(
                 product(Rs, lambdass, ts, boards),
                 leave=False,
                 total=len(Rs) * len(lambdass) * len(ts) * len(boards),
-                desc="Testing projector",
             ):
                 with self.subTest(t=t, R=R, lambdas=lambdas, camera=camera):
                     self.assertEqual(board.dtype, np.float64)

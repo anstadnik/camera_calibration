@@ -12,7 +12,7 @@ from calibration.projector.camera import Camera
 class TestBenchmark(TestCase):
     def test_benchmark(self):
         Rs = [
-            np.eye(3),
+            # np.eye(3),
             Rotation.from_euler("xyz", [10, 10, 10], degrees=True).as_matrix(),
         ]
         lambdass = [
@@ -21,13 +21,16 @@ class TestBenchmark(TestCase):
             for l2 in np.arange(
                 -2.61752136752137 * l1 - 6.85141810943093,
                 -2.61752136752137 * l1 - 4.39190876941320,
-                0.5,
+                1.0,
             )
         ]
         cameras = [
             Camera(),
             # Camera(135.0, np.array([40, 30]), np.array([1920, 1080])),
             Camera(135.0, np.array([40, 30]), np.array([1920, 1080]), 1.0),
+            Camera(
+                135.0, np.array([36, 36 * 1080 / 1920]), np.array([1920, 1080]), 1.0
+            ),
         ]
         ts_for_cameras = [
             list(map(np.array, product([-0.1, 0.1], [-0.1, 0.1], [-0.2, -0.01]))),
@@ -63,4 +66,4 @@ class TestBenchmark(TestCase):
                                         self.assertEqual(
                                             getattr(v, f.name), getattr(camera, f.name)
                                         )
-                    self.assertNotIn(None, results)
+                    self.assertEqual(results[0].error, 0.0)

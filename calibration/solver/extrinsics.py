@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.linalg import svd
 
 
 def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> np.ndarray:
@@ -20,7 +21,8 @@ def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> np.ndarray:
         [[-v * X_, -v * Y_, u * X_, u * Y_, -v, u] for (u, v), (X_, Y_) in zip(x, X)]
     )
 
-    _, _, V = np.linalg.svd(M, full_matrices=False)
+    # _, _, V = np.linalg.svd(M, full_matrices=False)
+    _, _, V = svd(M, full_matrices=False)
     assert isinstance(V, np.ndarray)
     H = V.T[:, -1]
     r_11, r_12, r_21, r_22, t_1, t_2 = H

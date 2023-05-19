@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from tqdm.auto import tqdm
 import numpy as np
 from tqdm.contrib.concurrent import process_map
 
@@ -33,7 +32,7 @@ class BenchmarkResult:
                 @ max_point_img_space
             )
             max_r = float(np.linalg.norm(max_point[:2]))
-            corners_ = self.prediction.project(self.features.board, max_r * 10)
+            corners_ = self.prediction.project(self.features.board, max_r)
         except ValueError:
             return -1.0
         return np.sqrt(((corners_ - self.features.corners) ** 2).mean())
