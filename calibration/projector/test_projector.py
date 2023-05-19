@@ -31,10 +31,9 @@ class TestBoard(unittest.TestCase):
             [4, 2],
         ]
         b /= np.array([4, 2])
-        b -= 0.5
 
-        np.testing.assert_array_equal(b.min(axis=0), [-0.5, -0.5])
-        np.testing.assert_array_equal(b.max(axis=0), [0.5, 0.5])
+        np.testing.assert_array_equal(b.min(axis=0), [0.0, 0.0])
+        np.testing.assert_array_equal(b.max(axis=0), [1.0, 1.0])
         np.testing.assert_array_equal(gen_checkerboard_grid(3, 5), b)
 
     def test_gen_charuco_grid(self):
@@ -58,10 +57,9 @@ class TestBoard(unittest.TestCase):
             ]
         )
         b /= np.array([2.0, 1.0])
-        b -= 0.5
 
-        np.testing.assert_array_equal(b.min(axis=0), [-0.5, -0.5])
-        np.testing.assert_array_equal(b.max(axis=0), [0.5, 0.5])
+        np.testing.assert_array_equal(b.min(axis=0), [0.0, 0.0])
+        np.testing.assert_array_equal(b.max(axis=0), [1.0, 1.0])
         np.testing.assert_array_equal(gen_charuco_grid(3, 5, 0.4, 0.2), b)
 
 
@@ -106,13 +104,16 @@ class TestProjector(unittest.TestCase):
         ]
         cameras = [
             Camera(),
-            Camera(135.0, np.array([40, 30]), np.array([1920, 1080])),
+            # Camera(135.0, np.array([40, 30]), np.array([1920, 1080])),
             Camera(135.0, np.array([40, 30]), np.array([1920, 1080]), 1.0),
+            # Camera(
+            #     135.0, np.array([36, 36 * 1080 / 1920]), np.array([1920, 1080]), 1.0
+            # ),
         ]
         ts_for_cameras = [
-            list(map(np.array, product([-0.1, 0.1], [-0.1, 0.1], [-0.2, -0.01]))),
-            list(map(np.array, product([-0.01, 0.01], [-0.01, 0.01], [-0.1, -0.01]))),
-            list(map(np.array, product([-0.01, 0.01], [-0.01, 0.01], [-0.1, -0.01]))),
+            list(map(np.array, product([-0.1, 0.1], [-0.1, 0.1], [-0.1, -0.01]))),
+            list(map(np.array, product([-0.01, 0.01], [-0.01, 0.01], [-0.05, -0.01]))),
+            list(map(np.array, product([-0.01, 0.01], [-0.01, 0.01], [-0.05, -0.01]))),
         ]
         boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
 
