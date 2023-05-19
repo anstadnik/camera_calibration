@@ -13,7 +13,7 @@ def solve(x: np.ndarray, X: np.ndarray, camera: Camera) -> Projector:
     Args:
         x: [x, y] mx2 array of image points
         X: [x, y] mx2 array of board points
-        intrinsic_matrix: Intrinsic matrix
+        camera: Camera object
 
     Returns:
         lambdas: [2x1] array of camera parameters
@@ -21,8 +21,9 @@ def solve(x: np.ndarray, X: np.ndarray, camera: Camera) -> Projector:
         t: [1x1] translation
     """
     x = np.c_[x, np.ones(x.shape[0])]
-    x = np.linalg.pinv(camera.intrinsic_matrix) @ x.T
-    x = x.T[:, :2]
+    x = (np.linalg.inv(camera.intrinsic_matrix) @ x.T).T
+    x /= x[:, 2][:, None]  # type: ignore
+    x = x[:, :2]
 
     p = solve_extrinsic(x, X)
     lambdas, t_3 = solve_intrinsic(x, X, p)

@@ -67,8 +67,7 @@ def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> np.ndarray:
                 )
             )
 
-    # for i in range(RR.shape[2]):
-    #     ic(RR[:, :, i])
+    np.testing.assert_array_equal(X[0], [0, 0])
 
     minRR = np.inf
     minRR_ind = -1
