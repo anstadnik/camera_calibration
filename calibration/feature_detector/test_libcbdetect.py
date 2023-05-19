@@ -35,5 +35,5 @@ class TestFeatures(unittest.TestCase):
         # plot_corners(img, corners)
         boards = boards_from_corners(img, corners, params)
 
-        assert corners.p
-        assert boards
+        self.assertTrue(corners.p)
+        self.assertTrue(boards)

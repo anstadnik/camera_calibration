@@ -35,16 +35,16 @@ def _process_projector(
     return None, p
 
 
-def _get_Projector(_) -> Projector:
-    return Projector()
+def _get_Projector(kwargs: dict) -> Projector:
+    return Projector(**kwargs)
 
 
 def simul_features(
-    n: int, board: np.ndarray
+    n: int, board: np.ndarray, kwargs: dict
 ) -> list[tuple[Features | None, Projector]]:
     projectors = process_map(
         _get_Projector,
-        range(n),
+        (kwargs for _ in range(n)),
         chunksize=100,
         leave=False,
         desc="Generating projectors",

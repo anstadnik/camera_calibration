@@ -56,9 +56,9 @@ def evaluate(
 
 
 def benchmark_simul(
-    n=int(1e6), board=gen_checkerboard_grid(7, 9)
+    n=int(1e6), board=gen_checkerboard_grid(7, 9), kwargs: dict | None = None
 ) -> list[BenchmarkResult]:
-    feats_and_projs = simul_features(n, board)
+    feats_and_projs = simul_features(n, board, kwargs or {})
     projs_ = calibrate([(f, p.camera) for f, p in feats_and_projs])
     return evaluate(feats_and_projs, projs_)
 
