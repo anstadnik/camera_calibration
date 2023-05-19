@@ -75,9 +75,11 @@ def _process_entry(entry: Entry) -> Features | None:
         return None
     best_board_i = np.array([(np.array(b.idx) > 0).sum() for b in boards]).argmax()
     best_board = np.array(boards[best_board_i].idx)
-    board = np.transpose(np.nonzero(best_board >= 0))
+    board = np.transpose(np.nonzero(best_board >= 0)).astype(np.float64)
     # Swap y and x
     board = board[:, [1, 0]]
+    board /= board.max(axis=0)
+    board -= 0.5
     corners = np.array(corners.p)[best_board[best_board >= 0]]
 
     return None if np.isinf(corners).any() else Features(board, corners)

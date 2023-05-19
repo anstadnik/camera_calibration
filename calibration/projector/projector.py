@@ -45,7 +45,7 @@ class Projector:
     lambdas: np.ndarray = field(default_factory=_gen_lambdas)
     camera: Camera = field(default_factory=Camera)
 
-    def project(self, X: np.ndarray) -> np.ndarray:
+    def project(self, X: np.ndarray, max_r: float | None = None) -> np.ndarray:
         """
         Simulates the projection of board points (X) onto a image plane,
         given the simulation parameters (p).
@@ -75,9 +75,12 @@ class Projector:
             # x[2] == 1
             return self.psi(r) * np.linalg.norm(x[:2]) - r
 
-        max_point_img_space = np.r_[self.camera.resolution, 1]
-        max_point = np.linalg.inv(self.camera.intrinsic_matrix) @ max_point_img_space
-        max_r = np.linalg.norm(max_point[:2])
+        if max_r is None:
+            max_point_img_space = np.r_[self.camera.resolution, 1]
+            max_point = (
+                np.linalg.inv(self.camera.intrinsic_matrix) @ max_point_img_space
+            )
+            max_r = float(np.linalg.norm(max_point[:2]))
         rs = np.array(
             [root_scalar(f, args=(xi,), bracket=(0, max_r)).root for xi in x[idx]]
         )
