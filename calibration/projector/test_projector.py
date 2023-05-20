@@ -111,7 +111,9 @@ class TestProjector(unittest.TestCase):
             list(map(np.array, product([-1.7, -0.8], [-1.2, -0.8], [13.0, 20.0]))),
         ]
         boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
-        for camera, ts in zip(tqdm(cameras, desc="Testing projector"), ts_for_cameras):
+        for camera, ts in zip(
+            tqdm(cameras, leave=False, desc="Testing projector"), ts_for_cameras
+        ):
             for R, lambdas, t, board in tqdm(
                 product(Rs, lambdass, ts, boards),
                 leave=False,
