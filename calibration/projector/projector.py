@@ -9,7 +9,7 @@ from .camera import Camera
 
 
 def _gen_lambdas() -> np.ndarray:
-    l1 = np.random.uniform(-1.5, 1.5)
+    l1 = np.random.uniform(-5.0, 1.0)
     l2 = np.random.uniform(
         -2.61752136752137 * l1 - 6.85141810943093,
         -2.61752136752137 * l1 - 4.39190876941320,
@@ -41,7 +41,7 @@ class Projector:
 
     R: np.ndarray = field(default_factory=lambda: qr(np.random.randn(3, 3))[0])
     t: np.ndarray = field(
-        default_factory=lambda: np.random.uniform([-1.0, -0.7, 2.5], [1.5, 1.5, 4.0])
+        default_factory=lambda: np.random.uniform([-1.0, -0.7, 2.5], [0.0, 0.3, 4.0])
     )
     lambdas: np.ndarray = field(default_factory=_gen_lambdas)
     camera: Camera = field(default_factory=Camera)
