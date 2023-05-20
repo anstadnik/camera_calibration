@@ -1,11 +1,7 @@
 import unittest
-from itertools import product
 
 import numpy as np
-from scipy.spatial.transform import Rotation
-from tqdm.auto import tqdm
 
-from calibration.projector.projector import Projector
 
 from .board import gen_charuco_grid, gen_checkerboard_grid
 from .camera import Camera

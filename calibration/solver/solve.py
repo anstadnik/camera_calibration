@@ -39,6 +39,3 @@ def solve(x: np.ndarray, X: np.ndarray, camera: Camera) -> Projector:
     ]
 
     return projs[np.argmin(reproj_errors)]
-
-    # assert proj is not None
-    # return proj

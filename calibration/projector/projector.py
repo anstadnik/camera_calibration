@@ -74,7 +74,6 @@ class Projector:
         # x = (np.linalg.inv(self.P) @ X_h.T).T
         x = (self.P @ X_h.T).T
         x /= x[:, 2][:, None]
-        # px.scatter(x, x=0, y=1).show()
 
         # Distortion
         idx = np.linalg.norm(x[:, :2], axis=1) > np.finfo(float).eps
@@ -98,7 +97,6 @@ class Projector:
             self.psi(np.linalg.norm(x[idx, :2], axis=1)), x[idx, 2], decimal=5
         )
         x[:, 2] = 1
-        # px.scatter(x, x=0, y=1).show()
 
         # Intrinsics
         x = (self.camera.intrinsic_matrix @ x.T).T

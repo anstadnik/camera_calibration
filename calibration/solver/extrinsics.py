@@ -86,12 +86,4 @@ def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> list[np.ndarray]:
     RR_t1_dists = np.linalg.norm(RR[:2, 2, :] - x[0][:, np.newaxis], axis=0)
     min_, max_ = np.min(RR_t1_dists), np.max(RR_t1_dists)
     min_ids =np.nonzero(RR_t1_dists < min_ + ((max_-min_) / 100) )[0]
-    Hs = [RR[:, :, i] for i in min_ids]
-
-    # print(minRR_ind)
-    # minRR_ind = 3
-
-    # H = RR[:, :, minRR_ind]
-    
-
-    return Hs
+    return [RR[:, :, i] for i in min_ids]

@@ -15,16 +15,12 @@ class TestProjectorAndSolver(unittest.TestCase):
     def test_proj_equal_backproj(self):
         Rs = [
             np.eye(3),
-            # Rotation.from_euler("z", 10, degrees=True).as_matrix(),
-            Rotation.from_euler("y", 5, degrees=True).as_matrix(),
             Rotation.from_euler("xyz", [5, 5, 5], degrees=True).as_matrix(),
-            Rotation.from_euler("xyz", [10, 10, 10], degrees=True).as_matrix(),
+            Rotation.from_euler("xyz", [-5, 3, 5], degrees=True).as_matrix(),
         ]
         lambdass = [
             np.array([l1, l2])
-            # for l1 in np.arange(-5.0, 1.1, 2)
             for l1 in np.arange(-5.0, 1.1, 2)
-            # for l2 in np.arange(-5.0, 1.1, 2)
             for l2 in np.arange(
                 -2.61752136752137 * l1 - 6.85141810943093,
                 -2.61752136752137 * l1 - 4.39190876941320,
@@ -40,7 +36,6 @@ class TestProjectorAndSolver(unittest.TestCase):
             list(map(np.array, product([-1.7, -0.8], [-1.2, -0.8], [13.0, 20.0]))),
         ]
         boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
-        # boards = [gen_checkerboard_grid(7, 9)]
 
         def f(R, t, lambdas, camera, board):
             with self.subTest(R=R, t=t, lambdas=lambdas, camera=camera):
@@ -50,25 +45,18 @@ class TestProjectorAndSolver(unittest.TestCase):
 
                 self.assertTrue((x > 0).all())
                 self.assertTrue((x < proj.camera.resolution).all())
+
                 X_ = proj.backproject(x)
-                # TODO: change to rtol
                 np.testing.assert_allclose(X_, board, atol=1e-10, rtol=1e-6)
+
                 proj_ = solve(x, board, camera)
-                # np.testing.assert_allclose(proj.t, proj_.t, atol=1e-10, rtol=0.1)
-                # np.testing.assert_allclose(proj.R, proj_.R, atol=1e-10, rtol=0.1)
-                # np.testing.assert_allclose(
-                #     proj.lambdas, proj_.lambdas, atol=1e-10, rtol=0.1
-                # )
+                atol = 1e-3 if camera.focal_length == 135 else 1e-5
+                np.testing.assert_allclose(proj.t, proj_.t, atol=atol)
+                np.testing.assert_allclose(proj.R, proj_.R, atol=atol)
+                np.testing.assert_allclose(proj.lambdas, proj_.lambdas, atol=atol)
 
-                try:
-                    x_ = proj_.project(board)
-                except ValueError:
-                    with open("WTF.pkl", "wb") as f:
-                        import pickle
-
-                        pickle.dump((proj, board), f)
-                    raise
-                np.testing.assert_allclose(x_, x, atol=1e-10, rtol=0.1)
+                x_ = proj_.project(board)
+                np.testing.assert_allclose(x_, x, atol=1e-10, rtol=1e-5)
 
         for camera, ts in zip(
             tqdm(cameras, leave=False, desc="Testing projector and solver"),
@@ -76,17 +64,16 @@ class TestProjectorAndSolver(unittest.TestCase):
         ):
             for R, lambdas, t, board in tqdm(
                 product(Rs, lambdass, ts, boards),
-                # [deque(product(Rs, lambdass, ts, boards), 3)[0]],
                 leave=False,
                 total=len(Rs) * len(lambdass) * len(ts) * len(boards),
             ):
                 f(R, t, lambdas, camera, board)
 
-        # d = boards[0].max(axis=0)
-        # f(
-        #     Rs[0],
-        #     ts_for_cameras[0][0] + np.r_[d, 0],
-        #     lambdass[0],
-        #     cameras[0],
-        #     boards[0][::-1] - d,
-        # )
+        d = boards[0].max(axis=0)
+        f(
+            Rs[0],
+            ts_for_cameras[0][0] + np.r_[d, 0],
+            lambdass[0],
+            cameras[0],
+            boards[0][::-1] - d,
+        )
