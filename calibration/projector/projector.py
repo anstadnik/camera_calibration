@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+import plotly.express as px
 
 import numpy as np
 from numpy.linalg import qr
@@ -24,10 +25,10 @@ class Projector:
 
     Attributes:
         R (np.ndarray):
-            A 3x3 orthogonal matrix representing the backprojection rotation
+            A 3x3 orthogonal matrix representing the projection rotation
             matrix (default: random).
         t (np.ndarray):
-            A 3D vector representing the backprojection translation vector
+            A 3D vector representing the projection translation vector
             (default: random).
         lambdas (np.ndarray):
             A 1D array of radial distortion coefficients (default: random).
@@ -40,7 +41,7 @@ class Projector:
 
     R: np.ndarray = field(default_factory=lambda: qr(np.random.randn(3, 3))[0])
     t: np.ndarray = field(
-        default_factory=lambda: np.random.uniform([-0.1, -0.1, -0.4], [0.1, 0.1, -0.01])
+        default_factory=lambda: np.random.uniform([-1.0, -0.7, 2.5], [1.5, 1.5, 4.0])
     )
     lambdas: np.ndarray = field(default_factory=_gen_lambdas)
     camera: Camera = field(default_factory=Camera)
@@ -74,6 +75,7 @@ class Projector:
         # x = (np.linalg.inv(self.P) @ X_h.T).T
         x = (self.P @ X_h.T).T
         x /= x[:, 2][:, None]
+        # px.scatter(x, x=0, y=1).show()
 
         # Distortion
         idx = np.linalg.norm(x[:, :2], axis=1) > np.finfo(float).eps
@@ -87,7 +89,7 @@ class Projector:
             max_point = (
                 np.linalg.inv(self.camera.intrinsic_matrix) @ max_point_img_space
             )
-            max_r = float(np.linalg.norm(max_point[:2]))
+            max_r = float(np.linalg.norm(max_point[:2])) * 1.1
         rs = np.array(
             [root_scalar(f, args=(xi,), bracket=(0, max_r)).root for xi in x[idx]]
         )
@@ -97,6 +99,7 @@ class Projector:
             self.psi(np.linalg.norm(x[idx, :2], axis=1)), x[idx, 2], decimal=5
         )
         x[:, 2] = 1
+        # px.scatter(x, x=0, y=1).show()
 
         # Intrinsics
         x = (self.camera.intrinsic_matrix @ x.T).T
@@ -131,6 +134,6 @@ class Projector:
         x /= x[:, 2][:, None]  # type: ignore
 
         # Extrinsics
-        x = (self.P @ x.T).T
+        x = (np.linalg.inv(self.P) @ x.T).T
         x /= x[:, 2][:, None]
         return x[:, :2]

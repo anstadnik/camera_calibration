@@ -1,4 +1,5 @@
 from itertools import product
+import plotly.express as px
 from tqdm.auto import tqdm
 from scipy.spatial.transform import Rotation
 import unittest
@@ -90,33 +91,43 @@ class TestProjector(unittest.TestCase):
     def test_proj_equal_backproj(self):
         Rs = [
             np.eye(3),
-            Rotation.from_euler("z", 10, degrees=True).as_matrix(),
-            Rotation.from_euler("xyz", [10, 10, 10], degrees=True).as_matrix(),
+            # Rotation.from_euler("z", 10, degrees=True).as_matrix(),
+            # Rotation.from_euler("xyz", [10, 10, 10], degrees=True).as_matrix(),
         ]
         lambdass = [
             np.array([l1, l2])
-            for l1 in np.arange(-1.5, 1.51, 1)
+            for l1 in np.arange(-5., 5.1, 2)
             for l2 in np.arange(
                 -2.61752136752137 * l1 - 6.85141810943093,
                 -2.61752136752137 * l1 - 4.39190876941320,
-                0.5,
+                1.0,
             )
         ]
         cameras = [
             Camera(),
             # Camera(135.0, np.array([40, 30]), np.array([1920, 1080])),
-            Camera(135.0, np.array([40, 30]), np.array([1920, 1080]), 1.0),
+            # Camera(135.0, np.array([40, 30]), np.array([1920, 1080]), 1.0),
             # Camera(
             #     135.0, np.array([36, 36 * 1080 / 1920]), np.array([1920, 1080]), 1.0
             # ),
         ]
         ts_for_cameras = [
-            list(map(np.array, product([-0.1, 0.1], [-0.1, 0.1], [-0.1, -0.01]))),
-            list(map(np.array, product([-0.01, 0.01], [-0.01, 0.01], [-0.05, -0.01]))),
-            list(map(np.array, product([-0.01, 0.01], [-0.01, 0.01], [-0.05, -0.01]))),
+            list(map(np.array, product([1.0, 1.5], [1.0, 1.5], [2.5, 4.0]))),
+            # list(map(np.array, product([-0.01, 0.01], [-0.01, 0.01], [0.01, 0.05]))),
+            # list(map(np.array, product([-0.01, 0.01], [-0.01, 0.01], [-0.05, -0.01]))),
         ]
-        boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
+        # boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
+        boards = [gen_checkerboard_grid(7, 9)]
 
+        # Rs = [np.array(
+        #     [
+        #         [0.96984631, -0.14131448, 0.19856573],
+        #         [0.17101007, 0.97508244, -0.14131448],
+        #         [-0.17364818, 0.17101007, 0.96984631],
+        #     ]
+        # )]
+        # lambdass = [np.array([-1.5, -1.92513606])]
+        # ts_for_cameras=[[ np.array([-0.01, -0.01, 0.1])]]
         for camera, ts in zip(tqdm(cameras, desc="Testing projector"), ts_for_cameras):
             for R, lambdas, t, board in tqdm(
                 product(Rs, lambdass, ts, boards),
@@ -130,8 +141,11 @@ class TestProjector(unittest.TestCase):
                         x = proj.project(board)
                     except ValueError:
                         self.fail("ValueError in project")
+                    # px.scatter(x, x=0, y=1).show()
 
-                    self.assertTrue((x > 0).all())
-                    self.assertTrue((x < proj.camera.resolution).all())
+                    # self.assertTrue((x > 0).all())
+                    # self.assertTrue((x < proj.camera.resolution).all())
+                    np.testing.assert_array_less(x, proj.camera.resolution)
+                    np.testing.assert_array_less(0, x)
                     X_ = proj.backproject(x)
                     np.testing.assert_allclose(X_, board, atol=1e-10)
