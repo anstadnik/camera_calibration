@@ -71,7 +71,8 @@ class Projector:
         """
         # Extrinsics
         X_h = np.c_[X, np.ones(X.shape[0])]
-        x = (np.linalg.inv(self.P) @ X_h.T).T
+        # x = (np.linalg.inv(self.P) @ X_h.T).T
+        x = (self.P @ X_h.T).T
         x /= x[:, 2][:, None]
 
         # Distortion
