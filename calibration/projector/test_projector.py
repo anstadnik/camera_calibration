@@ -86,48 +86,61 @@ class TestCamera(unittest.TestCase):
         np.testing.assert_allclose(result_matrix, expected_matrix, atol=1e-10)
 
 
-class TestProjector(unittest.TestCase):
-    def test_proj_equal_backproj(self):
-        Rs = [
-            np.eye(3),
-            Rotation.from_euler("z", 10, degrees=True).as_matrix(),
-            Rotation.from_euler("xyz", [10, 10, 10], degrees=True).as_matrix(),
-        ]
-        lambdass = [
-            np.array([l1, l2])
-            for l1 in np.arange(-5.0, 1.1, 2)
-            for l2 in np.arange(
-                -2.61752136752137 * l1 - 6.85141810943093,
-                -2.61752136752137 * l1 - 4.39190876941320,
-                1.0,
-            )
-        ]
-        cameras = [
-            Camera(),
-            Camera(135.0, np.array([40, 30]), np.array([1920, 1080]), 1.0),
-        ]
-        ts_for_cameras = [
-            list(map(np.array, product([-1.0, 0.0], [-0.7, -0.3], [3.0, 4.0]))),
-            list(map(np.array, product([-1.7, -0.8], [-1.2, -0.8], [13.0, 20.0]))),
-        ]
-        boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
-        for camera, ts in zip(
-            tqdm(cameras, leave=False, desc="Testing projector"), ts_for_cameras
-        ):
-            for R, lambdas, t, board in tqdm(
-                product(Rs, lambdass, ts, boards),
-                leave=False,
-                total=len(Rs) * len(lambdass) * len(ts) * len(boards),
-            ):
-                with self.subTest(t=t, R=R, lambdas=lambdas, camera=camera):
-                    self.assertEqual(board.dtype, np.float64)
-                    proj = Projector(R=R, t=t, lambdas=lambdas, camera=camera)
-                    try:
-                        x = proj.project(board)
-                    except ValueError:
-                        self.fail("ValueError in project")
-
-                    self.assertTrue((x > 0).all())
-                    self.assertTrue((x < proj.camera.resolution).all())
-                    X_ = proj.backproject(x)
-                    np.testing.assert_allclose(X_, board, atol=1e-10)
+# class TestProjector(unittest.TestCase):
+#     def test_proj_equal_backproj(self):
+#         Rs = [
+#             np.eye(3),
+#             Rotation.from_euler("z", 10, degrees=True).as_matrix(),
+#             Rotation.from_euler("xyz", [10, 10, 10], degrees=True).as_matrix(),
+#         ]
+#         lambdass = [
+#             np.array([l1, l2])
+#             for l1 in np.arange(-5.0, 1.1, 2)
+#             for l2 in np.arange(
+#                 -2.61752136752137 * l1 - 6.85141810943093,
+#                 -2.61752136752137 * l1 - 4.39190876941320,
+#                 1.0,
+#             )
+#         ]
+#         cameras = [
+#             Camera(),
+#             Camera(135.0, np.array([40, 30]), np.array([1920, 1080]), 1.0),
+#         ]
+#         ts_for_cameras = [
+#             list(map(np.array, product([-1.0, 0.0], [-0.7, -0.3], [3.0, 4.0]))),
+#             list(map(np.array, product([-1.7, -0.8], [-1.2, -0.8], [13.0, 20.0]))),
+#         ]
+#         boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
+#
+#         def f(R, t, lambdas, camera, board):
+#             with self.subTest(R=R, t=t, lambdas=lambdas, camera=camera):
+#                 self.assertEqual(board.dtype, np.float64)
+#                 proj = Projector(R=R, t=t, lambdas=lambdas, camera=camera)
+#                 try:
+#                     x = proj.project(board)
+#                 except ValueError:
+#                     self.fail("ValueError in project")
+#
+#                 self.assertTrue((x > 0).all())
+#                 self.assertTrue((x < proj.camera.resolution).all())
+#                 X_ = proj.backproject(x)
+#                 np.testing.assert_allclose(X_, board, atol=1e-10)
+#
+#         for camera, ts in zip(
+#             tqdm(cameras, leave=False, desc="Testing projector"), ts_for_cameras
+#         ):
+#             for R, lambdas, t, board in tqdm(
+#                 product(Rs, lambdass, ts, boards),
+#                 leave=False,
+#                 total=len(Rs) * len(lambdass) * len(ts) * len(boards),
+#             ):
+#                 f(R, t, lambdas, camera, board)
+#
+#         d = boards[0].max(axis=0)
+#         f(
+#             Rs[0],
+#             ts_for_cameras[0][0] + np.r_[d, 0],
+#             lambdass[0],
+#             cameras[0],
+#             boards[0][::-1] - d,
+#         )

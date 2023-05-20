@@ -47,6 +47,7 @@ def simul_features(
         (kwargs for _ in range(n)),
         chunksize=100,
         leave=False,
+        total=n,
         desc="Generating projectors",
     )
     return process_map(
@@ -78,8 +79,8 @@ def _process_entry(entry: Entry) -> Features | None:
     board = np.transpose(np.nonzero(best_board >= 0)).astype(np.float64)
     # Swap y and x
     board = board[:, [1, 0]]
+    board -= board[0]
     board /= board.max(axis=0)
-    board -= 0.5
     corners = np.array(corners.p)[best_board[best_board >= 0]]
 
     return None if np.isinf(corners).any() else Features(board, corners)
