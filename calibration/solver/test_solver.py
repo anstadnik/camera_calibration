@@ -5,7 +5,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 from tqdm.auto import tqdm
 
-from calibration.projector.board import gen_checkerboard_grid
+from calibration.projector.board import gen_charuco_grid, gen_checkerboard_grid
 from calibration.projector.camera import Camera
 from calibration.projector.projector import Projector
 from calibration.solver.solve import solve
@@ -18,7 +18,7 @@ class TestProjectorAndSolver(unittest.TestCase):
             # Rotation.from_euler("z", 10, degrees=True).as_matrix(),
             Rotation.from_euler("y", 5, degrees=True).as_matrix(),
             Rotation.from_euler("xyz", [5, 5, 5], degrees=True).as_matrix(),
-            # Rotation.from_euler("xyz", [10, 10, 10], degrees=True).as_matrix(),
+            Rotation.from_euler("xyz", [10, 10, 10], degrees=True).as_matrix(),
         ]
         lambdass = [
             np.array([l1, l2])
@@ -39,8 +39,8 @@ class TestProjectorAndSolver(unittest.TestCase):
             list(map(np.array, product([-1.0, 0.0], [-0.7, -0.3], [3.0, 4.0]))),
             list(map(np.array, product([-1.7, -0.8], [-1.2, -0.8], [13.0, 20.0]))),
         ]
-        # boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
-        boards = [gen_checkerboard_grid(7, 9)]
+        boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
+        # boards = [gen_checkerboard_grid(7, 9)]
 
         def f(R, t, lambdas, camera, board):
             with self.subTest(R=R, t=t, lambdas=lambdas, camera=camera):

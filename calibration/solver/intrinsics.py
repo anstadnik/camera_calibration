@@ -13,7 +13,7 @@ def solve_intrinsic(
             where n is the number of points and each point is represented as [x, y].
         X (np.ndarray): Points in the board space, with shape (n, 2),
             where n is the number of points and each point is represented as [x, y].
-        H (np.ndarray): A 3x3 array representing the extrinsic parameters of the camera.
+        p (np.ndarray): A 3x3 array representing the extrinsic parameters of the camera.
 
     Returns:
         tuple[np.ndarray, np.ndarray]: A tuple containing the intrinsic parameters
@@ -32,7 +32,8 @@ def solve_intrinsic(
 
     p_vals = np.linalg.norm(x[:, :2], axis=1)
     p_vals = np.tile(p_vals, 2)
-    p_vals = p_vals[:, np.newaxis] ** (2 * np.arange(1, N + 1)[np.newaxis, :])
+    # p_vals = p_vals[:, np.newaxis] ** (2 * np.arange(1, N + 1)[np.newaxis, :])
+    p_vals = np.c_[p_vals**2, p_vals**4]
 
     A_C_p_mat = A_C_vec[:, None] * p_vals
 

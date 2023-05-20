@@ -20,14 +20,25 @@ def solve(x: np.ndarray, X: np.ndarray, camera: Camera) -> Projector:
         R: [3x3] rotation matrix
         t: [1x1] translation
     """
-    x = np.c_[x, np.ones(x.shape[0])]
-    x = (np.linalg.inv(camera.intrinsic_matrix) @ x.T).T
-    x /= x[:, 2][:, None]  # type: ignore
-    x = x[:, :2]
+    x_ = np.c_[x, np.ones(x.shape[0])]
+    x_ = (np.linalg.inv(camera.intrinsic_matrix) @ x_.T).T
+    x_ /= x_[:, 2][:, None]
+    x_ = x_[:, :2]
 
-    p = solve_extrinsic(x, X)
-    lambdas, t_3 = solve_intrinsic(x, X, p)
-    p[2, 2] = t_3
-    t = p[:, 2]
-    R = np.c_[p[:, :2], np.cross(p[:, 0], p[:, 1])]
-    return Projector(R=R, t=t, lambdas=lambdas, camera=camera)
+    ps = solve_extrinsic(x_, X)
+    assert ps
+    projs = []
+    for p in ps:
+        lambdas, t_3 = solve_intrinsic(x_, X, p)
+        t = np.r_[p[:2, 2], t_3]
+        R = np.c_[p[:, :2], np.cross(p[:, 0], p[:, 1])]
+        projs.append(Projector(R=R, t=t, lambdas=lambdas, camera=camera))
+
+    reproj_errors = [
+        np.linalg.norm(proj_.backproject(x) - X, axis=1).mean() for proj_ in projs
+    ]
+
+    return projs[np.argmin(reproj_errors)]
+
+    # assert proj is not None
+    # return proj

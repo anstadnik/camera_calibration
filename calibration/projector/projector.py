@@ -103,7 +103,7 @@ class Projector:
         # Intrinsics
         x = (self.camera.intrinsic_matrix @ x.T).T
         # Pyright bug
-        x /= x[:, 2][:, None]  # type: ignore
+        x /= x[:, 2][:, None]
         return x[:, :2]
 
     def backproject(self, x: np.ndarray) -> np.ndarray:
@@ -126,11 +126,11 @@ class Projector:
         x = np.c_[x, np.ones(x.shape[0])]
         x = (np.linalg.inv(self.camera.intrinsic_matrix) @ x.T).T
         # Pyright bug
-        x /= x[:, 2][:, None]  # type: ignore
+        x /= x[:, 2][:, None]
 
         # Distortion
         x[:, 2] = self.psi(np.linalg.norm(x[:, :2], axis=1))
-        x /= x[:, 2][:, None]  # type: ignore
+        x /= x[:, 2][:, None]
 
         # Extrinsics
         x = (np.linalg.inv(self.P) @ x.T).T

@@ -4,7 +4,7 @@ import numpy as np
 import plotly.express as px
 from pandas.compat import os
 
-from calibration.benchmark.benchmark import benchmark_simul
+from calibration.benchmark.benchmark import benchmark_babelcalib, benchmark_simul
 from calibration.solver.solve import solve
 
 
@@ -30,13 +30,13 @@ def test_solver():
     # px.scatter(x=board[:, 0], y=board[:, 1], color = range(board.shape[0])).show()
 
     proj_ = solve(x, board, proj.camera)
-    print(proj.R)
-    print(proj_.R)
-    print(abs(proj.R) - abs(proj_.R))
-    print(proj.t, proj_.t)
-    print(proj_.lambdas, proj.lambdas)
-    print(proj_.t - proj.t)
-    print(proj_.lambdas - proj.lambdas)
+    # print(proj.R)
+    # print(proj_.R)
+    # print(abs(proj.R) - abs(proj_.R))
+    # print(proj.t, proj_.t)
+    # print(proj_.lambdas, proj.lambdas)
+    # print(proj_.t - proj.t)
+    # print(proj_.lambdas - proj.lambdas)
     board_ = proj_.backproject(x)
     np.testing.assert_allclose(board, board_, atol=1e-10, rtol=1e-6)
 
@@ -59,10 +59,10 @@ def test_solver():
 if __name__ == "__main__":
     test_solver()
     # if not os.path.isfile("babelcalib_results.pkl"):
-    #     babelcalib_results = benchmark_babelcalib(load_babelcalib()[:10])
+    #     babelcalib_results = benchmark_babelcalib()
     #     with open("babelcalib_results.pkl", "wb") as f:
     #         pkl.dump(babelcalib_results, f)
-    if not os.path.isfile("simul_results.pkl"):
-        simul_results = benchmark_simul(int(1e5))
-        with open("simul_results.pkl", "wb") as f:
-            pkl.dump(simul_results, f)
+    # if not os.path.isfile("simul_results.pkl"):
+    #     simul_results = benchmark_simul(int(1e5))
+    #     with open("simul_results.pkl", "wb") as f:
+    #         pkl.dump(simul_results, f)

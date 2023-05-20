@@ -2,7 +2,7 @@ import numpy as np
 from scipy.linalg import svd
 
 
-def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> np.ndarray:
+def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> list[np.ndarray]:
     """
     Computes the extrinsic parameters of a camera, given the 2D image points and
     the 3D world points.
@@ -69,15 +69,29 @@ def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> np.ndarray:
                 )
             )
 
+    # for i1 in range(RR.shape[2]):
+    #     print(f"RR[:, :, {i1}] = \n{RR[:, :, i1]}")
+
     np.testing.assert_array_equal(X[0], [0, 0])
 
-    minRR = np.inf
-    minRR_ind = -1
-    for min_count in range(RR.shape[2]):
-        if np.linalg.norm(RR[:2, 2, min_count] - x[0]) < minRR:
-            minRR = np.linalg.norm(RR[:2, 2, min_count] - x[0])
-            minRR_ind = min_count
+    # This part is designed to find Hs which correspond to the correct side from
+    # the camera's point of view (i.e. it should be in front of the camera and
+    #                               not behind it)
+    # minRR = np.inf
+    # # minRR_ind = -1
+    # for min_count in range(RR.shape[2]):
+    #     if np.linalg.norm(RR[:2, 2, min_count] - x[0]) < minRR:
+    #         minRR = np.linalg.norm(RR[:2, 2, min_count] - x[0])
+    #         # minRR_ind = min_count
+    RR_t1_dists = np.linalg.norm(RR[:2, 2, :] - x[0][:, np.newaxis], axis=0)
+    min_, max_ = np.min(RR_t1_dists), np.max(RR_t1_dists)
+    min_ids =np.nonzero(RR_t1_dists < min_ + ((max_-min_) / 100) )[0]
+    Hs = [RR[:, :, i] for i in min_ids]
 
-    H = RR[:, :, minRR_ind]
+    # print(minRR_ind)
+    # minRR_ind = 3
 
-    return H
+    # H = RR[:, :, minRR_ind]
+    
+
+    return Hs
