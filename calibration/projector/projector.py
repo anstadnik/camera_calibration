@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-import plotly.express as px
 
 import numpy as np
 from numpy.linalg import qr
