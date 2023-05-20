@@ -45,6 +45,14 @@ class Projector:
     lambdas: np.ndarray = field(default_factory=_gen_lambdas)
     camera: Camera = field(default_factory=Camera)
 
+    @property
+    def P(self) -> np.ndarray:
+        return np.c_[self.R[:, :2], self.t]
+
+    def psi(self, r):
+        l1, l2 = self.lambdas
+        return 1 + l1 * r**2 + l2 * r**4
+
     def project(self, X: np.ndarray, max_r: float | None = None) -> np.ndarray:
         """
         Simulates the projection of board points (X) onto a image plane,
@@ -63,9 +71,7 @@ class Projector:
         """
         # Extrinsics
         X_h = np.c_[X, np.ones(X.shape[0])]
-        P = np.c_[self.R[:, :2], self.t]
-        P_inv = np.linalg.inv(P)
-        x = (P_inv @ X_h.T).T
+        x = (np.linalg.inv(self.P) @ X_h.T).T
         x /= x[:, 2][:, None]
 
         # Distortion
@@ -124,11 +130,6 @@ class Projector:
         x /= x[:, 2][:, None]  # type: ignore
 
         # Extrinsics
-        P = np.c_[self.R[:, :2], self.t]
-        x = (P @ x.T).T
+        x = (self.P @ x.T).T
         x /= x[:, 2][:, None]
         return x[:, :2]
-
-    def psi(self, r):
-        l1, l2 = self.lambdas
-        return 1 + l1 * r**2 + l2 * r**4
