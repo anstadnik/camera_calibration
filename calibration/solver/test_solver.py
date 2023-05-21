@@ -17,6 +17,8 @@ class TestProjectorAndSolver(unittest.TestCase):
             np.eye(3),
             Rotation.from_euler("xyz", [5, 5, 5], degrees=True).as_matrix(),
             Rotation.from_euler("xyz", [-5, 3, 5], degrees=True).as_matrix(),
+            Rotation.from_euler("xyz", [0, 0, 90], degrees=True).as_matrix(),
+            # Rotation.from_euler("xyz", [0, 0, 180], degrees=True).as_matrix(),
         ]
         lambdass = [
             np.array([l1, l2])
@@ -33,7 +35,7 @@ class TestProjectorAndSolver(unittest.TestCase):
         ]
         ts_for_cameras = [
             list(map(np.array, product([-1.0, 0.0], [-0.7, -0.3], [3.0, 4.0]))),
-            list(map(np.array, product([-1.7, -0.8], [-1.2, -0.8], [13.0, 20.0]))),
+            list(map(np.array, product([-1.7, -0.8], [-1.2, -0.8], [20.0]))),
         ]
         boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
 

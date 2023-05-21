@@ -1,10 +1,11 @@
 from dataclasses import dataclass, field
+
 import numpy as np
 from tqdm.contrib.concurrent import process_map
 
 from calibration.benchmark.calib import calibrate
-
-from calibration.benchmark.features import Features, babelcalib_features, simul_features
+from calibration.benchmark.features import (Features, babelcalib_features,
+                                            simul_features)
 from calibration.data.babelcalib.babelcalib import Dataset, load_babelcalib
 from calibration.data.babelcalib.entry import Entry
 from calibration.projector.board import gen_checkerboard_grid
@@ -50,8 +51,14 @@ def _eval(arg: tuple[SIMUL_INP | BABELCALIB_INP, Projector | None]) -> Benchmark
 def evaluate(
     inp: list[SIMUL_INP] | list[BABELCALIB_INP], projs: list[Projector | None]
 ) -> list[BenchmarkResult]:
-    kwargs = dict(total=len(inp), leave=False, desc="Evaluating")
-    return process_map(_eval, map(tuple, zip(inp, projs)), **kwargs)
+    return process_map(
+        _eval,
+        zip(inp, projs),
+        total=len(inp),
+        chunksize=1000,
+        leave=False,
+        desc="Evaluating",
+    )
 
 
 def benchmark_simul(
@@ -67,12 +74,20 @@ def get_camera_from_entry(entry: Entry) -> Camera:
     resolution = np.array(entry.image.size)
     sensor_size = np.array([36, 36.0 * resolution[1] / resolution[0]])
     focal_length = 35
-    return Camera(focal_length, resolution, sensor_size, skew=0)
+    return Camera(
+        focal_length=focal_length, resolution=resolution, sensor_size=sensor_size
+    )
 
 
 def benchmark_babelcalib(dataset: list[Dataset] | None = None) -> list[BenchmarkResult]:
     if dataset is None:
         dataset = load_babelcalib()
+        # Skip aprilgrid
+        dataset = [
+            ds
+            for ds in dataset
+            if not (ds.name.startswith("UZH") or ds.name.startswith("Kalibr"))
+        ]
     feats_and_ents = babelcalib_features(dataset)
     projs_ = calibrate([(f, get_camera_from_entry(e)) for f, e in feats_and_ents])
     return evaluate(feats_and_ents, projs_)

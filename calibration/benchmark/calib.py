@@ -16,5 +16,5 @@ def calibrate(
     feature_and_camera: list[tuple[Features | None, Camera]]
 ) -> list[Projector | None]:
     return process_map(
-        _calibrate, feature_and_camera, chunksize=100, leave=False, desc="Calibrating"
+        _calibrate, feature_and_camera, chunksize=1000, leave=False, desc="Calibrating"
     )

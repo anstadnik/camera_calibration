@@ -22,7 +22,11 @@ def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> list[np.ndarray]:
     )
 
     # _, _, V = np.linalg.svd(M, full_matrices=False)
-    _, _, V = svd(M, full_matrices=False)
+    try:
+        _, _, V = svd(M, full_matrices=False)
+    except ValueError:
+        breakpoint()
+        raise
     assert isinstance(V, np.ndarray)
     H = V.T[:, -1]
     r_11, r_12, r_21, r_22, t_1, t_2 = H
@@ -77,12 +81,6 @@ def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> list[np.ndarray]:
     # This part is designed to find Hs which correspond to the correct side from
     # the camera's point of view (i.e. it should be in front of the camera and
     #                               not behind it)
-    # minRR = np.inf
-    # # minRR_ind = -1
-    # for min_count in range(RR.shape[2]):
-    #     if np.linalg.norm(RR[:2, 2, min_count] - x[0]) < minRR:
-    #         minRR = np.linalg.norm(RR[:2, 2, min_count] - x[0])
-    #         # minRR_ind = min_count
     RR_t1_dists = np.linalg.norm(RR[:2, 2, :] - x[0][:, np.newaxis], axis=0)
     min_, max_ = np.min(RR_t1_dists), np.max(RR_t1_dists)
     min_ids =np.nonzero(RR_t1_dists < min_ + ((max_-min_) / 100) )[0]

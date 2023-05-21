@@ -3,7 +3,6 @@ from dataclasses import dataclass
 
 import numpy as np
 from cbdetect_py import CornerType, Params, boards_from_corners, find_corners
-from tqdm.auto import tqdm
 from tqdm.contrib.concurrent import process_map
 
 from calibration.data.babelcalib.babelcalib import Dataset
@@ -59,46 +58,53 @@ def simul_features(
     )
 
 
-def _process_entry(entry: Entry) -> Features | None:
-    img = np.array(entry.image)
-    params = Params()
-    params.show_processing = False
-    params.corner_type = (
-        CornerType.SaddlePoint
-        # if target.type == BoardType.RECTANGULAR
-        # else CornerType.MonkeySaddlePoint
-    )
+def _process_ds(ds: Dataset) -> list[Features | None]:
+    assert ds.targets[0].type == BoardType.RECTANGULAR
+    features = []
+    for entry in (*ds.train, *ds.test):
+        img = np.array(entry.image)
+        params = Params()
+        params.show_processing = False
+        params.corner_type = (
+            CornerType.SaddlePoint
+            # if target.type == BoardType.RECTANGULAR
+            # else CornerType.MonkeySaddlePoint
+        )
 
-    corners = find_corners(img, params)
-    boards = boards_from_corners(img, corners, params)
+        corners = find_corners(img, params)
+        boards = boards_from_corners(img, corners, params)
 
-    if not boards:
-        return None
-    best_board_i = np.array([(np.array(b.idx) > 0).sum() for b in boards]).argmax()
-    best_board = np.array(boards[best_board_i].idx)
-    board = np.transpose(np.nonzero(best_board >= 0)).astype(np.float64)
-    # Swap y and x
-    board = board[:, [1, 0]]
-    board -= board[0]
-    board /= board.max(axis=0)
-    corners = np.array(corners.p)[best_board[best_board >= 0]]
+        if not boards:
+            features.append(None)
+            continue
+        best_board_i = np.array([(np.array(b.idx) > 0).sum() for b in boards]).argmax()
+        best_board = np.array(boards[best_board_i].idx)
+        board = np.transpose(np.nonzero(best_board >= 0)).astype(np.float64)
+        # Swap y and x
+        board = board[:, [1, 0]]
+        board -= board[0]
+        # if (board.max(axis=0) == 0).any():
+        #     breakpoint()
+        # board /= board.max(axis=0)
+        corners = np.array(corners.p)[best_board[best_board >= 0]]
 
-    return None if np.isinf(corners).any() else Features(board, corners)
+        features.append(None if np.isinf(corners).any() else Features(board, corners))
+    return features
 
 
 # TODO: Add ds, subds and image index name
 def babelcalib_features(datasets: list[Dataset]) -> list[tuple[Features | None, Entry]]:
-    results = []
-    for ds in tqdm(datasets, leave=False, desc="Process dataset"):
-        assert ds.targets[0].type == BoardType.RECTANGULAR
-        res = process_map(
-            _process_entry,
-            iter((*ds.train, *ds.test)),
-            chunksize=10,
-            leave=False,
-            desc="Searching corners",
-        )
-        results.extend(res)
+    results = process_map(_process_ds, datasets, leave=False, desc="Process dataset")
+    results = [r for res in results for r in res]
+    # res = map(_process_entry, (*ds.train, *ds.test))
+    # res = process_map(
+    #     _process_entry,
+    #     iter((*ds.train, *ds.test)),
+    #     chunksize=10,
+    #     leave=False,
+    #     desc="Searching corners",
+    # )
+    # results.extend(res)
 
     entries = (e for ds in datasets for subds in (ds.train, ds.test) for e in subds)
     return list(zip(results, entries))
