@@ -1,9 +1,68 @@
 
-\chapter{Introduction}
+\chapter{Introduction and motivation}\label{cha:introduction_and_motivation}
 
-\section{History}
+\section{Outline of the problem}\label{sec:outline_of_the_problem}
 
-Something on the topic
+Better camera calibration improves the performance of various downstream tasks
+by providing a more accurate mapping between 3D world coordinates and 2D image
+plane coordinates. This improved mapping enables precise alignment, positioning,
+and scaling of objects within the scene. By determining the camera's intrinsic
+and extrinsic parameters, algorithms can correct for lens distortion, estimate
+depth information, and accurately overlay virtual content. Consequently, tasks
+such as 3D reconstruction, augmented reality, and object detection can achieve
+better results in terms of precision, spatial consistency, and overall visual
+quality.
 
+Although manufacturers can estimate camera calibration parameters a priori,
+fully automatic calibration is often preferred, especially when camera metadata
+is unavailable. Currently, wide-angle lenses, particularly in mobile phones and
+GoPro-type cameras, dominate consumer photography. These cameras pose additional
+challenges due to their requirement for highly non-linear models with numerous
+parameters. The high distortion of the image plane also makes finding key points
+robustly challenging.
+
+Typically, camera calibration is obtained by capturing an image of a known
+calibration pattern, which is then used to estimate the camera parameters.
+Alternatively, some methods do not use a calibration pattern but instead infer
+geometric constraints directly from the scene. However, this approach is
+generally less accurate.
+
+As reported by \textcite{duisterhofTartanCalibIterativeWideAngle2022} on
+\citedate{duisterhofTartanCalibIterativeWideAngle2022}, the current state-of-the-art
+methods
+\cite{olsonAprilTagRobustFlexible2011}
+\cite{schopsWhyHaving102020} \cite{krogiusFlexibleLayoutsFiducial2019}
+fail on images with high distortion.
+\textcite{duisterhofTartanCalibIterativeWideAngle2022} suggested an iterative
+the approach of image undistortion and target reprojection, achieving the superior
+robustness to the noise than the state-of-the-art methods because the feature
+detection is performed on the undistorted image.
+
+Instead of searching for the features on the undistorted image, it is possible to
+use conjugate translations \cite{schaffalitzkyGeometricGroupingRepeated1998},
+to predict the position of the previously undetected feature points and to
+further, constrain the camera calibration.
+\textcite{prittsMinimalSolversRectifying2021} showed that three pairs of points,
+related by the same translations on the scene plane are sufficient to estimate
+the camera calibration and the parameters of the conjugate translations.
+
+We want to use the work of \textcite{prittsMinimalSolversRectifying2021} to bootstrap
+the camera calibration, and then use the found conjugate translations and camera
+parameters to iteratively predict and refine the positions of the calibration
+board features, calibration parameters, and conjugate translations.
+
+\section{Thesis structure}\label{sec:thesis_structure}
+
+This paper has the following structure: in \autoref{sec:related_work}, we will describe the related work, including the
+literature search method and methodology, various subtopics of the camera
+calibration, mention conjugate translations, and outline the state-of-the-art
+solutions. We define the research gap in \autoref{sec:gap_analysis} and outline
+the proposed approach to solution and evaluation in
+\autoref{sec:problem_setting_and_approach_to_solution}. We will describe the
+early results in \autoref{sec:early_results_and_discussion}, including the
+dataset analysis, feature detector, and conjugately translated points simulator.
+In \autoref{sec:summary_and_future_work}, we will summarize the results and
+outline future work.
+\todo{Update}
 
 \endinput
