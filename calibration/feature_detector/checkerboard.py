@@ -1,113 +1,130 @@
-# import numpy as np
-# from scipy import signal
+import numpy as np
+from scipy import signal
+
 # from scipy.spatial import cKDTree
-# from numpy import pi
+from numpy import pi
+
 # from scipy.cluster.vq import kmeans
 # import cv2
 #
 # try:
-#     import gputools # type: ignore
+#     import gputools  
+#
 #     GPUTOOLS = True
 # except ImportError:
 #     GPUTOOLS = False
-#
-#
-# def create_correlation_patch(angle_1,angle_2,radius):
-#
-#     # width and height
-#     width  = radius*2+1
-#     height = radius*2+1
-#
-#     # initialize template
-#     template = []
-#     for i in range(4):
-#         x = np.zeros((height, width))
-#         template.append(x)
-#
-#     # midpoint
-#     mu = radius
-#     mv = radius
-#
-#     # compute normals from angles
-#     n1 = [-np.sin(angle_1), np.cos(angle_1)]
-#     n2 = [-np.sin(angle_2), np.cos(angle_2)]
-#
-#     # for all points in template do
-#     for u in range(width):
-#         for v in range(height):
-#             # vector
-#             vec  = [u-mu, v-mv]
-#             dist = np.linalg.norm(vec)
-#
-#             # check on which side of the normals we are
-#             s1 = np.dot(vec, n1)
-#             s2 = np.dot(vec, n2)
-#
-#             if dist <= radius:
-#                 if s1 <= -0.1 and s2 <= -0.1:
-#                     template[0][v,u] = 1
-#                 elif s1 >= 0.1 and s2 >= 0.1:
-#                     template[1][v,u] = 1
-#                 elif s1 <= -0.1 and s2 >= 0.1:
-#                     template[2][v,u] = 1
-#                 elif s1 >= 0.1 and s2 <= -0.1:
-#                     template[3][v,u] = 1
-#
-#     # # normalize
-#     for i in range(4):
-#         template[i] /= np.sum(template[i])
-#
-#     return template
-#
-# def detect_corners_template(gray, template, mode='same'):
-#     img_corners = [None]*4
-#     for i in range(4):
-#         if GPUTOOLS and mode == 'same':
-#             img_corners[i] = gputools.convolve(gray, template[i])
-#         else:
-#             img_corners[i] = signal.convolve(gray, template[i], mode=mode)
-#
-#     img_corners_mu = np.mean(img_corners, axis=0)
-#
-#     arr = np.array([img_corners[0]-img_corners_mu, img_corners[1]-img_corners_mu,
-#                     img_corners_mu-img_corners[2], img_corners_mu-img_corners[3]])
-#     # case 1: a=white, b=black
-#     img_corners_1 = np.min(arr, axis=0)
-#
-#     # case 2: b=white, a=black
-#     img_corners_2 = np.min(-arr, axis=0)
-#
-#     # combine both
-#     img_corners = np.max([img_corners_1, img_corners_2], axis=0)
-#
-#     return img_corners
-#
-#
-# TPROPS = [[0, pi/2], [pi/4, -pi/4],
-#           # [0, pi/4], [0, -pi/4],
-#           [pi/4, pi/2], [-pi/4, pi/2]]
-#           # [-3*pi/8, 3*pi/8], [-pi/8, pi/8],
-#           # [-pi/8, -3*pi/8], [pi/8, 3*pi/8]]
-# # TPROPS = [[0, pi/2], [0, -pi/4], [0, pi/4]]
-# RADIUS = [6, 8, 10]
-#
-# def detect_corners(gray, radiuses=RADIUS):
-#     out = np.zeros(gray.shape)
-#
-#     for angle_1, angle_2 in TPROPS:
-#         for radius in radiuses:
-#             temp = create_correlation_patch(angle_1, angle_2, radius)
-#             corr = detect_corners_template(gray, temp)
-#             out = np.max([corr, out], axis=0)
-#
-#     return out
+
+
+def create_correlation_patch(angle_1, angle_2, radius):
+    # width and height
+    width = radius * 2 + 1
+    height = radius * 2 + 1
+
+    # initialize template
+    template = []
+    for _ in range(4):
+        x = np.zeros((height, width))
+        template.append(x)
+
+    # midpoint
+    mu = radius
+    mv = radius
+
+    # compute normals from angles
+    n1 = [-np.sin(angle_1), np.cos(angle_1)]
+    n2 = [-np.sin(angle_2), np.cos(angle_2)]
+
+    # for all points in template do
+    for u in range(width):
+        for v in range(height):
+            # vector
+            vec = [u - mu, v - mv]
+            dist = np.linalg.norm(vec)
+
+            # check on which side of the normals we are
+            s1 = np.dot(vec, n1)
+            s2 = np.dot(vec, n2)
+
+            if dist <= radius:
+                if s1 <= -0.1 and s2 <= -0.1:
+                    template[0][v, u] = 1
+                elif s1 >= 0.1 and s2 >= 0.1:
+                    template[1][v, u] = 1
+                elif s1 <= -0.1 and s2 >= 0.1:
+                    template[2][v, u] = 1
+                elif s1 >= 0.1 and s2 <= -0.1:
+                    template[3][v, u] = 1
+
+    # # normalize
+    for i in range(4):
+        template[i] /= np.sum(template[i])
+
+    return template
+
+
+def detect_corners_template(gray, template, mode="same"):
+    # img_corners = [None]*4
+    # for i in range(4):
+    #     if GPUTOOLS and mode == 'same':
+    #         img_corners[i] = gputools.convolve(gray, template[i])
+    #     else:
+    #         img_corners[i] = signal.convolve(gray, template[i], mode=mode)
+    img_corners = [signal.convolve(gray, template[i], mode=mode) for i in range(4)]
+
+    img_corners_mu = np.mean(img_corners, axis=0)
+
+    arr = np.array(
+        [
+            img_corners[0] - img_corners_mu,
+            img_corners[1] - img_corners_mu,
+            img_corners_mu - img_corners[2],
+            img_corners_mu - img_corners[3],
+        ]
+    )
+    # case 1: a=white, b=black
+    img_corners_1 = np.min(arr, axis=0)
+
+    # case 2: b=white, a=black
+    img_corners_2 = np.min(-arr, axis=0)
+
+    # combine both
+    img_corners = np.max([img_corners_1, img_corners_2], axis=0)
+
+    return img_corners
+
+
+TPROPS = [
+    [0, pi / 2],
+    [pi / 4, -pi / 4],
+    # [0, pi/4], [0, -pi/4],
+    [pi / 4, pi / 2],
+    [-pi / 4, pi / 2],
+]
+# [-3*pi/8, 3*pi/8], [-pi/8, pi/8],
+# [-pi/8, -3*pi/8], [pi/8, 3*pi/8]]
+# TPROPS = [[0, pi/2], [0, -pi/4], [0, pi/4]]
+RADIUS = [6, 8, 10]
+
+
+def detect_corners(gray, radiuses=RADIUS):
+    out = np.zeros(gray.shape)
+
+    for angle_1, angle_2 in TPROPS:
+        for radius in radiuses:
+            temp = create_correlation_patch(angle_1, angle_2, radius)
+            corr = detect_corners_template(gray, temp)
+            out = np.max([corr, out], axis=0)
+
+    return out
+
+
 #
 # def get_corner_candidates(corr, step=40, thres=0.01):
 #     out = []
 #     check = set()
 #     for i in range(0, corr.shape[0], step//2):
 #         for j in range(0, corr.shape[1], step//2):
-#             region = corr[i:i+step, j:j+step]
+#             region = corr[i:i+step, j:j+step]  # type: ignore
 #             ix = np.argmax(region)
 #             r, c = np.unravel_index(ix, region.shape)
 #             val = region[r, c]

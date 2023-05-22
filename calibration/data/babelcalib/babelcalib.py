@@ -23,15 +23,15 @@ class Dataset:
 
     @classmethod
     def from_dir(cls, dir_path: str, name: str, targets: list[Target]) -> "Dataset":
-        train = cls._load(os.path.join(dir_path, "train"))
-        test = cls._load(os.path.join(dir_path, "test"))
+        train = cls._load(name, "train", os.path.join(dir_path, "train"))
+        test = cls._load(name, "test", os.path.join(dir_path, "test"))
         return cls(name, targets, train, test)
 
     @staticmethod
-    def _load(dir_path: str) -> list[Entry]:
+    def _load(ds_name: str, subds_name: str, dir_path: str) -> list[Entry]:
         files = sorted(os.listdir(dir_path))
         data = [
-            Entry(os.path.join(dir_path, path))
+            Entry(ds_name, subds_name, os.path.join(dir_path, path))
             for path in files
             if path.endswith(".orpc")
         ]
@@ -94,7 +94,7 @@ def load_babelcalib(
                 assert key not in targets
                 targets[key] = load_from_dsc_file_tp_file(dsc_path, tp_path)
 
-    for path in tqdm(os.listdir(data_dir), leave=False):
+    for path in tqdm(os.listdir(data_dir), leave=False, desc="Loading BabelCalib"):
         full_path = os.path.join(data_dir, path)
 
         if os.path.isdir(full_path):

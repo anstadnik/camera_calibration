@@ -14,7 +14,7 @@ def gen_checkerboard_grid(h: int, w: int) -> np.ndarray:
     """
     board = np.array([[x, y] for y in range(h) for x in range(w)], np.float64)
     board /= board.max(axis=0)
-    board -= 0.5
+    # board -= 0.5
     return board
 
 
@@ -35,7 +35,7 @@ def gen_charuco_grid(h: int, w: int, s1: float, s2: float | None = None) -> np.n
     y = [j / 2 if j % 2 == 0 else (j - 1) / 2 + s2 for j in range(h)]
     board = np.array([[x[j], y[i]] for i in range(h) for j in range(w)])
     board /= board.max(axis=0)
-    board -= 0.5
+    # board -= 0.5
     return board
 
 
