@@ -73,7 +73,7 @@ def get_camera_from_entry(entry: Entry) -> Camera:
     assert entry.image is not None
     resolution = np.array(entry.image.size)
     sensor_size = np.array([36, 36.0 * resolution[1] / resolution[0]])
-    focal_length = 35
+    focal_length = 35.
     return Camera(
         focal_length=focal_length, resolution=resolution, sensor_size=sensor_size
     )

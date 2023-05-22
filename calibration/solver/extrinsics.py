@@ -22,11 +22,7 @@ def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> list[np.ndarray]:
     )
 
     # _, _, V = np.linalg.svd(M, full_matrices=False)
-    try:
-        _, _, V = svd(M, full_matrices=False)
-    except ValueError:
-        breakpoint()
-        raise
+    _, _, V = svd(M, full_matrices=False)
     assert isinstance(V, np.ndarray)
     H = V.T[:, -1]
     r_11, r_12, r_21, r_22, t_1, t_2 = H

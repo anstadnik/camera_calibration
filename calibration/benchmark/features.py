@@ -83,9 +83,6 @@ def _process_ds(ds: Dataset) -> list[Features | None]:
         # Swap y and x
         board = board[:, [1, 0]]
         board -= board[0]
-        # if (board.max(axis=0) == 0).any():
-        #     breakpoint()
-        # board /= board.max(axis=0)
         corners = np.array(corners.p)[best_board[best_board >= 0]]
 
         features.append(None if np.isinf(corners).any() else Features(board, corners))
@@ -96,20 +93,6 @@ def _process_ds(ds: Dataset) -> list[Features | None]:
 def babelcalib_features(datasets: list[Dataset]) -> list[tuple[Features | None, Entry]]:
     results = process_map(_process_ds, datasets, leave=False, desc="Process dataset")
     results = [r for res in results for r in res]
-    # res = map(_process_entry, (*ds.train, *ds.test))
-    # res = process_map(
-    #     _process_entry,
-    #     iter((*ds.train, *ds.test)),
-    #     chunksize=10,
-    #     leave=False,
-    #     desc="Searching corners",
-    # )
-    # results.extend(res)
 
     entries = (e for ds in datasets for subds in (ds.train, ds.test) for e in subds)
     return list(zip(results, entries))
-
-    # Skip entries with no board
-    # return [
-    #     (res, entry) for res, entry in zip(results, entries) if res.board is not None
-    # ]

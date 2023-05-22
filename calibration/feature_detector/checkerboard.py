@@ -7,12 +7,12 @@ from numpy import pi
 # from scipy.cluster.vq import kmeans
 # import cv2
 #
-try:
-    import gputools  # type: ignore
-
-    GPUTOOLS = True
-except ImportError:
-    GPUTOOLS = False
+# try:
+#     import gputools  
+#
+#     GPUTOOLS = True
+# except ImportError:
+#     GPUTOOLS = False
 
 
 def create_correlation_patch(angle_1, angle_2, radius):

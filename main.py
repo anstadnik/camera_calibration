@@ -8,7 +8,6 @@ from calibration.benchmark.benchmark import (
     benchmark_babelcalib,
     benchmark_simul,
 )
-from calibration.data.babelcalib.babelcalib import load_babelcalib
 from calibration.data.babelcalib.entry import Entry
 from calibration.feature_detector.visualization import show_boards
 
