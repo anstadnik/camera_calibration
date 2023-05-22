@@ -14,7 +14,7 @@ from calibration.feature_detector.visualization import show_boards
 
 def run_benchmark():
     if not os.path.isfile("simul_results.pkl"):
-        simul_results = benchmark_simul(int(1e5))
+        simul_results = benchmark_simul(int(1e3))
         with open("simul_results.pkl", "wb") as f:
             pkl.dump(simul_results, f)
     if not os.path.isfile("babelcalib_results.pkl"):
@@ -34,8 +34,7 @@ def run_corner_refinement():
         assert isinstance(r.input, Entry)
         assert r.input.image is not None
         assert r.features is not None
-    show_boards(np.array(r.input.image), r.features.corners,
-                r.features.board).show()
+    show_boards(np.array(r.input.image), r.features.corners, r.features.board).show()
 
 
 if __name__ == "__main__":
