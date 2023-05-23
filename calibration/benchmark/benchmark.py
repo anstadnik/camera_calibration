@@ -1,10 +1,10 @@
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 
 import numpy as np
+import pandas as pd
 from tqdm.contrib.concurrent import process_map
+
 from calibration.benchmark.calib import calibrate
-from calibration.solver.scaramuzza.solve import solve as solve_scaramuzza
-from calibration.solver.optimization.solve import solve as solve_optimization
 
 # from calibration.benchmark.calib import calibrate_optimization, calibrate_scaramuzza
 from calibration.benchmark.features import (
@@ -19,6 +19,8 @@ from calibration.data.babelcalib.entry import Entry
 from calibration.projector.board import gen_checkerboard_grid
 from calibration.projector.camera import Camera
 from calibration.projector.projector import Projector
+from calibration.solver.optimization.solve import solve as solve_optimization
+from calibration.solver.scaramuzza.solve import solve as solve_scaramuzza
 
 
 @dataclass
@@ -44,7 +46,11 @@ class BenchmarkResult:
             return -1.0
         return np.sqrt(((corners_ - self.features.corners) ** 2).mean())
 
-    # TODO: Implement into_dataframe
+
+def result_into_df(results: list[BenchmarkResult]) -> pd.DataFrame:
+    return pd.json_normalize(
+        [{k: v for k, v in asdict(r).items() if v is not None} for r in results]
+    )
 
 
 def _eval(
@@ -67,20 +73,16 @@ def evaluate(
     )
 
 
+_solvers = [("Scaramuzza", solve_scaramuzza), ("Optimization", solve_optimization)]
+
+
 def benchmark_simul(
     n=int(1e5), board=gen_checkerboard_grid(7, 9), kwargs: dict | None = None
 ) -> list[BenchmarkResult]:
     projs_and_feats = simul_features(n, board, kwargs or {})
     solvers_args = [(f, p.camera) for p, f in projs_and_feats if f]
 
-    solvers = [("Scaramuzza", solve_scaramuzza), ("Optimization", solve_optimization)]
-    projs = calibrate(solvers, solvers_args)
-    # projs_scaramuzza = calibrate_scaramuzza(solvers_args)
-    # projs_optimization = calibrate_optimization(solvers_args)
-    # projs = [
-    #     {"Scaramuzza": p_scaramuzza, "Optimization": p_optimization}
-    #     for p_scaramuzza, p_optimization in zip(projs_scaramuzza, projs_optimization)
-    # ]
+    projs = calibrate(_solvers, solvers_args)
     return evaluate(projs_and_feats, projs)
 
 
@@ -104,12 +106,5 @@ def benchmark_babelcalib(dataset: list[Dataset] | None = None) -> list[Benchmark
         ]
     ents_and_feats = babelcalib_features(dataset)
     solvers_args = [(f, get_camera_from_entry(e)) for e, f in ents_and_feats if f]
-    solvers = [("Scaramuzza", solve_scaramuzza), ("Optimization", solve_optimization)]
-    projs = calibrate(solvers, solvers_args)
-    # projs_scaramuzza = calibrate_scaramuzza(solvers_args)
-    # projs_optimization = calibrate_optimization(solvers_args)
-    # projs = [
-    #     {"Scaramuzza": p_scaramuzza, "Optimization": p_optimization}
-    #     for p_scaramuzza, p_optimization in zip(projs_scaramuzza, projs_optimization)
-    # ]
+    projs = calibrate(_solvers, solvers_args)
     return evaluate(ents_and_feats, projs)
