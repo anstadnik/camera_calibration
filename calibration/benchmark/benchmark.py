@@ -47,27 +47,21 @@ class BenchmarkResult:
         return np.sqrt(((corners_ - self.features.corners) ** 2).mean())
 
 
-def result_into_df(results: list[BenchmarkResult]) -> pd.DataFrame:
+def results_into_df(results: list[BenchmarkResult]) -> pd.DataFrame:
     return pd.json_normalize(
         [{k: v for k, v in asdict(r).items() if v is not None} for r in results]
     )
-
-
-def _eval(
-    arg: tuple[SIMUL_INP | BABELCALIB_INP, dict[str, Projector]]
-) -> BenchmarkResult:
-    (inp, feats), projs = arg
-    return BenchmarkResult(inp, feats, projs)
 
 
 def evaluate(
     inp: list[SIMUL_INP] | list[BABELCALIB_INP], projs: list[dict[str, Projector]]
 ) -> list[BenchmarkResult]:
     return process_map(
-        _eval,
-        zip(inp, projs),
+        BenchmarkResult,
+        *zip(*inp),
+        projs,
         total=len(inp),
-        chunksize=1000,
+        chunksize=100,
         leave=False,
         desc="Evaluating",
     )
@@ -80,9 +74,9 @@ def benchmark_simul(
     n=int(1e5), board=gen_checkerboard_grid(7, 9), kwargs: dict | None = None
 ) -> list[BenchmarkResult]:
     projs_and_feats = simul_features(n, board, kwargs or {})
-    solvers_args = [(f, p.camera) for p, f in projs_and_feats if f]
-
+    solvers_args = [(f, p.camera) if f else None for p, f in projs_and_feats]
     projs = calibrate(_solvers, solvers_args)
+    assert len(projs) == len(projs_and_feats)
     return evaluate(projs_and_feats, projs)
 
 
@@ -105,6 +99,9 @@ def benchmark_babelcalib(dataset: list[Dataset] | None = None) -> list[Benchmark
             ds for ds in dataset if not any(map(ds.name.startswith, aprilgrid_datasets))
         ]
     ents_and_feats = babelcalib_features(dataset)
-    solvers_args = [(f, get_camera_from_entry(e)) for e, f in ents_and_feats if f]
+    solvers_args = [
+        (f, get_camera_from_entry(e)) if f else None for e, f in ents_and_feats
+    ]
     projs = calibrate(_solvers, solvers_args)
+    assert len(projs) == len(ents_and_feats)
     return evaluate(ents_and_feats, projs)

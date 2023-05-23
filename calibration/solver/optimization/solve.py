@@ -15,7 +15,7 @@ def optimize_optax(
     resolution: jax.Array,
     step_size=0.01,
     # num_steps=100000,
-    num_steps=1000,
+    num_steps=10000,
 ) -> dict[str, jax.Array]:
     params = {
         "theta": jnp.array([1.0, 1.0, 1.0]),

@@ -82,7 +82,9 @@ def _process_ds(ds: Dataset) -> list[Features | None]:
 
 # TODO: Add ds, subds and image index name
 def babelcalib_features(datasets: list[Dataset]) -> list[BABELCALIB_INP]:
-    results = process_map(_process_ds, datasets, leave=False, desc="Process dataset")
+    results = process_map(
+        _process_ds, datasets, leave=False, desc="Find features in dataset"
+    )
     results = [r for res in results for r in res]
     entries = (e for ds in datasets for subds in (ds.train, ds.test) for e in subds)
     return list(zip(entries, results))

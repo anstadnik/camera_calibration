@@ -13,11 +13,11 @@ _SOLVER = Callable[[np.ndarray, np.ndarray, Camera], Projector]
 
 
 def _calibrate_helper(
-    arg: tuple[Features | None, Camera], solvers: list[tuple[str, _SOLVER]]
+    arg: tuple[Features , Camera], solvers: list[tuple[str, _SOLVER]]
 ) -> dict[str, Projector]:
-    features, camera = arg
-    if features is None:
+    if arg is None:
         return {}
+    features, camera = arg
     return features and {
         solver_name: solver(features.corners, features.board, camera)
         for solver_name, solver in solvers
@@ -26,7 +26,7 @@ def _calibrate_helper(
 
 def calibrate(
     solvers: list[tuple[str, _SOLVER]],
-    feature_and_camera: list[tuple[Features, Camera]],
+    feature_and_camera: list[tuple[Features, Camera] | None],
 ) -> list[dict[str, Projector]]:
     return process_map(
         partial(_calibrate_helper, solvers=solvers),
