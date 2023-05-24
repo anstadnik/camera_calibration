@@ -51,8 +51,6 @@ openany
 
 \usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
 
-\usepackage{todonotes}
-
 %----------------------------------------------------------------------------------------
 %	MARGIN SETTINGS
 %----------------------------------------------------------------------------------------
@@ -66,6 +64,12 @@ openany
 	bottom=1.5cm, % Bottom margin
 	%showframe, % Uncomment to show how the type block is set on the page
 }
+
+\usepackage[textwidth=20mm]{todonotes}
+\setlength{\marginparwidth}{2.5cm}
+\usepackage{caption}
+\usepackage{subcaption}
+\graphicspath{ {images/} }
 
 %----------------------------------------------------------------------------------------
 %	THESIS INFORMATION
@@ -148,37 +152,39 @@ openany
 %	DECLARATION PAGE
 %----------------------------------------------------------------------------------------
 
-\begin{declaration}
-	\addchaptertocentry{\authorshipname} % Add the declaration to the table of contents
-	\noindent I, \authorname, declare that this thesis titled, \enquote{\ttitle} and the work presented in it are my own. I confirm that:
-
-	\begin{itemize}
-		\item This work was done wholly or mainly while in candidature for a research degree at this University.
-		\item Where any part of this thesis has previously been submitted for a degree or any other qualification at this University or any other institution, this has been clearly stated.
-		\item Where I have consulted the published work of others, this is always clearly attributed.
-		\item Where I have quoted from the work of others, the source is always given. With the exception of such quotations, this thesis is entirely my own work.
-		\item I have acknowledged all main sources of help.
-		\item Where the thesis is based on work done by myself jointly with others, I have made clear exactly what was done by others and what I have contributed myself.\\
-	\end{itemize}
-
-	\noindent Signed:\\
-	\rule[0.5em]{25em}{0.5pt} % This prints a line for the signature
-
-	\noindent Date:\\
-	\rule[0.5em]{25em}{0.5pt} % This prints a line to write the date
-\end{declaration}
-
-\cleardoublepage
+% \begin{declaration}
+% 	\addchaptertocentry{\authorshipname} % Add the declaration to the table of contents
+% 	\noindent I, \authorname, declare that this thesis titled, \enquote{\ttitle} and the work presented in it are my own. I confirm that:
+%
+% 	\begin{itemize}
+% 		\item This work was done wholly or mainly while in candidature for a research degree at this University.
+% 		\item Where any part of this thesis has previously been submitted for a degree or any other qualification at this University or any other institution, this has been clearly stated.
+% 		\item Where I have consulted the published work of others, this is always clearly attributed.
+% 		\item Where I have quoted from the work of others, the source is always given. With the exception of such quotations, this thesis is entirely my own work.
+% 		\item I have acknowledged all main sources of help.
+% 		\item Where the thesis is based on work done by myself jointly with others, I have made clear exactly what was done by others and what I have contributed myself.\\
+% 	\end{itemize}
+%
+% 	\noindent Signed:\\
+% 	\rule[0.5em]{25em}{0.5pt} % This prints a line for the signature
+%
+% 	\noindent Date:\\
+% 	\rule[0.5em]{25em}{0.5pt} % This prints a line to write the date
+% \end{declaration}
+%
+% \cleardoublepage
+\todo{Enable}
 
 %----------------------------------------------------------------------------------------
 %	QUOTATION PAGE
 %----------------------------------------------------------------------------------------
 
-\vspace*{0.2\textheight}
-
-\noindent\enquote{\itshape Thanks to my solid academic training, today I can write hundreds of words on virtually any topic without possessing a shred of information, which is how I got a good job in journalism.}\bigbreak
-
-\hfill Dave Barry
+% \vspace*{0.2\textheight}
+%
+% \noindent\enquote{\itshape Thanks to my solid academic training, today I can write hundreds of words on virtually any topic without possessing a shred of information, which is how I got a good job in journalism.}\bigbreak
+%
+% \hfill Dave Barry
+\todo{Enable}
 
 %----------------------------------------------------------------------------------------
 %	ABSTRACT PAGE
@@ -188,12 +194,20 @@ openany
 	\addchaptertocentry{\abstractname} % Add the abstract to the table of contents
 	The Thesis Abstract is written here (and usually kept to just this page). The page is kept centered vertically so can expand into the blank space above the title too\ldots
 
-	% Camera calibration is a crucial step in many computer vision applications.
-	% However, despite the constant development of solutions, they still tend to
-	% be sensitive to the noise of the input data, bad lightning conditions,
-	% occlusions and other problems, especially under the conditions of
-	% high distortion, such as mobile phones and GoPro-type cameras.
-	%
+	Camera calibration is a crucial step in many computer vision applications.
+  Typically, it involves taking a set of images of a calibration pattern,
+  detecting its' features, and estimating the camera parameters. However, under
+  certain conditions (including occlusions, bad lightning, highly distorted
+  images etc.), feature detectors might fail to detect some of the
+  features.\todo{Do I have to justify it?}.
+
+  In this paper, we propose a novel approach to feature detection in the context
+  of camera calibration. After the initial feature detection and calibration,
+  we use the intermediate camera parameters to predict the possible positions
+  of the previously undetected features. Those features are filtered using the
+  binary classifier, and the remaining features are used to further constrain
+  the camera calibration.
+
 	% In this paper, we propose a novel approach to camera calibration. We want to
 	% use a robust solver to estimate the geometry between the correspondence of
 	% points on the calibration pattern, which are called conjugate translations.
@@ -208,22 +222,26 @@ openany
 %	ACKNOWLEDGEMENTS
 %----------------------------------------------------------------------------------------
 
-\begin{acknowledgements}
-	\addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
-	The acknowledgments and the people to thank go here, don't forget to include your project advisor\ldots
-
-	\noindent If you was supported with the scholarship, please thank to your donor organization or a person who supported you.
-\end{acknowledgements}
+% \begin{acknowledgements}
+% 	\addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
+% 	The acknowledgments and the people to thank go here, don't forget to include your project advisor\ldots
+%
+% 	\noindent If you was supported with the scholarship, please thank to your donor organization or a person who supported you.
+% \end{acknowledgements}
+\todo{Enable}
 
 %----------------------------------------------------------------------------------------
 %	LIST OF CONTENTS/FIGURES/TABLES PAGES
 %----------------------------------------------------------------------------------------
 
-\tableofcontents % Prints the main table of contents
-
-\listoffigures % Prints the list of figures
-
-\listoftables % Prints the list of tables
+% \tableofcontents % Prints the main table of contents
+\todo{Enable}
+%
+% \listoffigures % Prints the list of figures
+\todo{Enable}
+%
+% \listoftables % Prints the list of tables
+\todo{Enable}
 
 %----------------------------------------------------------------------------------------
 %	ABBREVIATIONS
@@ -269,7 +287,8 @@ openany
 %	DEDICATION
 %----------------------------------------------------------------------------------------
 
-\dedicatory{For/Dedicated to/To my\ldots}
+% \dedicatory{For/Dedicated to/To my\ldots}
+\todo{Enable}
 
 %----------------------------------------------------------------------------------------
 %	THESIS CONTENT - CHAPTERS
