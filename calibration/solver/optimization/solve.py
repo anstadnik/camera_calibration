@@ -1,4 +1,5 @@
-import optax
+# import optax
+from jaxopt import GaussNewton
 import jax.numpy as jnp
 import numpy as np
 import jax
@@ -9,13 +10,52 @@ from calibration.solver.optimization.rotation import euler_angles_to_rotation_ma
 
 
 # @partial(jax.jit, static_argnames=("step_size", "num_steps"))
-def optimize_optax(
+# def optimize_optax(
+#     corners: jax.Array,
+#     board: jax.Array,
+#     resolution: jax.Array,
+#     step_size=0.01,
+#     num_steps=100000,
+#     # num_steps=10000,
+# ) -> dict[str, jax.Array]:
+#     params = {
+#         "theta": jnp.array([1.0, 1.0, 1.0]),
+#         "t": jnp.array([1.0, 1.0, 1.0]),
+#         "lambdas": jnp.array([-1.0, -1.0]),
+#         "focal_length": jnp.array([35.0]),
+#         "sensor_size": jnp.array([36.0, 24.0]),
+#     }
+#
+#     # Create an Adam optimizer
+#     optimizer = optax.adam(step_size)
+#
+#     # Initialize the optimizer state.
+#     opt_state = optimizer.init(params)
+#
+#     # Define a function to compute the gradient and update the parameters
+#     @jax.jit
+#     def step(params, opt_state):
+#         loss_value, grads = jax.value_and_grad(backprojection_loss)(
+#             params, corners, board, resolution
+#         )
+#         updates, opt_state = optimizer.update(grads, opt_state, params)
+#         params = optax.apply_updates(params, updates)
+#         return params, opt_state, loss_value
+#
+#     # Run the optimization loop
+#     params, opt_state, _ = jax.lax.fori_loop(
+#         0, num_steps, lambda _, x: step(*x[:2]), (params, opt_state, 0.0)
+#     )
+#
+#     assert isinstance(params, dict)
+#     return params
+
+
+def optimize_gauss_newton(
     corners: jax.Array,
     board: jax.Array,
     resolution: jax.Array,
-    step_size=0.01,
     # num_steps=100000,
-    num_steps=10000,
 ) -> dict[str, jax.Array]:
     params = {
         "theta": jnp.array([1.0, 1.0, 1.0]),
@@ -25,37 +65,29 @@ def optimize_optax(
         "sensor_size": jnp.array([36.0, 24.0]),
     }
 
-    # Create an Adam optimizer
-    optimizer = optax.adam(step_size)
+    # Define a function to compute the residuals
+    def residuals(params):
+        return backprojection_loss(params, corners, board, resolution)
 
-    # Initialize the optimizer state.
-    opt_state = optimizer.init(params)
+    # Instantiate a Gauss-Newton solver
+    gn = GaussNewton(residual_fun=residuals)
 
-    # Define a function to compute the gradient and update the parameters
-    @jax.jit
-    def step(params, opt_state):
-        loss_value, grads = jax.value_and_grad(backprojection_loss)(
-            params, corners, board, resolution
-        )
-        updates, opt_state = optimizer.update(grads, opt_state, params)
-        params = optax.apply_updates(params, updates)
-        return params, opt_state, loss_value
+    # Run the solver
+    result = gn.run(params)
 
-    # Run the optimization loop
-    params, opt_state, _ = jax.lax.fori_loop(
-        0, num_steps, lambda _, x: step(*x[:2]), (params, opt_state, 0.0)
-    )
-
-    assert isinstance(params, dict)
-    return params
+    assert isinstance(result.params, dict)
+    return result.params
 
 
-def solve(corners: np.ndarray, board: np.ndarray, camera: Camera) -> Projector:
+def solve(corners: np.ndarray, board: np.ndarray, camera: Camera) -> Projector | None:
     resolution = camera.resolution
-    params = optimize_optax(
-        jnp.array(corners), jnp.array(board), jnp.array(resolution), num_steps=10000
+    params = optimize_gauss_newton(
+        jnp.array(corners), jnp.array(board), jnp.array(resolution)
     )
     params = {k: np.array(v) for k, v in params.items()}
+
+    if any(np.isnan(v).any() for v in params.values()):
+        return None
 
     camera = Camera(
         focal_length=int(params["focal_length"]),

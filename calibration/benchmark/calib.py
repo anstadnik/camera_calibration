@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Callable
 import numpy as np
+from tqdm.auto import tqdm
 from tqdm.contrib.concurrent import process_map
 
 from calibration.projector.camera import Camera
@@ -9,19 +10,20 @@ from calibration.projector.projector import Projector
 from .features import Features
 
 
-_SOLVER = Callable[[np.ndarray, np.ndarray, Camera], Projector]
+_SOLVER = Callable[[np.ndarray, np.ndarray, Camera], Projector | None]
 
 
 def _calibrate_helper(
-    arg: tuple[Features , Camera], solvers: list[tuple[str, _SOLVER]]
+    arg: tuple[Features, Camera] | None, solvers: list[tuple[str, _SOLVER]]
 ) -> dict[str, Projector]:
     if arg is None:
         return {}
     features, camera = arg
-    return features and {
+    ret = {
         solver_name: solver(features.corners, features.board, camera)
         for solver_name, solver in solvers
     }
+    return {k: v for k, v in ret.items() if v is not None}
 
 
 def calibrate(
@@ -36,3 +38,6 @@ def calibrate(
         leave=False,
         desc="Calibrating",
     )
+    # return list(
+    #     map(partial(_calibrate_helper, solvers=solvers), tqdm(feature_and_camera))
+    # )
