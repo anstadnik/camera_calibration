@@ -29,10 +29,10 @@ generally less accurate.
 As reported by \textcite{duisterhofTartanCalibIterativeWideAngle2022} on
 \citedate{duisterhofTartanCalibIterativeWideAngle2022}, the current state-of-the-art
 methods
-\cite{olsonAprilTagRobustFlexible2011a}
-\cite{schopsWhyHaving102020} \cite{krogiusFlexibleLayoutsFiducial2019}
+\citep{olsonAprilTagRobustFlexible2011a, schopsWhyHaving102020,
+krogiusFlexibleLayoutsFiducial2019}
 fail on images with high distortion.
-\textcite{duisterhofTartanCalibIterativeWideAngle2022} suggested an iterative
+\cite{duisterhofTartanCalibIterativeWideAngle2022} suggested an iterative
 the approach of image undistortion and target reprojection, achieving the superior
 robustness to the noise than the state-of-the-art methods because the feature
 detection is performed on the undistorted image.
@@ -50,6 +50,19 @@ This additional points will further constrain the camera calibration, improving
 the accuracy of the calibration parameters.
 \todo{Explain why more features is better}
 \missingfigure{Show the example of the calibration board and the image}
+
+\section{Research objective}\label{sec:research_objective}
+
+The objective of this research is to improve the accuracy of the camera
+calibration by finding previously undetected features on the calibration
+board \todo{Probably rephrase if I won't compare the actual calibration}. For
+that, we formulate the set of research questions:
+\begin{itemize}
+  \item How to find additional features on the calibration board which were not
+    detected by the feature detector?
+  \item How to filter out falsely detected features?
+    \todo{Add more}
+\end{itemize}
 
 \section{Thesis structure}\label{sec:thesis_structure}
 

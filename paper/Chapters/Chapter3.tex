@@ -1,3 +1,462 @@
 \chapter{Background}\label{cha:background}
 
+\section{Notation}\label{sec:notation}
+
+\begin{table}[htbp]
+	\label{tab:notation}
+	\centering
+	\begin{tabular}{rl}
+		\toprule
+		Term                           & Description                                \\
+		\midrule
+		\(\mathbf{u} = \begin{pmatrix}
+			               u, v, 1
+		               \end{pmatrix}^{T}\) & A point in the board coordinate system \\
+
+		\bottomrule
+	\end{tabular}
+	\caption{Notation}
+\end{table}
+
+\section{Camera model}\label{sec:camera_model}
+
+In this paper, scene and image points are represented using homogeneous
+coordinates. This approach allows representing many geometric transformations as
+linear, which simplifies the mathematical representation of the camera model.
+
+\subsection{Perspective projection}\label{sub:perspective_projection}
+
+The perspective projection is a mapping from a 3D point \(\begin{pmatrix}
+	X, Y, Z
+\end{pmatrix}^{T}\)
+in the world coordinate
+to the 2D coordinate \(\begin{pmatrix}
+	u, v
+\end{pmatrix}^{T}\)
+on the image plane which is distance \(f\)\todo{Should f not be italic?} from the center
+of projection. It is given by the perspective projection equation:
+\[
+	\begin{pmatrix}
+		u, v
+	\end{pmatrix}^{T} = \frac{f}{Z} \begin{pmatrix}
+		X, Y
+	\end{pmatrix}^{T}.
+\]
+This equation can be written using the homogeneous coordinates as:
+\begin{equation} \label{eq:perspective_projection}
+	\alpha \begin{pmatrix}
+		u \\ v \\ 1
+	\end{pmatrix}^{T} = \begin{bmatrix}
+		f & 0 & 0 & 0 \\
+		0 & f & 0 & 0 \\
+		0 & 0 & 1 & 0
+	\end{bmatrix} \begin{pmatrix}
+		X \\ Y \\ Z \\ 1
+	\end{pmatrix}^{T},
+\end{equation}
+where \(\alpha = \sfrac{1}{Z}\) is a scale factor.
+
+\subsection{Scene to camera projection}\label{sub:scene_to_camera_projection}
+
+A 3D scene point \(\begin{pmatrix}
+	X, Y, Z
+\end{pmatrix}^{T}\) can be projected onto the image plane as
+\(R \begin{pmatrix}
+	X, Y, Z
+\end{pmatrix}^{T} + \mathbf{t}\), where \(R\) is a \(3 \times 3\) rotation matrix
+and \(\mathbf{t}\) is
+a \(3 \times 1\) translation vector. Using the homogeneous coordinates, this
+can be written as:
+\begin{equation}
+	\begin{bmatrix}
+		R              & \mathbf{t} \\
+		\mathbf{0}^{T} & 1
+	\end{bmatrix} \begin{pmatrix}
+		X \\ Y \\ Z \\ 1
+	\end{pmatrix}.
+\end{equation}
+
+\subsection{Camera to image projection}\label{sub:camera_to_image_projection}
+
+To project a point from the camera coordinate system to the image plane, we
+need to apply a homography encoding the camera intrinsic parameters.
+This is a \(3 \times 3\) upper-triangular matrix:
+\begin{equation}
+	\begin{bmatrix}
+		\alpha_x & \alpha_x \cot \theta & c_x \\
+		0        & \alpha_y \sin \theta & c_y \\
+		0        & 0                    & 1
+	\end{bmatrix}
+\end{equation}
+
+where:
+\begin{itemize}
+	\item $\alpha_x$ and $\alpha_y$ represent the scale factor of the camera in
+	      terms of \sfrac{pixels}{mm} in the x and y directions respectively.
+	\item $c_x$ and $c_y$ are the coordinates of the principal point, which is typically the image center.
+	\item $\cot \theta$ and $\sin \theta$ are related to the skew coefficient, which measures the angle between the x and y pixel axes. The variable $\theta$ represents this angle.
+	      % \item $f$ is the distance from the camera center to the image plane, which is also known as the focal length.
+	      % \item $f_x$ and $f_y$ represent the effective focal lengths in the x and y
+	      %       directions in pixel units.\todo{Figure out what exactly is called a focal
+	      % 	      length}
+	      % \item $k$ represents the skew.
+\end{itemize}.
+For a typical camera, \(\theta = \sfrac{\pi}{2}\) and \(\alpha_x = \alpha_y = 1
+\) \todo{Add reference}.
+
+Conventionally, the intrinsic matrix incorporates the scaling, introduced
+by the focal length:
+\begin{equation}
+	K = \begin{bmatrix}
+		\alpha_x f & \alpha_x \cot \theta & c_x \\
+		0          & \alpha_y f           & c_y \\
+		0          & 0                    & 1
+	\end{bmatrix} \begin{bmatrix}
+		f & 0 & 0 \\
+		0 & f & 0 \\
+		0 & 0 & 1
+	\end{bmatrix} = \begin{bmatrix}
+		f_x & k   & c_x \\
+		0   & f_y & c_y \\
+		0   & 0   & 1
+	\end{bmatrix}.
+\end{equation}
+
+By incorporating the assumptions \todo{specify them} into the intrinsic matrix,
+we can simplify it to:
+\begin{equation}
+	K = \begin{bmatrix}
+		f & 0 & c_x \\
+		0 & f & c_y \\
+		0 & 0 & 1
+	\end{bmatrix}.
+\end{equation}
+
+\subsection{Camera matrix}\label{sub:camera_matrix}
+
+The composition of positioning and orienting the camera, projection, and the
+imaging transformation can be represented by a $3 \times 4$ camera
+matrix\todo{Add reference}. This matrix can be expressed as:
+
+\begin{equation}
+	\begin{bmatrix}
+		\mathbf{p_1} & \mathbf{p_2} & \mathbf{p_3} & \mathbf{p_4}
+	\end{bmatrix} = K \begin{bmatrix}
+		I_3 \vert \mathbf{0}
+	\end{bmatrix} \begin{bmatrix}
+		R              & \mathbf{t} \\
+		\mathbf{0}^{T} & 1
+	\end{bmatrix} = K \begin{bmatrix}
+		R \vert \mathbf{t}
+	\end{bmatrix},
+\end{equation}
+
+Hence, the transformation of a point in the scene by the camera $\mathrm{P}^{3 \times 4}$ can be formulated as:
+
+\begin{equation}
+	\alpha(u, v, 1)^{T} = P^{3 \times 4}(X, Y, Z, 1)^{T},
+\end{equation}
+
+with $\alpha$ being $1 / Z$.
+
+\subsection{Projection of the points from the scene plane}\label{sub:projection_of_the_points_from_the_scene_plane}
+
+When working with the coplanar scene points, we can simplify the projection
+by assuming that the scene plane is located at \(Z = 0\). In this case, the
+projection of the point becomes:
+\begin{equation}
+	\alpha \begin{pmatrix}
+		u \\ v \\ 1
+	\end{pmatrix} = \begin{bmatrix}
+		\mathbf{p_1} & \mathbf{p_2} & \mathbf{p_3} & \mathbf{p_4}
+	\end{bmatrix} \begin{pmatrix}
+		X \\ Y \\ 0 \\ 1
+		% \end{pmatrix} = \begin{bmatrix}
+		%   \mathbf{p_1} & \mathbf{p_2} & \mathbf{p_4}
+		% \end{bmatrix} \begin{pmatrix}
+		%   X \\ Y \\ 1
+		% \end{pmatrix}.
+	\end{pmatrix} = \underbrace{\begin{bmatrix}
+			\mathbf{p_1} & \mathbf{p_2} & \mathbf{p_4}
+		\end{bmatrix}}_{P} \begin{pmatrix}
+		X \\ Y \\ 1
+	\end{pmatrix}.
+\end{equation}
+
+\subsection{Distortion}\label{sub:distortion}
+
+The distortion of the image is caused by the lens not being perfectly planar.
+Typically, the small distoritons caused by lens misalignment are ignored
+\todo{add reference}, allowing us to model the distortion as radially symmetric.
+Then, the function that maps a point \(\mathbf{u} = \begin{pmatrix}
+	u, v, 1
+\end{pmatrix}^{T}\) from a retinal plane \todo{Specify what's that} to the
+ray direction in the camera coordinate system is given by:
+\begin{equation}
+	g(\mathbf{u}) = \begin{pmatrix}
+		u, v, \psi(r(\mathbf{u}))
+	\end{pmatrix}^{T},
+\end{equation}
+where \(r(\mathbf{u}) = \sqrt{u^2 + v^2}\) is the radial distance from the
+principal point.
+
+\subsubsection{Back-projection using the Division Model}\label{subsub:back_projection_using_the_division_model}
+
+The division model has a good ability to model the distortion of the wide-angle
+lenses, and is wildly used \todo{Add reference}. The model is defined as:
+\begin{equation}
+	\psi(r) = 1 + \sum_{n = 1}^{N} \lambda_n r^{2n},
+\end{equation}
+where \(\lambda_n\) are the distortion coefficients.
+
+The function \(\psi(r)\) is not invertible in general.
+Let \(\mathbf{X} = \begin{pmatrix}
+	X, Y, Z
+\end{pmatrix}^{T} = \alpha g(\mathbf{u})\) be a ray\todo{Should I explain
+	somewhere how the rays are defined?} in the camera coordinate system.
+
+Then,
+\begin{align}
+	\frac{\mathbf{X}}{Z} & =
+	\begin{pmatrix}
+		\frac{X}{Z}, \frac{Y}{Z}, 1
+	\end{pmatrix}^{T}                               \\        & =
+	\begin{pmatrix}
+		\frac{\alpha u}{\alpha \psi(r(\mathbf{u}))},
+		\frac{\alpha v}{\alpha \psi(r(\mathbf{u}))},
+		1
+	\end{pmatrix}^{T}  \\
+	                     & = \label{eq:division_derivation1}
+	\begin{pmatrix}
+		\frac{u}{\psi(r(\mathbf{u}))},
+		\frac{v}{\psi(r(\mathbf{u}))},
+		1
+	\end{pmatrix}^{T}
+\end{align}
+
+From \ref{eq:division_derivation1} we see that
+\begin{equation} \label{eq:division_derivation2}
+	\begin{cases}
+		\frac{X}{Z} = \frac{u}{\psi(r(\mathbf{u}))} \\
+		\frac{Y}{Z} = \frac{v}{\psi(r(\mathbf{u}))}
+	\end{cases} \implies \\
+	\begin{cases}
+		u = \frac{X \psi(r(\mathbf{u}))}{Z} \\
+		v = \frac{Y \psi(r(\mathbf{u}))}{Z}
+	\end{cases}
+\end{equation}
+
+Now, let \(\widehat{r}\) be a root of
+\(r(\mathbf{u})
+= \sqrt{
+	\frac{X * \psi \left( r\right))}{Z}^{2} +
+	\frac{Y * \psi \left( r\right))}{Z}^{2}
+} = r\).
+
+Then, \(\mathbf{u} = \frac{\widehat{r}}{r(\mathbf{X})}\mathbf{X}\).
+
+% Then set \( \mathbf{u} =
+% \frac{\widehat{r} \mathbf{X}}{\left\lVert \begin{pmatrix}
+% 	X, Y
+% \end{pmatrix}^{T}\right\rVert} \). My intuition for that is that
+% the idea is to set \(\left\lVert \begin{pmatrix}
+% 	X, Y
+% \end{pmatrix}^{T}\right\rVert = r\). This approach works.
+
+% We will build on the omnidirectional camera model proposed by
+% ~\cite{micusikEstimationOmnidirectionalCamera2003a}.
+% Let \(\mathbf{X} = \begin{bmatrix}
+% 	X, Y, Z
+% \end{bmatrix}\) be a point in the board coordinate system.
+% The connection between \(\mathbf{X}\) and it's projection onto the image plane
+% \(
+% \mathbf{u} = \begin{bmatrix}
+% 	u, v, 1
+% \end{bmatrix}^{T}
+% \)
+% is established by the following formula:
+% \begin{equation} \label{eq:projection}
+% 	\gamma g(K\mathbf{u}) = P\mathbf{X}
+% \end{equation}.
+
+% Typically \todo{Add the reference to the camera model}, the projection of the 3D
+% point \(\mathbf{X} = \begin{bmatrix} X, Y, Z \end{bmatrix}^{T}\) onto the image
+%   plane is done in three steps
+
+% Let  \(\mathbf{u} = \begin{bmatrix}
+%   u, v, 1
+% \end{bmatrix}^{T}\) is a point in the board space,
+% and \(g(\mathbf{u}) = \begin{bmatrix}
+%   u, v, \psi\left(\left\lVert \begin{bmatrix}
+%     u, v
+%   \end{bmatrix}^{T}\right\rVert\right)
+% \end{bmatrix}\) is a distortion function
+% where \(\psi(r) = 1 + \lambda_1 * r^{2} + \lambda_2 * r^{4}\).
+% Then, \(\mathbf{X} = \alpha g(\mathbf{u})\) is a distorted position of the
+% \(\mathbf{u}\).
+%
+% Now, given \(\mathbf{X}\), we want to find \(\mathbf{u}\).
+% To do that, first divide \(\mathbf{X}\) by \(Z\) to remove \(\alpha\):
+% \begin{align} 
+%   \frac{\mathbf{X}}{Z} &= 
+%   \begin{bmatrix}
+%     \frac{X}{Z}, \frac{Y}{Z}, 1
+%   \end{bmatrix}^{T} \\ &= 
+%   \begin{bmatrix}
+%     \frac{\alpha u}{\alpha \psi\left(\left\lVert \begin{bmatrix}
+%       u, v
+%     \end{bmatrix}^{T}\right\rVert\right)}, 
+%     \frac{\alpha v}{\alpha \psi\left(\left\lVert \begin{bmatrix}
+%       u, v
+%     \end{bmatrix}^{T}\right\rVert\right)},
+%     1
+%   \end{bmatrix}^{T} \\ &= \label{eq:3}
+%   \begin{bmatrix}
+%     \frac{u}{\psi\left(\left\lVert \begin{bmatrix}
+%       u, v
+%     \end{bmatrix}^{T}\right\rVert\right)}, 
+%     \frac{v}{\psi\left(\left\lVert \begin{bmatrix}
+%       u, v
+%     \end{bmatrix}^{T}\right\rVert\right)},
+%     1
+%   \end{bmatrix}^{T}
+% \end{align}
+%
+% From \ref{eq:3} we see that 
+% \[
+%   \begin{cases}
+%     \frac{X}{Z} &= \frac{u}{\psi \left( \left\lVert \begin{bmatrix}
+%   u, v
+% \end{bmatrix}^{T}\right\rVert\right)} \\
+%     \frac{Y}{Z} &= \frac{v}{\psi \left( \left\lVert \begin{bmatrix}
+%   u, v
+% \end{bmatrix}^{T}\right\rVert\right)}
+%   \end{cases} \implies 
+%   \begin{cases}
+%     u &= \frac{X \psi \left( \left\lVert \begin{bmatrix}
+%   u, v
+% \end{bmatrix}^{T}\right\rVert\right)}{Z} \\
+%     v &= \frac{Y \psi \left( \left\lVert \begin{bmatrix}
+%   u, v
+% \end{bmatrix}^{T}\right\rVert\right)}{Z}
+%   \end{cases}
+% \]
+%
+% Now, find \(r\) such that 
+% \( \left\lVert \begin{bmatrix}
+%     \frac{X * \psi \left( r\right))}{Z}, 
+%     \frac{Y * \psi \left( r\right))}{Z}
+%   \end{bmatrix}^{T}\right\rVert = r \) using rootfinding.
+%
+% Then, I see two ways of using \(r\). First, as stated in the BabelCalib paper,
+% is to set \( \mathbf{u} =
+%   \frac{r \mathbf{X}}{\left\lVert \begin{bmatrix}
+%       X, Y
+%     \end{bmatrix}^{T}\right\rVert} \). My intuition for that is that
+%     the idea is to set \(\left\lVert \begin{bmatrix}
+%       X, Y
+%     \end{bmatrix}^{T}\right\rVert = r\). This approach works.
+%
+% But, also from \ref{eq:3} we see that
+% \(\mathbf{u} = \frac{\mathbf{X} \psi \left( \left\lVert \begin{bmatrix}
+%   u, v
+% \end{bmatrix}^{T}\right\rVert\right)}{Z}\). However, when I try to use this
+% formula, I do not get \(\mathbf{u}\). Is there a mistake in my derivations?
+
+% Now, assume we're given \(X\) such that:
+% \begin{equation}
+% 	\mathbf{X} = \left(U, V, Z\right) = \lambda g\left(\mathbf{u}\right) =
+% 	\left(\lambda u, \lambda v, \lambda \psi\left(r\left(\mathbf{u}\right)\right)\right).
+% \end{equation}.
+%
+% Note, that multiplying X by a constant is equal to moving a point along the ray
+% \(0, \mathbf{X}\). Also, note that \(\psi(r)\) is linear for \(0 \leq r\).
+% Hence, we have to find the intersection between lines \(r = \psi(r)\) and 
+% \(\alpha\sqrt{U^2 + V^2} = \alpha Z \).
+%
+% Then, we have
+% \begin{align}
+%   \frac{r}{\psi(r)} &= \frac{\alpha\sqrt{U^2 + V^2}}{\alpha Z} \\
+%   \frac{r \alpha Z}{\psi(r) \alpha\sqrt{U^2 + V^2}} &= 1
+% \end{align}
+
+% We have to find a \(\alpha = \frac{1}{\lambda}\) such that 
+
+% Then,
+% \begin{equation}
+% 	\frac{\mathbf{X}}{Z} = \left(\frac{U}{Z}, \frac{V}{Z}, 1\right) =
+% 	\left(\frac{\lambda u}{\lambda \psi\left(r\left(\mathbf{u}\right)\right)},
+% 	\frac{\lambda v}{\lambda \psi\left(r\left(\mathbf{u}\right)\right)} , 1\right) =
+% 	\left(\frac{u}{\psi\left(r\left(\mathbf{u}\right)\right)},
+% 	\frac{v}{\psi\left(r\left(\mathbf{u}\right)\right)} , 1\right)
+% \end{equation}.
+
+% Now, we know that psi 
+
+% \begin{tikzpicture}
+%
+% 	\begin{axis}[
+% 			xmin = -2, xmax = 2,
+% 			ymin = -2, ymax = 2.0]
+% 		\addplot[
+% 			domain = -2:2,
+% 			samples = 200,
+% 			smooth,
+% 			thick,
+% 			blue,
+% 		] {1 + -1.9 * x^2 + -0.9 * x^4};
+% 		\legend{
+%       % \(\lambda_1=-1.9\); \(\lambda_2=-0.9\),
+%       \(\psi(r)\),
+% 			% Plot only with marks,
+% 			% Plot with other type of marks
+% 		}
+% 	\end{axis}
+%
+% \end{tikzpicture}
+%
+
+% Let's define the camera matrix $P$ that maps scene coordinates to ray directions
+% in the camera coordinate system as follows:
+% \begin{equation}
+% 	\mathrm{P} =
+% 	\operatorname{diag}(f, f, 1) \begin{bmatrix} \mathrm{R} & \mathbf{t}
+% 	\end{bmatrix}
+% \end{equation}
+% , where $f$ denotes the focal length, $\mathrm{R}$ is the
+% rotation matrix given by $\begin{bmatrix} \mathbf{r}_1 & \mathbf{r}_2 &
+%                 \mathbf{r}_3\end{bmatrix}$, and $\mathbf{t} = (t_x, t_y, t_z)^\top$ is the
+% translation vector.
+% Then, we can establish a relationship between the image
+% point $\mathbf{u} = (u, v, 1)^\top$ and the scene point $\mathbf{X}$
+% as:
+% \begin{equation}
+% 	\gamma g(A \mathbf{u}) = P\mathbf{X}, \quad
+% 	\text{s.t.} \quad \gamma > 0
+% \end{equation}.
+% In this equation, the matrix $A$ maps image
+% coordinates to sensor coordinates. Let's denote the center of projection as
+% $\mathbf{e} = (e_x, e_y, 1)^\top$, the scale factor as $s$, and the pixel
+% aspect ratio as $a$. For our initialization method, we assume orthogonal
+% pixels, leading to the following matrix $A$:
+% \begin{equation}
+% 	\mathrm{A} =
+% 	\operatorname{diag}(a^{-1}, 1, 1) \operatorname{diag}(s^{-1}, s^{-1}, 1)
+% 	\mathrm{T}(-\mathbf{e})
+% \end{equation}
+% , where $T(x)$ represents a homogeneous matrix encoding
+% translation by $\mathbf{x}$. The nonlinear function $g(\cdot) \in \mathbb{R}^3
+% 	\rightarrow \mathbb{R}^3$ in the previous equation maps from the retinal plane
+% to ray directions in the camera coordinate system. During the initialization
+% method, we disregard the generally small distortions caused by lens
+% misalignment [16]. As a result, we can model the back-projection of
+% $\mathbf{u} = (u, v, 1)^\top$ as radially symmetric
+% \begin{equation}
+% 	g(\mathbf{u}) = (u, v, \psi(r(\mathbf{u})))^\top
+% \end{equation}
+% , where the radius of the
+% retinal point is given by $r(\mathbf{u}) = \sqrt{u^2 + v^2}$.
+
+\section{Feature detection}\label{sec:feature_detection}
+
 

@@ -18,74 +18,76 @@ points with known geometry.
 
 To achieve a robust calibration, images with repeating patterns are
 usually used. The camera
-calibration parameters can be found using prior knowledge of the properties of the pattern, such that the pattern invariants hold on
-the image. Initially, the chessboard~\citep{OpenCVCameraCalibration, v.douskosAutomaticCalibrationDigital2007} patterns were used
-(Fig.~\ref{fig:chessboard}).
-
+calibration parameters can be found using prior knowledge of the properties of
+the pattern, such that the pattern invariants hold on
+the image. Initially, the chessboard~\citep{OpenCVCameraCalibration,
+v.douskosAutomaticCalibrationDigital2007} patterns were used
+(\cref{fig:chessboard}).
 
 Later, ArUco
-~\cite{garrido-juradoAutomaticGenerationDetection2014} allowed detecting the
+~\citep{garrido-juradoAutomaticGenerationDetection2014} (\cref{fig:gboriginal}) and
+AprilTag~\citep{olsonAprilTagRobustFlexible2011a} (\cref{fig:apriltag})
+allowed detecting the
 orientation of the pattern, as well as uniquely identifying each located pattern
-even under occlusion (Fig. \ref{fig:gboriginal}). Based on ArUco,
-ChArUcO~\cite{OpenCVCameraCalibration} (Fig.~\ref{fig:charuco}) and
-AprilTag~\cite{olsonAprilTagRobustFlexible2011a} (Fig.~\ref{fig:apriltag}) were
+even under occlusion. Based on ArUco,
+ChArUcO~\citep{OpenCVCameraCalibration} (\cref{fig:charuco}) was
 proposed as more robust.
 
 \begin{figure}[h]
-\centering
-\begin{subfigure}[b]{0.45\textwidth}
-\centering
-\includegraphics[width=\linewidth]{chessboard.png}
-\caption{Chessboard~\cite{OpenCVCameraCalibration}}
-\label{fig:chessboard}
-\end{subfigure}
-\hfill
-\begin{subfigure}[b]{0.45\textwidth}
-\centering
-\includegraphics[width=\linewidth]{gboriginal.png}
-\caption{ArUco board~\cite{OpenCVDetectionArUco}}
-\label{fig:gboriginal}
-\end{subfigure}
-\begin{subfigure}[b]{0.45\textwidth}
-\centering
-\includegraphics[width=\linewidth]{charuco.png}
-\caption{Charuco board~\cite{OpenCVDetectionChArUco}}
-\label{fig:charuco}
-\end{subfigure}
-\hfill
-\begin{subfigure}[b]{0.45\textwidth}
-\centering
-\includegraphics[width=\linewidth]{apriltag.png}
-  \caption{AprilTag board~\cite{rosebrockAprilTagPython2020} (right)}
-\label{fig:apriltag}
-\end{subfigure}
-\caption{Calibration boards.}
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{chessboard.png}
+		\caption{Chessboard~\cite{OpenCVCameraCalibration}}
+		\label{fig:chessboard}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{gboriginal.png}
+		\caption{ArUco board~\cite{OpenCVDetectionArUco}}
+		\label{fig:gboriginal}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{charuco.png}
+		\caption{Charuco board~\cite{OpenCVDetectionChArUco}}
+		\label{fig:charuco}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{apriltag.png}
+		\caption{AprilTag board~\cite{rosebrockAprilTagPython2020} (right)}
+		\label{fig:apriltag}
+	\end{subfigure}
+	\caption{Calibration boards.}
 \end{figure}
 
 \section{Camera models}\label{sub:camera_models}
 
-The camera model's choice depends on the camera's physical properties
+The choice of the camera model depends on the camera's physical properties
 and the accuracy required. Usually, the parametric models are simpler to use, as
-they have only a few parameters and deliver good accuracy. 
+they have only a few parameters and deliver good accuracy.
 The most common are the Double Sphere
-model~\cite{usenkoDoubleSphereCamera2018}, the Kannala-Brandt
-model~\cite{kannalaGenericCameraModel2006}, and the Field-of-View
-model~\cite{devernayStraightLinesHave2001}.
+model~\citep{usenkoDoubleSphereCamera2018}, the Kannala-Brandt
+model~\citep{kannalaGenericCameraModel2006}, and the Field-of-View
+model~\citep{devernayStraightLinesHave2001}.
 In the ill-posed problem of camera calibration, the common choice
 of the camera model is the division
-model~\cite{fitzgibbonSimultaneousLinearEstimation2001}.
-However, \textcite{schopsWhyHaving102020} show that they tend to have
+model~\citep{fitzgibbonSimultaneousLinearEstimation2001}.
+However, \cite{schopsWhyHaving102020} shows that they tend to have
 significantly higher errors than the non-parametric (general) models.
-The \textcite{lochmanBabelCalibUniversalApproach2021} suggested a framework for
+The \cite{lochmanBabelCalibUniversalApproach2021} suggested a framework for
 converting the parameters of a powerful back-projection
 \cite{zhangFlexibleNewTechnique2000} model to recover different models' parameters.
 
 \section{Camera parameters estimation}\label{sub:camera_parameters_estimation}
 
 Camera calibration using repeating patterns was an important subject for a long
-time, for example, \textcite{schaffalitzkyGeometricGroupingRepeated1998} in
+time, for example, \cite{schaffalitzkyGeometricGroupingRepeated1998} in
 \citeyear{schaffalitzkyGeometricGroupingRepeated1998} and
-\textcite{zhangFlexibleNewTechnique2000}.
+\cite{zhangFlexibleNewTechnique2000}.
 
 % Camera calibration is a crucial step for many computer vision tasks,
 % hence many methods were proposed to solve this problem (e.g.,
@@ -98,14 +100,16 @@ time, for example, \textcite{schaffalitzkyGeometricGroupingRepeated1998} in
 % ~\cite{ramalingamUnifyingModelCamera2017}).
 
 Nevertheless, camera calibration is still an open problem; recently,
-multiple new approaches have arisen. 
-\textcite{lochmanBabelCalibUniversalApproach2021} suggest a universal approach
+multiple new approaches have arisen.
+\cite{lochmanBabelCalibUniversalApproach2021} suggest a universal approach
 to camera calibration, with a separate step of converting between camera models.
-\textcite{huDeepChArUcoDark2019} used deep learning to detect ChArUcO boards.
+\cite{huDeepChArUcoDark2019} used deep learning to detect ChArUcO boards.
 Recently, on \citedate{duisterhofTartanCalibIterativeWideAngle2022},
-\textcite{duisterhofTartanCalibIterativeWideAngle2022} introduced the iterative
+\cite{duisterhofTartanCalibIterativeWideAngle2022} introduced the iterative
 approach to camera calibration, which outperforms the previous state-of-the-art
 approaches for wide-angle cameras.
+
+\todo{Add the paper about the feature detection}
 
 % The camera calibration depends a lot on the physical camera properties, choice
 % of the camera model, calibration method, number of images used for calibration,
@@ -113,3 +117,4 @@ approaches for wide-angle cameras.
 % there is no established method of general camera calibration approach
 % comparison, and the state-of-the-art is not well-defined. However, it is possible
 % to compare the methods in the context of specific tasks and datasets.
+
