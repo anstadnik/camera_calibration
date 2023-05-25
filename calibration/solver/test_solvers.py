@@ -8,10 +8,11 @@ from tqdm.auto import tqdm
 from calibration.projector.board import gen_charuco_grid, gen_checkerboard_grid
 from calibration.projector.camera import Camera
 from calibration.projector.projector import Projector
-from calibration.solver.solve import solve
+from .optimization import solve as solve_optimization
+from .scaramuzza import solve as solve_scaramuzza
 
 
-class TestProjectorAndSolver(unittest.TestCase):
+class TestProjectorAndSolverOptimization(unittest.TestCase):
     def test_proj_equal_backproj(self):
         Rs = [
             np.eye(3),
@@ -39,8 +40,10 @@ class TestProjectorAndSolver(unittest.TestCase):
         ]
         boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
 
-        def f(R, t, lambdas, camera, board):
-            with self.subTest(R=R, t=t, lambdas=lambdas, camera=camera):
+        def f(R, t, lambdas, camera, board, solve, solve_name):
+            with self.subTest(
+                R=R, t=t, lambdas=lambdas, camera=camera, solve_name=solve_name
+            ):
                 self.assertEqual(board.dtype, np.float64)
                 proj = Projector(R=R, t=t, lambdas=lambdas, camera=camera)
                 x = proj.project(board)
@@ -60,22 +63,28 @@ class TestProjectorAndSolver(unittest.TestCase):
                 x_ = proj_.project(board)
                 np.testing.assert_allclose(x_, x, atol=1e-10, rtol=1e-5)
 
-        for camera, ts in zip(
-            tqdm(cameras, leave=False, desc="Testing projector and solver"),
-            ts_for_cameras,
-        ):
-            for R, lambdas, t, board in tqdm(
-                product(Rs, lambdass, ts, boards),
-                leave=False,
-                total=len(Rs) * len(lambdass) * len(ts) * len(boards),
+        for solve_name, solve in [
+            ("optimization", solve_optimization),
+            ("scaramuzza", solve_scaramuzza),
+        ]:
+            for camera, ts in zip(
+                tqdm(cameras, leave=False, desc="Testing projector and solver"),
+                ts_for_cameras,
             ):
-                f(R, t, lambdas, camera, board)
+                for R, lambdas, t, board in tqdm(
+                    product(Rs, lambdass, ts, boards),
+                    leave=False,
+                    total=len(Rs) * len(lambdass) * len(ts) * len(boards),
+                ):
+                    f(R, t, lambdas, camera, board, solve, solve_name)
 
-        d = boards[0].max(axis=0)
-        f(
-            Rs[0],
-            ts_for_cameras[0][0] + np.r_[d, 0],
-            lambdass[0],
-            cameras[0],
-            boards[0][::-1] - d,
-        )
+            d = boards[0].max(axis=0)
+            f(
+                Rs[0],
+                ts_for_cameras[0][0] + np.r_[d, 0],
+                lambdass[0],
+                cameras[0],
+                boards[0][::-1] - d,
+                solve,
+                solve_name,
+            )

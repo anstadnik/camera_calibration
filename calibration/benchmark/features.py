@@ -17,11 +17,14 @@ class Features:
     corners: np.ndarray
 
 
+SIMUL_INP = tuple[Projector, Features | None]
+BABELCALIB_INP = tuple[Entry, Features | None]
+
+
 # TODO: Add noise
-def _process_projector(
-    projector_board: tuple[Projector, np.ndarray]
-) -> tuple[Features | None, Projector]:
-    p, board = projector_board
+def _simul_features(args: tuple[dict, np.ndarray]) -> SIMUL_INP:
+    kwargs, board = args
+    p = Projector(**kwargs)
     with contextlib.suppress(ValueError):
         corners = p.project(board)
         out_of_img = ((corners < 0) | (corners > p.camera.resolution)).any(axis=1)
@@ -29,31 +32,19 @@ def _process_projector(
         corners = corners[~out_of_img]
 
         if corners.size != 0 and not np.isinf(corners).any():
-            return Features(board_, corners), p
+            return (p, Features(board_, corners))
 
-    return None, p
-
-
-def _get_Projector(kwargs: dict) -> Projector:
-    return Projector(**kwargs)
+    return (p, None)
 
 
-def simul_features(
-    n: int, board: np.ndarray, kwargs: dict
-) -> list[tuple[Features | None, Projector]]:
-    projectors = process_map(
-        _get_Projector,
-        (kwargs for _ in range(n)),
+def simul_features(n: int, board: np.ndarray, kwargs: dict) -> list[SIMUL_INP]:
+    # TODO: try partial
+    return process_map(
+        _simul_features,
+        ((kwargs, board) for _ in range(n)),
         chunksize=100,
         leave=False,
         total=n,
-        desc="Generating projectors",
-    )
-    return process_map(
-        _process_projector,
-        [(p, board) for p in projectors],
-        chunksize=100,
-        leave=False,
         desc="Simulating",
     )
 
@@ -90,9 +81,10 @@ def _process_ds(ds: Dataset) -> list[Features | None]:
 
 
 # TODO: Add ds, subds and image index name
-def babelcalib_features(datasets: list[Dataset]) -> list[tuple[Features | None, Entry]]:
-    results = process_map(_process_ds, datasets, leave=False, desc="Process dataset")
+def babelcalib_features(datasets: list[Dataset]) -> list[BABELCALIB_INP]:
+    results = process_map(
+        _process_ds, datasets, leave=False, desc="Find features in dataset"
+    )
     results = [r for res in results for r in res]
-
     entries = (e for ds in datasets for subds in (ds.train, ds.test) for e in subds)
-    return list(zip(results, entries))
+    return list(zip(entries, results))

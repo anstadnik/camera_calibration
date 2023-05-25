@@ -1,31 +1,31 @@
 name: camera_calibration
 channels:
 - conda-forge
+- pkgs/main
 dependencies:
-- beautifulsoup4
 - black
-- build
-- cxx-compiler
+- dacite
 - icecream
 - ipdb
 - ipython
 - ipywidgets
 - isort
+- jaxopt
 - jupyterlab-git
 - jupyterlab-katex
 - jupyterlab-lsp
 - jupyterlab_code_formatter
+- numba
 - numpy
 - opencv
+- optax
 - pandas
 - pillow
-- pip
-- pkg-config
 - plotly
 - pybind11
-- pytest
 - python-lsp-server
 - ruff
+- scikit-learn
 - scipy
 - tqdm
 - pip:

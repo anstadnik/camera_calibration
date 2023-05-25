@@ -1,20 +1,43 @@
+from functools import partial
+from typing import Callable
+import numpy as np
+from tqdm.auto import tqdm
 from tqdm.contrib.concurrent import process_map
 
 from calibration.projector.camera import Camera
 from calibration.projector.projector import Projector
-from calibration.solver.solve import solve
 
 from .features import Features
 
 
-def _calibrate(arg: tuple[Features | None, Camera]) -> Projector | None:
+_SOLVER = Callable[[np.ndarray, np.ndarray, Camera], Projector | None]
+
+
+def _calibrate_helper(
+    arg: tuple[Features, Camera] | None, solvers: list[tuple[str, _SOLVER]]
+) -> dict[str, Projector]:
+    if arg is None:
+        return {}
     features, camera = arg
-    return None if features is None else solve(features.corners, features.board, camera)
+    ret = {
+        solver_name: solver(features.corners, features.board, camera)
+        for solver_name, solver in solvers
+    }
+    return {k: v for k, v in ret.items() if v is not None}
 
 
 def calibrate(
-    feature_and_camera: list[tuple[Features | None, Camera]]
-) -> list[Projector | None]:
+    solvers: list[tuple[str, _SOLVER]],
+    feature_and_camera: list[tuple[Features, Camera] | None],
+) -> list[dict[str, Projector]]:
     return process_map(
-        _calibrate, feature_and_camera, chunksize=1000, leave=False, desc="Calibrating"
+        partial(_calibrate_helper, solvers=solvers),
+        feature_and_camera,
+        # chunksize=1000,
+        chunksize=10,
+        leave=False,
+        desc="Calibrating",
     )
+    # return list(
+    #     map(partial(_calibrate_helper, solvers=solvers), tqdm(feature_and_camera))
+    # )
