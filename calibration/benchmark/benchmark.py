@@ -6,7 +6,6 @@ from tqdm.contrib.concurrent import process_map
 
 from calibration.benchmark.calib import calibrate
 
-# from calibration.benchmark.calib import calibrate_optimization, calibrate_scaramuzza
 from calibration.benchmark.features import (
     BABELCALIB_INP,
     SIMUL_INP,
