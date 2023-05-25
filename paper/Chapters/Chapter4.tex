@@ -2,8 +2,180 @@
 
 \section{Feature detection}\label{sec:feature_detection}
 
+\section{Camera calibration}\label{sec:camera_calibration}
 
+\subsection{Reprojection error}\label{sub:reprojection_error}
+
+The reprojection error is the distance between the reprojected point and the
+measured one. It is used to evaluate the quality of the camera calibration.
+
+We chose to minimize the reprojection error between the board and back-projected
+corners, which were initially detected. The projection and back-projection are
+the inverse of each other, hence minimizing the error between the projection of
+the board and the detected corners and minimizing the error between the
+back-projection of the detected corners and the board are
+equivalent\todo{Doesn't sound very rigorous to me.}.
+
+Let's define the following variables: \(\boldsymbol{\theta} = \begin{pmatrix}
+	\theta_x, \theta_y, \theta_z
+\end{pmatrix}^{T}\) is the vector of Euler rotation angles, \(\mathbf{t} = \begin{pmatrix}
+	t_x, t_y, t_z
+\end{pmatrix}^{T}\) is the translation vector, \(\boldsymbol{\lambda} = \begin{pmatrix}
+	\lambda_1, \lambda_2
+\end{pmatrix}^{T}\)\todo{Justify why we used 2} is the intrinsic parameters vector, \(\) is the focal
+length, and \(\mathbf{s} = \begin{pmatrix}
+	s_x, s_y
+\end{pmatrix}^{T}\) is the sensor size\todo{Make sure I'm using the correct terms.}.
+From the input image, we know the resolution \(\mathbf{r} = \begin{pmatrix}
+	r_x, r_y
+\end{pmatrix}^{T}\).
+From the rotation vector, we can compute the rotation matrix \(\mathbf{R}\) as:
+
+From \(\boldsymbol{\theta}\), the rotation matrix $R$ can be calculated as follows:
+
+\begin{equation}
+	R = R(\theta_x) R(\theta_y) R(\theta_z)
+\end{equation} \todo{Is the notation ok?}
+
+where
+
+\begin{align}
+	% R_x(\phi)   & =
+	% \begin{bmatrix}
+	% 	1 & 0          & 0           \\
+	% 	0 & \cos(\phi) & -\sin(\phi) \\
+	% 	0 & \sin(\phi) & \cos(\phi)
+	% \end{bmatrix} \\
+	% R_y(\theta) & =
+	% \begin{bmatrix}
+	% 	\cos(\theta)  & 0 & \sin(\theta) \\
+	% 	0             & 1 & 0            \\
+	% 	-\sin(\theta) & 0 & \cos(\theta)
+	% \end{bmatrix}                 \\
+	% R_z(\psi)   & =
+	% \begin{bmatrix}
+	% 	\cos(\psi) & -\sin(\psi) & 0 \\
+	% 	\sin(\psi) & \cos(\psi)  & 0 \\
+	% 	0          & 0           & 1
+	% \end{bmatrix}
+	R(\theta_x) & =
+	\begin{bmatrix}
+		1 & 0              & 0               \\
+		0 & \cos(\theta_x) & -\sin(\theta_x) \\
+		0 & \sin(\theta_x) & \cos(\theta_x)
+	\end{bmatrix} \\
+	R(\theta_y) & =
+	\begin{bmatrix}
+		\cos(\theta_y)  & 0 & \sin(\theta_y) \\
+		0               & 1 & 0              \\
+		-\sin(\theta_y) & 0 & \cos(\theta_y)
+	\end{bmatrix}     \\
+	R(\theta_z) & =
+	\begin{bmatrix}
+		\cos(\theta_z) & -\sin(\theta_z) & 0 \\
+		\sin(\theta_z) & \cos(\theta_z)  & 0 \\
+		0              & 0               & 1
+	\end{bmatrix}
+\end{align}
+
+Then, \(H\) is given by:
+\begin{equation}
+	H = \begin{bmatrix}
+		\mathbf{r_1} & \mathbf{r_2} & \mathbf{t}
+	\end{bmatrix}.
+\end{equation}
+
+We can compute the intrinsic camera matrices as follows:
+\begin{equation}
+	K = \begin{pmatrix}
+		\frac{f r_x}{s_x} & 0                 & \frac{r_x}{2} \\
+		0                 & \frac{f r_y}{s_y} & \frac{r_y}{2} \\
+		0                 & 0                 & 1
+	\end{pmatrix},
+\end{equation}.
+
+Then, the back-projection of a 2D point \(\mathbf{u} = \begin{pmatrix}
+	u, v, 1
+\end{pmatrix}\) into a scene point with \(Z = 0\) \(\mathbf{X} = \begin{pmatrix}
+	X, Y, 1
+\end{pmatrix}\) is given by:
+\begin{equation}
+	\mathbf{X} = H g_{\lambda_1, \lambda_2}(K^{-1} \mathbf{u}).
+\end{equation}
+
+\subsection{Optimization}\label{sub:optimization}
+
+The loss function is the sum of the squared reprojection errors between the board and
+the back-projected corners, which were initially detected:
+\begin{equation}
+	L = \sum_{i=1}^{N} \left\lVert
+	H g_{\lambda_1, \lambda_2}(K^{-1} \mathbf{u_i}) -
+	\mathbf{X_i} \right\rVert^2.
+\end{equation}
+
+For the initial guess, we used the randomly chosen constant small values.
+
+The model converged to the same results compared to the initial parameters, set
+using the Scaramuzza solver, unless the initial guess was very degenerate (i.e.
+\(R\) was such that the board plane passed through the principal point, and all
+backprojected points were projected onto the same line).
+
+This issue also occured with random small initial values, due to the best
+approximation for \(R\) which minimizes \(L\) when the distance from the
+back-projected board from the measure one was high (i.e., the \(t\) was far from
+the true value) being the degenerate solution\todo{Am I using the term
+correctly?}. In order to avoid this issue, we first optimized only the \(t\),
+until the loss function converged, meaning that \(t\) is close to the true
+value.
+
+However, another issue was that when the board was rotated close to the
+\(180^{\circ}\), \(R\) once again converged to the degenerate solution. In order
+to avoid this issue, we found the solution with initial \(\theta_z\) set to
+value, close to \(0^{\circ}\) and \(180^{\circ}\), and then used the solution
+which minimized the loss function.
+
+\missingfigure{Show the distribution of the reprojection error}.
+
+
+\section{Feature detection}\label{sec:feature_detection}
+
+Often, not all of the board's corners were detected initially. Firstly, we
+assumed that the whole board was detected, and imputed the missing points in the
+board space.\todo{Add ref to the figure}. Then, we tried extending the board
+points.
+
+\missingfigure{Show the image, the respective board, and the imputed points}
+
+We used the obtained camera parameters to then project the imputed board points
+into the image space.
 
 \section{Classifier}\label{sec:classifier}
 
+Given the possible positions of the previously undetected corners, we used a
+classifier, proposed by \cite{geigerAutomaticCameraRange2012}.
+By convolving the image with the templates of the board corners\todo{I have to
+reference it from the related work section}, we obtained the
+probability\todo{It's not probability} of
+each pixel being a corner.\todo{Also, explain in details + math how it's done}
 
+The original paper then used a number of checks to further prune the detected
+corners, and extending line by line the initial board, formed from the
+random close points which made a square \todo{Make sure that's accurate, and
+reference. Also, the sentence is too compicated}.
+We did not require that, since we already had the board, and we directly used
+the response map to find the corners.
+
+\missingfigure{Show the map of responses, and the detected corners}
+
+To create a training dataset, we collected the true and false positives from the
+corners we already had:
+
+For each of the detected corners on all images, we collected the values of the
+response function at the previously detected corners, and around them.
+We didn't collect the values of all of the pixels, because then we would have
+got too optimistic values for selecting the true positives\todo{Rephrase}.
+
+\missingfigure{Show the distribution of the response function}
+
+We trained a binary classifier, using the collected data, and then used it to
+detect the true corners.

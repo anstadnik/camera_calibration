@@ -7,12 +7,25 @@
 	\centering
 	\begin{tabular}{rl}
 		\toprule
-		Term                           & Description                                \\
+		Term                           & Description                                                                \\
 		\midrule
 		\(\mathbf{u} = \begin{pmatrix}
 			               u, v, 1
-		               \end{pmatrix}^{T}\) & A point in the board coordinate system \\
-
+		               \end{pmatrix}^{T}\) & A point in the board coordinate system                                 \\
+		\(\mathbf{X} = \begin{pmatrix}
+			               X, Y, Z, 1
+		               \end{pmatrix}^{T}\) & A point in the world coordinate system                                 \\
+		\(R\)                          & A \(3 \times 3\) rotation matrix                                           \\
+		\(\mathbf{t}\)                 & A \(3 \times 1\) translation vector                                        \\
+		\(\alpha_x\)                   & Scale factor in the x direction (pixels/mm)                                \\
+		\(\alpha_y\)                   & Scale factor in the y direction (pixels/mm)                                \\
+		\(c_x, c_y\)                   & Coordinates of the principal point (image center)                          \\
+		\(\theta\)                     & Angle between the x and y pixel axes                                       \\
+		\(f\)                          & Distance from the camera center to the image plane (focal length)          \\
+		\(f_x, f_y\)                   & Effective focal lengths in the x and y directions                          \\
+		\(K\)                          & Intrinsic matrix incorporating the scaling, introduced by the focal length \\
+		\(H\)                          & Homography matrix                                                          \\
+		\(\lambda_n\)                  & Distortion coefficients                                                    \\
 		\bottomrule
 	\end{tabular}
 	\caption{Notation}
@@ -80,7 +93,8 @@ can be written as:
 
 To project a point from the camera coordinate system to the image plane, we
 need to apply a homography encoding the camera intrinsic parameters.
-This is a \(3 \times 3\) upper-triangular matrix:
+This is a \(3 \times 3\) upper-triangular matrix\todo{Is it really
+	upper-triangular?}:
 \begin{equation}
 	\begin{bmatrix}
 		\alpha_x & \alpha_x \cot \theta & c_x \\
@@ -139,9 +153,7 @@ imaging transformation can be represented by a $3 \times 4$ camera
 matrix\todo{Add reference}. This matrix can be expressed as:
 
 \begin{equation}
-	\begin{bmatrix}
-		\mathbf{p_1} & \mathbf{p_2} & \mathbf{p_3} & \mathbf{p_4}
-	\end{bmatrix} = K \begin{bmatrix}
+	K \begin{bmatrix}
 		I_3 \vert \mathbf{0}
 	\end{bmatrix} \begin{bmatrix}
 		R              & \mathbf{t} \\
@@ -154,7 +166,11 @@ matrix\todo{Add reference}. This matrix can be expressed as:
 Hence, the transformation of a point in the scene by the camera $\mathrm{P}^{3 \times 4}$ can be formulated as:
 
 \begin{equation}
-	\alpha(u, v, 1)^{T} = P^{3 \times 4}(X, Y, Z, 1)^{T},
+	\alpha(u, v, 1)^{T} = K \begin{bmatrix}
+		R \vert \mathbf{t}
+	\end{bmatrix} \begin{pmatrix}
+		X, Y, Z, 1
+	\end{pmatrix}^{T}
 \end{equation}
 
 with $\alpha$ being $1 / Z$.
@@ -167,8 +183,8 @@ projection of the point becomes:
 \begin{equation}
 	\alpha \begin{pmatrix}
 		u \\ v \\ 1
-	\end{pmatrix} = \begin{bmatrix}
-		\mathbf{p_1} & \mathbf{p_2} & \mathbf{p_3} & \mathbf{p_4}
+	\end{pmatrix} = K \begin{bmatrix}
+		\mathbf{r_1} & \mathbf{r_2} & \mathbf{r_3} & \mathbf{t}
 	\end{bmatrix} \begin{pmatrix}
 		X \\ Y \\ 0 \\ 1
 		% \end{pmatrix} = \begin{bmatrix}
@@ -177,8 +193,8 @@ projection of the point becomes:
 		%   X \\ Y \\ 1
 		% \end{pmatrix}.
 	\end{pmatrix} = \underbrace{\begin{bmatrix}
-			\mathbf{p_1} & \mathbf{p_2} & \mathbf{p_4}
-		\end{bmatrix}}_{P} \begin{pmatrix}
+			\mathbf{r_1} & \mathbf{r_2} & \mathbf{t}
+		\end{bmatrix}}_{H} \begin{pmatrix}
 		X \\ Y \\ 1
 	\end{pmatrix}.
 \end{equation}
@@ -220,7 +236,7 @@ Then,
 	\frac{\mathbf{X}}{Z} & =
 	\begin{pmatrix}
 		\frac{X}{Z}, \frac{Y}{Z}, 1
-	\end{pmatrix}^{T}                               \\        & =
+	\end{pmatrix}^{T}                               \\                & =
 	\begin{pmatrix}
 		\frac{\alpha u}{\alpha \psi(r(\mathbf{u}))},
 		\frac{\alpha v}{\alpha \psi(r(\mathbf{u}))},
