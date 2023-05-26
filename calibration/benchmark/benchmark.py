@@ -1,15 +1,12 @@
-from dataclasses import asdict, dataclass, field
-
 import numpy as np
-import pandas as pd
 from tqdm.contrib.concurrent import process_map
+from calibration.benchmark.benchmark_result import BenchmarkResult
 
 from calibration.benchmark.calib import calibrate
 
 from calibration.benchmark.features import (
     BABELCALIB_INP,
     SIMUL_INP,
-    Features,
     babelcalib_features,
     simul_features,
 )
@@ -22,47 +19,12 @@ from calibration.solver.optimization.solve import solve as solve_optimization
 from calibration.solver.scaramuzza.solve import solve as solve_scaramuzza
 
 
-@dataclass
-class BenchmarkResult:
-    input: Entry | Projector
-    features: Features | None
-    predictions: dict[str, Projector]
-    errors: dict[str, float] = field(init=False)
-
-    def __post_init__(self):
-        self.errors = {k: self._calc_error(v) for k, v in self.predictions.items()}
-
-    def _calc_error(self, proj: Projector) -> float:
-        assert self.features is not None
-        try:
-            max_point_img_space = np.r_[proj.camera.resolution, 1]
-            max_point = (
-                np.linalg.inv(proj.camera.intrinsic_matrix) @ max_point_img_space
-            )
-            max_r = float(np.linalg.norm(max_point[:2]))
-            corners_ = proj.project(self.features.board, max_r)
-        except ValueError:
-            return -1.0
-        return np.sqrt(((corners_ - self.features.corners) ** 2).mean())
-
-
-def results_into_df(results: list[BenchmarkResult]) -> pd.DataFrame:
-    return pd.json_normalize(
-        [{k: v for k, v in asdict(r).items() if v is not None} for r in results]
-    )
-
-
 def evaluate(
     inp: list[SIMUL_INP] | list[BABELCALIB_INP], projs: list[dict[str, Projector]]
 ) -> list[BenchmarkResult]:
+    args = [(i, f, p) for (i, f), p in zip(inp, projs) if f is not None]
     return process_map(
-        BenchmarkResult,
-        *zip(*inp),
-        projs,
-        total=len(inp),
-        chunksize=100,
-        leave=False,
-        desc="Evaluating",
+        BenchmarkResult, *args, chunksize=100, leave=False, desc="Evaluating"
     )
 
 
