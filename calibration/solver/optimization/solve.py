@@ -23,10 +23,10 @@ def params_to_proj(jparams: dict[str, jArr], resolution: nArr) -> Projector | No
         int(jparams["focal_length"]), params["sensor_size"], np.array(resolution)
     )
 
-    th = jnp.concatenate([jparams["th_x"], jparams["th_y"], jparams["th_z"]])
-    params["R"] = np.array(euler_angles_to_rotation_matrix(th))
+    theta = jnp.concatenate([jparams["theta_x"], jparams["theta_y"], jparams["theta_z"]])
+    params["R"] = np.array(euler_angles_to_rotation_matrix(theta))
 
-    for p in ["focal_length", "sensor_size", "th_x", "th_y", "th_z"]:
+    for p in ["focal_length", "sensor_size", "theta_x", "theta_y", "theta_z"]:
         del params[p]
 
     return Projector(**params, camera=camera)
@@ -39,15 +39,15 @@ def optimize_optax(
     board: jArr,
     resolution: jArr,
     # step_size=0.05,
-    step_size=0.01,
+    step_size=0.001,
     patience=100,
 ) -> dict[str, jArr]:
-    # optimizer = optax.rmsprop(step_size)
-    optimizer = optax.adam(step_size)
+    optimizer = optax.rmsprop(step_size)
+    # optimizer = optax.adam(step_size)
     start_optimizing_during_phase = [
         ["t"],
-        ["th_z"],
-        ["th_x", "th_y"],
+        ["theta_z"],
+        ["theta_x", "theta_y"],
         ["lambdas", "focal_length", "sensor_size"],
     ]
     phase_when_optimize = {
@@ -78,14 +78,14 @@ def optimize_optax(
             updates, _ = phases[phase].update(updates, inits[phase])
         params_ = optax.apply_updates(params, updates)
 
-        jax.lax.cond(
-            i % 1000 == 0,
-            lambda _: jax.debug.print(
-                "iteration: {}, loss {}, phase: {}", i, loss_val, phase
-            ),
-            lambda _: None,
-            None,
-        )
+        # jax.lax.cond(
+        #     i % 1000 == 0,
+        #     lambda _: jax.debug.print(
+        #         "iteration: {}, loss {}, phase: {}", i, loss_val, phase
+        #     ),
+        #     lambda _: None,
+        #     None,
+        # )
 
         # Update the loss history
         loss_history = loss_history.at[i % patience].set(loss_val)
@@ -142,9 +142,9 @@ def solve(corners: nArr, board: nArr, camera: Camera) -> Projector | None:
     resolution = camera.resolution
     init_paramss = [
         {
-            "th_x": jnp.array([0.0]),
-            "th_y": jnp.array([0.0]),
-            "th_z": jnp.array([th_z]),
+            "theta_x": jnp.array([0.0]),
+            "theta_y": jnp.array([0.0]),
+            "theta_z": jnp.array([th_z]),
             "t": jnp.array([1.0, 1.0, 1.0]),
             "lambdas": jnp.array([0.0, 0.0]),
             "focal_length": jnp.array([35.0]),
