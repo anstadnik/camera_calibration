@@ -40,7 +40,7 @@ class Projector:
 
     R: np.ndarray = field(default_factory=lambda: qr(np.random.randn(3, 3))[0])
     t: np.ndarray = field(
-        default_factory=lambda: np.random.uniform([-1.0, -0.7, 2.5], [0.0, 0.3, 4.0])
+        default_factory=lambda: np.random.uniform([-1.0, -0.7, 2.5], [0.0, -0.3, 4.0])
     )
     lambdas: np.ndarray = field(default_factory=_gen_lambdas)
     camera: Camera = field(default_factory=Camera)
