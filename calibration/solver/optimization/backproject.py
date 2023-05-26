@@ -57,7 +57,8 @@ def backprojection_loss(
     board: jax.Array,
     resolution: jax.Array,
 ) -> jax.Array:
-    R = euler_angles_to_rotation_matrix(params["theta"])
+    theta = jnp.concatenate([params["theta_x"], params["theta_y"], params["theta_z"]])
+    R = euler_angles_to_rotation_matrix(theta)
     t = params["t"]
     lambdas = params["lambdas"]
 
