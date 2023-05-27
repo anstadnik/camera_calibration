@@ -2,6 +2,7 @@
 
 \section{Feature detection}\label{sec:feature_detection}
 
+
 \section{Camera calibration}\label{sec:camera_calibration}
 
 \subsection{Reprojection error}\label{sub:reprojection_error}
@@ -137,7 +138,7 @@ which minimized the loss function.
 \missingfigure{Show the distribution of the reprojection error}.
 
 
-\section{Feature detection}\label{sec:feature_detection}
+\section{Additional features detection}\label{sec:additional_features_detection}
 
 Often, not all of the board's corners were detected initially. Firstly, we
 assumed that the whole board was detected, and imputed the missing points in the
@@ -153,6 +154,7 @@ into the image space.
 
 Given the possible positions of the previously undetected corners, we used a
 classifier, proposed by \cite{geigerAutomaticCameraRange2012}.
+
 By convolving the image with the templates of the board corners\todo{I have to
 reference it from the related work section}, we obtained the
 probability\todo{It's not probability} of

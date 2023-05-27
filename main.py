@@ -16,12 +16,12 @@ from calibration.solver.optimization.solve import solve
 
 
 def run_benchmark():
-    if not os.path.isfile("babelcalib_results.pkl"):
-        babelcalib_results = benchmark_babelcalib()
-        with open("babelcalib_results.pkl", "wb") as f:
-            pkl.dump(babelcalib_results, f)
-        # with open("babelcalib_results_old.pkl", "rb") as f:
-        #     babelcalib_results = pkl.load(f)
+    if True or not os.path.isfile("babelcalib_results.pkl"):
+        # babelcalib_results = benchmark_babelcalib()
+        # with open("babelcalib_results.pkl", "wb") as f:
+        #     pkl.dump(babelcalib_results, f)
+        with open("babelcalib_results.pkl", "rb") as f:
+            babelcalib_results = pkl.load(f)
         refined_babelcalib_results = refine_features(babelcalib_results)
         with open("refined_babelcalib_results.pkl", "wb") as f:
             pkl.dump(refined_babelcalib_results, f)

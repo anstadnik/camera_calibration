@@ -10,6 +10,7 @@ def prune_corners(
     cornerness = detect_corners(np.array(ImageOps.grayscale(image)))
 
     corners = corners.astype(int)[mask]
+    # 0: original, 1: new
     mask = mask.astype(int)
 
     out_of_img = ((corners < 0) | (corners >= image.size)).any(axis=1).astype(int)

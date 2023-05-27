@@ -15,7 +15,8 @@ def show_corners(
 
 
 # TODO: Pass lists of np.ndarray instead of Corner and Board
-def show_boards(img: np.ndarray, corners: np.ndarray, board: np.ndarray) -> go.Figure:
+def show_boards(img: np.ndarray, corners: np.ndarray, board: np.ndarray
+) -> go.Figure:
     fig1 = px.imshow(img, binary_string=True)
 
     points = [

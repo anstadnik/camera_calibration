@@ -21,7 +21,7 @@ usually used. The camera
 calibration parameters can be found using prior knowledge of the properties of
 the pattern, such that the pattern invariants hold on
 the image. Initially, the chessboard~\citep{OpenCVCameraCalibration,
-v.douskosAutomaticCalibrationDigital2007} patterns were used
+	v.douskosAutomaticCalibrationDigital2007} patterns were used
 (\cref{fig:chessboard}).
 
 Later, ArUco
@@ -32,6 +32,9 @@ orientation of the pattern, as well as uniquely identifying each located pattern
 even under occlusion. Based on ArUco,
 ChArUcO~\citep{OpenCVCameraCalibration} (\cref{fig:charuco}) was
 proposed as more robust.
+
+There are also other calibration patterns, some of which are not square (for
+example, Delitlle~\citep{haDeltilleGridsGeometric2017}).
 
 \begin{figure}[h]
 	\centering
@@ -117,4 +120,21 @@ approaches for wide-angle cameras.
 % there is no established method of general camera calibration approach
 % comparison, and the state-of-the-art is not well-defined. However, it is possible
 % to compare the methods in the context of specific tasks and datasets.
+
+\section{Boards' features detection}\label{sec:boards_features_detection}
+
+The detection of the calibration board's features is a crucial step in the
+camera calibration pipeline. The detection accuracy directly affects the
+calibration accuracy. Besides the feature detection, it's also important to
+associate the detected features with the board's corners.
+
+There are various of the feature detection methods. Many of them require
+prior knowledge of the board's geometry, such as the number of rows and columns,
+and require the full visibility of the board. For example, the default OpenCV
+implementation of the chessboard detection~\citep{OpenCVCameraCalibration}.
+
+Because of that, other methods were proposed, such as
+\cite{fuersattelOCPADOccludedCheckerboard2016} and
+\cite{geigerAutomaticCameraRange2012}. Those method can detect the board under
+the partial occlusion and do not require prior knowledge of the board's geometry.
 

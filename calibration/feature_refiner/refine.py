@@ -16,12 +16,14 @@ class RefinedResult:
     features: Features
     refined_features: Features
     responses: np.ndarray
+    # Mask:
+    # 0 - unchanged
+    # 1 - filtered out
+    # 2 - new corner
+    # 3 - out of image
     new_board_mask: np.ndarray
     prediction: Projector
-    error: float = field(init=False)
-
-    def __post_init__(self):
-        self.error = calc_error(self.prediction, self.refined_features)
+    error: float
 
 
 # https://stackoverflow.com/a/45313353/ @Divakar
@@ -33,7 +35,7 @@ def view1D(a, b):  # a, b are arrays
 
 
 def refine_features_single(
-    r: BenchmarkResult, solver_name: str, pan_size: int = 1, thr=13.8
+    r: BenchmarkResult, solver_name: str="Optimization", pan_size: int = 1, thr=13.8
 ) -> RefinedResult | None:
     assert isinstance(r.input, Entry) and r.input.image is not None
     board = r.features.board.astype(int)
@@ -56,15 +58,25 @@ def refine_features_single(
         new_corners = proj.project(new_board)
     except ValueError:
         return None
+    print(new_corners.shape)
+    print(board.shape)
+    print(new_board.shape)
     responses, new_mask = prune_corners(new_corners, mask, r.input.image, thr)
+    print(new_corners.shape)
     return RefinedResult(
-        r.input, r.features, Features(new_board, new_corners), responses, new_mask, proj
+        r.input,
+        r.features,
+        Features(new_board, new_corners),
+        responses,
+        new_mask,
+        proj,
+        r.errors[solver_name],
     )
 
 
 def refine_features(
     results: list[BenchmarkResult], solver_name: str = "Optimization", pan_size: int = 1
-) -> list[RefinedResult|None]:
+) -> list[RefinedResult | None]:
     return process_map(
         partial(refine_features_single, solver_name=solver_name, pan_size=pan_size),
         results,
