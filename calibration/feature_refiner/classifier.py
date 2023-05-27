@@ -1,39 +1,31 @@
-from calibration.benchmark.benchmark import BenchmarkResult
 import numpy as np
 from PIL import ImageOps
-from calibration.data.babelcalib.entry import Entry
+from PIL.Image import Image
 from calibration.feature_detector.checkerboard import detect_corners
 
 
-def get_corner_responses(r: BenchmarkResult):
-    assert isinstance(r.input, Entry)
-    assert r.input.image is not None
-    assert r.features is not None
-    cornerness = detect_corners(np.array(ImageOps.grayscale(r.input.image)))
+def prune_corners(
+    corners: np.ndarray, mask: np.ndarray, image: Image, thr: float
+) -> tuple[np.ndarray, np.ndarray]:
+    cornerness = detect_corners(np.array(ImageOps.grayscale(image)))
 
-    corners = r.features.corners.astype(int)
+    corners = corners.astype(int)[mask]
+    mask = mask.astype(int)
 
-    # Preparing output array
-    outputs = []
+    out_of_img = ((corners < 0) | (corners >= image.size)).any(axis=1).astype(int)
+    # Now mask is an array of 0, 1 and 3
+    mask[mask == 1] = 1 + out_of_img * 2
+    corners = corners[out_of_img == 0]
 
-    # Padding image to handle edge cases
-    pad_image = np.pad(cornerness, ((5, 5), (5, 5)), mode="constant")
+    responses = cornerness[corners[:, 1], corners[:, 0]]
 
-    # Shifting corners because of padding
-    corners += 5
+    # Now mask is an array of 0 and 1
+    # Now, if responces > thr, mask is 2, otherwise 1. 0s are unchanged
+    mask[mask == 1] = (responses > thr).astype(int) + 1
 
-    # Iterate over corners
-    for corner in corners:
-        x, y = corner
-        # Get 11x11 window around corner
-        window = pad_image[y - 5 : y + 6, x - 5 : x + 6].flatten()
-        # Get distances to the corner
-        yy, xx = np.mgrid[-5:6, -5:6]
-        distances = np.hypot(xx, yy).flatten()
-        # Get corner_id
-        # ids = np.full(distances.shape, idx)
-        # Stack arrays
-        output = np.column_stack((window, distances))
-        outputs.append(output)
-
-    return np.concatenate(outputs)
+    # Mask:
+    # 0 - unchanged
+    # 1 - filtered out
+    # 2 - new corner
+    # 3 - out of image
+    return responses, mask

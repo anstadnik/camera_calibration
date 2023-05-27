@@ -27,7 +27,7 @@ def _simul_features(args: tuple[dict, np.ndarray]) -> SIMUL_INP:
     p = Projector(**kwargs)
     with contextlib.suppress(ValueError):
         corners = p.project(board)
-        out_of_img = ((corners < 0) | (corners > p.camera.resolution)).any(axis=1)
+        out_of_img = ((corners < 0) | (corners >= p.camera.resolution)).any(axis=1)
         board_ = board[~out_of_img]
         corners = corners[~out_of_img]
 
@@ -39,19 +39,15 @@ def _simul_features(args: tuple[dict, np.ndarray]) -> SIMUL_INP:
 
 def simul_features(n: int, board: np.ndarray, kwargs: dict) -> list[SIMUL_INP]:
     # TODO: try partial
+    args = ((kwargs, board) for _ in range(n))
     return process_map(
-        _simul_features,
-        ((kwargs, board) for _ in range(n)),
-        chunksize=100,
-        leave=False,
-        total=n,
-        desc="Simulating",
+        _simul_features, args, chunksize=100, leave=False, total=n, desc="Simulating"
     )
 
 
 def _process_ds(ds: Dataset) -> list[Features | None]:
     assert ds.targets[0].type == BoardType.RECTANGULAR
-    features = []
+    features: list[Features | None] = []
     for entry in (*ds.train, *ds.test):
         img = np.array(entry.image)
         params = Params()

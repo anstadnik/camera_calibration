@@ -1,7 +1,6 @@
 from functools import partial
 from typing import Callable
 import numpy as np
-from tqdm.auto import tqdm
 from tqdm.contrib.concurrent import process_map
 
 from calibration.projector.camera import Camera
@@ -33,11 +32,7 @@ def calibrate(
     return process_map(
         partial(_calibrate_helper, solvers=solvers),
         feature_and_camera,
-        # chunksize=1000,
         chunksize=10,
         leave=False,
         desc="Calibrating",
     )
-    # return list(
-    #     map(partial(_calibrate_helper, solvers=solvers), tqdm(feature_and_camera))
-    # )
