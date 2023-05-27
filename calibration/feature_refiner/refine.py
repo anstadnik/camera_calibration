@@ -33,8 +33,8 @@ def view1D(a, b):  # a, b are arrays
 
 
 def refine_features_single(
-    r: BenchmarkResult, solver_name: str = "Optimization", pan_size: int = 1, thr=13.8
-) -> RefinedResult:
+    r: BenchmarkResult, solver_name: str, pan_size: int = 1, thr=13.8
+) -> RefinedResult | None:
     assert isinstance(r.input, Entry) and r.input.image is not None
     board = r.features.board.astype(int)
     x_min, x_max, y_min, y_max = (
@@ -52,7 +52,10 @@ def refine_features_single(
     mask = np.isin(A, B, invert=True)
 
     proj = r.predictions[solver_name]
-    new_corners = proj.project(new_board)
+    try:
+        new_corners = proj.project(new_board)
+    except ValueError:
+        return None
     responses, new_mask = prune_corners(new_corners, mask, r.input.image, thr)
     return RefinedResult(
         r.input, r.features, Features(new_board, new_corners), responses, new_mask, proj
@@ -60,12 +63,12 @@ def refine_features_single(
 
 
 def refine_features(
-    results: list[BenchmarkResult], solver_name: str, pan_size: int = 1
-) -> list[RefinedResult]:
+    results: list[BenchmarkResult], solver_name: str = "Optimization", pan_size: int = 1
+) -> list[RefinedResult|None]:
     return process_map(
         partial(refine_features_single, solver_name=solver_name, pan_size=pan_size),
         results,
-        chunksize=100,
+        chunksize=10,
         leave=False,
         desc="Refining features",
     )

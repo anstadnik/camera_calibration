@@ -1,5 +1,4 @@
 from functools import partial
-import plotly.express as px
 import optax
 
 import jax.numpy as jnp
@@ -23,7 +22,9 @@ def params_to_proj(jparams: dict[str, jArr], resolution: nArr) -> Projector | No
         int(jparams["focal_length"]), params["sensor_size"], np.array(resolution)
     )
 
-    theta = jnp.concatenate([jparams["theta_x"], jparams["theta_y"], jparams["theta_z"]])
+    theta = jnp.concatenate(
+        [jparams["theta_x"], jparams["theta_y"], jparams["theta_z"]]
+    )
     params["R"] = np.array(euler_angles_to_rotation_matrix(theta))
 
     for p in ["focal_length", "sensor_size", "theta_x", "theta_y", "theta_z"]:

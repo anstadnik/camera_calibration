@@ -8,7 +8,9 @@ from calibration.benchmark.benchmark import (
     benchmark_babelcalib,
     benchmark_simul,
 )
+from calibration.data.babelcalib.babelcalib import load_babelcalib
 from calibration.data.babelcalib.entry import Entry
+from calibration.feature_refiner.refine import refine_features
 from calibration.projector.camera import Camera
 from calibration.solver.optimization.solve import solve
 
@@ -18,6 +20,11 @@ def run_benchmark():
         babelcalib_results = benchmark_babelcalib()
         with open("babelcalib_results.pkl", "wb") as f:
             pkl.dump(babelcalib_results, f)
+        # with open("babelcalib_results_old.pkl", "rb") as f:
+        #     babelcalib_results = pkl.load(f)
+        refined_babelcalib_results = refine_features(babelcalib_results)
+        with open("refined_babelcalib_results.pkl", "wb") as f:
+            pkl.dump(refined_babelcalib_results, f)
     if not os.path.isfile("simul_results.pkl"):
         simul_results = benchmark_simul(int(1e3))
         with open("simul_results.pkl", "wb") as f:
@@ -43,4 +50,4 @@ def run_corner_refinement():
 if __name__ == "__main__":
     # debug_test()
     run_benchmark()
-    run_corner_refinement()
+    # run_corner_refinement()

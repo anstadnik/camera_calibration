@@ -22,9 +22,14 @@ from calibration.solver.scaramuzza.solve import solve as solve_scaramuzza
 def evaluate(
     inp: list[SIMUL_INP] | list[BABELCALIB_INP], projs: list[dict[str, Projector]]
 ) -> list[BenchmarkResult]:
-    args = [(i, f, p) for (i, f), p in zip(inp, projs) if f is not None]
     return process_map(
-        BenchmarkResult, *args, chunksize=100, leave=False, desc="Evaluating"
+        BenchmarkResult,
+        [i for i, _ in inp],
+        [f for _, f in inp],
+        projs,
+        chunksize=100,
+        leave=False,
+        desc="Evaluating",
     )
 
 

@@ -27,7 +27,7 @@ def _simul_features(args: tuple[dict, np.ndarray]) -> SIMUL_INP:
     p = Projector(**kwargs)
     with contextlib.suppress(ValueError):
         corners = p.project(board)
-        out_of_img = ((corners < 0) | (corners > p.camera.resolution)).any(axis=1)
+        out_of_img = ((corners < 0) | (corners >= p.camera.resolution)).any(axis=1)
         board_ = board[~out_of_img]
         corners = corners[~out_of_img]
 
