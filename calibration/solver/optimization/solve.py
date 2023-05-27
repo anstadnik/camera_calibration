@@ -41,21 +41,21 @@ def optimize_optax(
     corners: jArr,
     board: jArr,
     resolution: jArr,
-    # step_size=0.05,
+    # step_size=0.005,
     step_size=0.001,
     patience=100,
 ) -> dict[str, jArr]:
     # optimizer = optax.rmsprop(step_size)
     optimizer = optax.adam(step_size)
-    # start_optimizing_during_phase = [
-    #     ["t"],
-    #     ["theta_z"],
-    #     ["theta_x", "theta_y"],
-    #     ["lambdas", "focal_length", "sensor_size"],
-    # ]
     start_optimizing_during_phase = [
-        ["t", "theta_z", "theta_x", "theta_y", "lambdas", "focal_length", "sensor_size"]
+        ["t", "theta_z"],
+        ["theta_x", "theta_y"],
+        ["lambdas"],
+        ["focal_length", "sensor_size"],
     ]
+    # start_optimizing_during_phase = [
+    #     ["t", "theta_z", "theta_x", "theta_y", "lambdas", "focal_length", "sensor_size"]
+    # ]
     phase_when_optimize = {
         p: i for i, ps in enumerate(start_optimizing_during_phase) for p in ps
     }
@@ -135,7 +135,7 @@ def optimize_optax(
 
             phase += 1
             loss_history = jnp.full(patience, jnp.inf)
-            if phase > len(phases):
+            if phase >= len(phases):
                 break
 
         i += 1
