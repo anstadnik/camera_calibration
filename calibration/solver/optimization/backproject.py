@@ -48,6 +48,7 @@ def backproject(
 def psi(lambdas: jax.Array, r: jax.Array) -> jax.Array:
     l1, l2 = lambdas
     return 1 + l1 * r**2 + l2 * r**4
+    # return 1 + l1 * r**2
 
 
 @jax.jit

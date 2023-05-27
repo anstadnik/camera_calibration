@@ -41,12 +41,14 @@ def optimize_optax(
     corners: jArr,
     board: jArr,
     resolution: jArr,
-    # step_size=0.005,
-    step_size=0.001,
+    # step_size=0.001,
+    step_size=0.005,
     patience=100,
 ) -> dict[str, jArr]:
     # optimizer = optax.rmsprop(step_size)
-    optimizer = optax.adam(step_size)
+    # optimizer = optax.adam(step_size)
+    optimizer = optax.amsgrad(step_size)
+
     start_optimizing_during_phase = [
         ["t", "theta_z"],
         ["theta_x", "theta_y"],
@@ -148,19 +150,22 @@ def solve(corners: nArr, board: nArr, camera: Camera) -> Projector | None:
     resolution = camera.resolution
     init_params = solve_scaramuzza(corners, board, camera)
     theta = Rotation.from_matrix(init_params.R).as_euler("xyz")
+    # init_params = {
+    # "theta_x": jnp.array([0.0]),
+    # "theta_y": jnp.array([0.0]),
+    # "theta_z": jnp.array([0.0]),
+    # "t": jnp.array([1.0, 1.0, 1.0]),
+    # "lambdas": jnp.array([0.0, 0.0]),
+    # "focal_length": jnp.array([35.0]),
+    # "sensor_size": jnp.array([36.0, 24.0]),
+    # }
     init_params = {
-        # "theta_x": jnp.array([0.0]),
-        # "theta_y": jnp.array([0.0]),
-        # "theta_z": jnp.array([th_z]),
-        # "t": jnp.array([1.0, 1.0, 1.0]),
-        # "lambdas": jnp.array([0.0, 0.0]),
-        # "focal_length": jnp.array([35.0]),
-        # "sensor_size": jnp.array([36.0, 24.0]),
         "theta_x": jnp.array([theta[0]]),
         "theta_y": jnp.array([theta[1]]),
         "theta_z": jnp.array([theta[2]]),
         "t": jnp.array(init_params.t),
         "lambdas": jnp.array(init_params.lambdas),
+        # "lambdas": jnp.array([init_params.lambdas[0], 0.]),
         "focal_length": jnp.array([camera.focal_length]),
         "sensor_size": jnp.array(camera.sensor_size),
     }
