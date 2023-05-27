@@ -16,15 +16,18 @@ from calibration.solver.optimization.solve import solve
 
 
 def run_benchmark():
-    if True or not os.path.isfile("babelcalib_results.pkl"):
-        # babelcalib_results = benchmark_babelcalib()
-        # with open("babelcalib_results.pkl", "wb") as f:
-        #     pkl.dump(babelcalib_results, f)
-        with open("babelcalib_results.pkl", "rb") as f:
-            babelcalib_results = pkl.load(f)
-        refined_babelcalib_results = refine_features(babelcalib_results)
-        with open("refined_babelcalib_results.pkl", "wb") as f:
-            pkl.dump(refined_babelcalib_results, f)
+    for aug in [None, "overlay", "prune_corners"]:
+        path = f"babelcalib_results_{aug}.pkl"
+        if True or not os.path.isfile(path):
+            babelcalib_results = benchmark_babelcalib(aug=aug)
+
+            with open(path, "wb") as f:
+                pkl.dump(babelcalib_results, f)
+            # with open(path, "rb") as f:
+            #     babelcalib_results = pkl.load(f)
+            refined_babelcalib_results = refine_features(babelcalib_results)
+            with open(f"refined_babelcalib_results_{aug}.pkl", "wb") as f:
+                pkl.dump(refined_babelcalib_results, f)
     if not os.path.isfile("simul_results.pkl"):
         simul_results = benchmark_simul(int(1e3))
         with open("simul_results.pkl", "wb") as f:
@@ -42,8 +45,11 @@ def run_corner_refinement():
         assert isinstance(r.input, Entry)
         assert r.input.image is not None
         assert r.features is not None
-    solve(r.features.corners, r.features.board,
-          Camera(resolution=np.array(r.input.image.size)))
+    solve(
+        r.features.corners,
+        r.features.board,
+        Camera(resolution=np.array(r.input.image.size)),
+    )
     # show_boards(np.array(r.input.image), r.features.corners, r.features.board).show()
 
 

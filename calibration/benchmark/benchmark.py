@@ -1,5 +1,6 @@
 import numpy as np
 from tqdm.contrib.concurrent import process_map
+from calibration.augmentations.augmentations import overlay_img, prune_corners
 from calibration.benchmark.benchmark_result import BenchmarkResult
 
 from calibration.benchmark.calib import calibrate
@@ -7,6 +8,7 @@ from calibration.benchmark.calib import calibrate
 from calibration.benchmark.features import (
     BABELCALIB_INP,
     SIMUL_INP,
+    Features,
     babelcalib_features,
     simul_features,
 )
@@ -56,7 +58,9 @@ def get_camera_from_entry(entry: Entry) -> Camera:
     )
 
 
-def benchmark_babelcalib(dataset: list[Dataset] | None = None) -> list[BenchmarkResult]:
+def benchmark_babelcalib(
+    dataset: list[Dataset] | None = None, aug: str | None = None
+) -> list[BenchmarkResult]:
     if dataset is None:
         dataset = load_babelcalib()
         # Skip aprilgrid
@@ -64,7 +68,17 @@ def benchmark_babelcalib(dataset: list[Dataset] | None = None) -> list[Benchmark
         dataset = [
             ds for ds in dataset if not any(map(ds.name.startswith, aprilgrid_datasets))
         ]
+    if aug == "overlay":
+        for ds in dataset:
+            for subds in [ds.train, ds.test]:
+                for e in subds:
+                    if e.image is not None:
+                        e.image = overlay_img(e.image)
     ents_and_feats = babelcalib_features(dataset)
+    if aug == "prune_corners":
+        ents_and_feats = [
+            (e, prune_corners(f) if f is not None else None) for e, f in ents_and_feats
+        ]
     solvers_args = [
         (f, get_camera_from_entry(e)) if f else None for e, f in ents_and_feats
     ]
