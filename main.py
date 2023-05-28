@@ -28,10 +28,10 @@ def run_benchmark():
             refined_babelcalib_results = refine_features(babelcalib_results)
             with open(f"refined_babelcalib_results_{aug}.pkl", "wb") as f:
                 pkl.dump(refined_babelcalib_results, f)
-    if not os.path.isfile("simul_results.pkl"):
-        simul_results = benchmark_simul(int(1e3))
-        with open("simul_results.pkl", "wb") as f:
-            pkl.dump(simul_results, f)
+    # if not os.path.isfile("simul_results.pkl"):
+    #     simul_results = benchmark_simul(int(1e3))
+    #     with open("simul_results.pkl", "wb") as f:
+    #         pkl.dump(simul_results, f)
 
 
 def run_corner_refinement():
