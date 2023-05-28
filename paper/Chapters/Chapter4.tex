@@ -2,10 +2,9 @@
 
 \section{Feature detection}\label{sec:feature_detection}
 
-For the feature detection, we used the approach proposed by
+For the feature detection, we used the approach, proposed by
 \cite{geigerAutomaticCameraRange2012} (see \cref{sec:boards_features_detection,
-	feature_detection}).
-\missingfigure{Show the feature detection results.}
+	sec:feature_detection}).
 
 \section{Camera calibration}\label{sec:camera_calibration}
 
@@ -13,7 +12,10 @@ In this work, we obtained the camera calibration in two steps: first, we
 used the approach, proposed by \cite{scaramuzzaToolboxEasilyCalibrating2006} to
 obtain the initial approximation of the camera parameters. Then, we used the
 optimization to minimize the reprojection error between the board and the
-back-projected corners.
+back-projected corners. A division model is very powerful, and is able to
+express a wide number of range of distortions
+\citep{prittsMinimalSolversRectifying2021}. In this work, we used a model with
+two parameters to allow for a better flexibility during the optimization.
 
 \subsection{Reprojection error}\label{sub:reprojection_error}
 
@@ -35,10 +37,10 @@ Let's define the following variables: \(\boldsymbol{\theta} = \begin{pmatrix}
 	t_x, t_y, t_z
 \end{pmatrix}^{T}\) is the translation vector, \(\boldsymbol{\lambda} = \begin{pmatrix}
 	\lambda_1, \lambda_2
-\end{pmatrix}^{T}\)\todo{Justify why we used 2} is the intrinsic parameters vector, \(\) is the focal
+\end{pmatrix}^{T}\) is the intrinsic parameters vector, \(\) is the focal
 length, and \(\mathbf{s} = \begin{pmatrix}
 	s_x, s_y
-\end{pmatrix}^{T}\) is the sensor size\todo{Make sure I'm using the correct terms.}.
+\end{pmatrix}^{T}\) is the sensor size.
 From the input image, we know the resolution \(\mathbf{r} = \begin{pmatrix}
 	r_x, r_y
 \end{pmatrix}^{T}\).
@@ -343,8 +345,6 @@ to avoid this issue, we found the solution with initial \(\theta_z\) set to
 value, close to \(0^{\circ}\) and \(180^{\circ}\), and then used the solution
 which minimized the loss function.
 
-\missingfigure{Show the distribution of the reprojection error}.
-
 \section{Additional features detection}\label{sec:additional_features_detection}
 
 Often, not all of the board's corners were detected initially. Firstly, we
@@ -352,14 +352,12 @@ assumed that the whole board was detected, and imputed the missing points in the
 board space.\todo{Add ref to the figure}. Then, we tried extending the board
 points.
 
-\missingfigure{Show the image, the respective board, and the imputed points}
-
 We used the obtained camera parameters to then project the imputed board points
 into the image space.
 
 \section{Classifier}\label{sec:classifier}
 
-In this work, we used the method, proposed by
+In this work, one of the methods we used was proposed by
 \cite{geigerAutomaticCameraRange2012} as it didn't require the whole board to be
 visible, automatically determines the board's number of rows and columns and
 worked quite well on highly-distorted images.
@@ -466,51 +464,50 @@ Then, the authors apply the conservative non-maximum suppression to the
 response map, and additionally filter the corners by assuring that there are two
 modes of the gradient directions.
 
-\subsection{Sub-pixel Corner and Orientation Refinement}\label{sub:sub_pixel_corner_and_orientation_refinement}
+% \subsection{Sub-pixel Corner and Orientation Refinement}\label{sub:sub_pixel_corner_and_orientation_refinement}
+%
+% Sub-pixel accurate corner locations and edge orientations are refined using the following optimizations:
+%
+% For sub-pixel corner localization, the corner $\mathbf{c}$ in a 2D space
+% $\mathbb{R}^2$ is refined using the assumption that the gradient direction
+% \(\mathbf{g_{p}}\) at
+% each pixel  \(\mathbf{p}\) in the small neighbourhood around the corner is
+% orthogonal to \(\mathbf{p} - \mathbf{c}\).
+%
+% \begin{equation}
+% 	\mathbf{c}=\arg \min _{\mathbf{c}^{\prime}} \sum_{\mathbf{p} \in
+% 	\mathcal{N}_{\mathbf{I}}\left(\mathbf{c}^{\prime}\right)}\left(\mathbf{g}_{\mathbf{p}}^T\left(\mathbf{p}-\mathbf{c}^{\prime}\right)\right)^2
+% \end{equation}
+%
+% For the orientation refinement, authors minimize the distance from the
+% orientation vectors \(\mathbf{e_1}, \mathbf{e_2}\) to the gradient directions
+% \(\mathbf{g_p}\) in the neighbourhood of the corner.
+%
+% \begin{equation}
+% 	\mathbf{e}_i=\arg \min _{\mathbf{e}_i^{\prime}} \sum_{\mathbf{p} \in
+% 		\mathcal{M}_i}\left(\mathbf{g}_{\mathbf{p}}^T \mathbf{e}_i^{\prime}\right)^2
+% 	\quad \text { s.t. } \mathbf{e}_i^{\prime T} \mathbf{e}_i^{\prime}=1
+% \end{equation}.
 
-Sub-pixel accurate corner locations and edge orientations are refined using the following optimizations:
+\subsection{Classifier training}\label{sub:classifier_training}
 
-For sub-pixel corner localization, the corner $\mathbf{c}$ in a 2D space
-$\mathbb{R}^2$ is refined using the assumption that the gradient direction
-\(\mathbf{g_{p}}\) at
-each pixel  \(\mathbf{p}\) in the small neighbourhood around the corner is
-orthogonal to \(\mathbf{p} - \mathbf{c}\).
-
-\begin{equation}
-	\mathbf{c}=\arg \min _{\mathbf{c}^{\prime}} \sum_{\mathbf{p} \in
-	\mathcal{N}_{\mathbf{I}}\left(\mathbf{c}^{\prime}\right)}\left(\mathbf{g}_{\mathbf{p}}^T\left(\mathbf{p}-\mathbf{c}^{\prime}\right)\right)^2
-\end{equation}
-
-For the orientation refinement, authors minimize the distance from the
-orientation vectors \(\mathbf{e_1}, \mathbf{e_2}\) to the gradient directions
-\(\mathbf{g_p}\) in the neighbourhood of the corner.
-
-\begin{equation}
-	\mathbf{e}_i=\arg \min _{\mathbf{e}_i^{\prime}} \sum_{\mathbf{p} \in
-		\mathcal{M}_i}\left(\mathbf{g}_{\mathbf{p}}^T \mathbf{e}_i^{\prime}\right)^2
-	\quad \text { s.t. } \mathbf{e}_i^{\prime T} \mathbf{e}_i^{\prime}=1
-\end{equation}.
-
-The original paper then used a number of checks to further prune the detected
-corners, and extending line by line the initial board, formed from the
-random close points which made a square \todo{Make sure that's accurate, and
-	reference. Also, the sentence is too compicated}.
-We did not require that, since we already had the board, and we directly used
-the response map to find the corners.
-
-\missingfigure{Show the map of responses, and the detected corners}
+We tested the approach of \cite{geigerAutomaticCameraRange2012}, and,
+alternatively, the Hessian responses for the image, as proposed by
+\cite{chenNewSubPixelDetector2005}.
 
 To create a training dataset, we collected the true and false positives from the
-corners we already had:
+corners we already detected.
 
 For each of the detected corners on all images, we collected the values of the
 response function at the previously detected corners, and around them.
-We didn't collect the values of all of the pixels, because then we would have
-got too optimistic values for selecting the true positives\todo{Rephrase}.
+We didn't collect the values of all of the pixels, in order to reduce the number
+of very simple examples.
 
-\missingfigure{Show the distribution of the response function}
+To determine the threshold for the classification, we used the ROC curve, and
+found the threshold which maximizes
+the geometric mean of the true positive rate and the false positive rate.
 
-We trained a binary classifier, using the collected data, and then used it to
-detect the true corners.
+We used both of the approaches to train the classifier, and compared the
+results in \cref{sec:classification}.
 
 

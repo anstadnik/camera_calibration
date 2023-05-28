@@ -54,5 +54,5 @@ def solve(corners: nArr, board: nArr, camera: Camera) -> Projector | None:
     # losses = [backprojection_loss(params, *args) for params in paramss]
     # params = paramss[np.argmin(losses)]
     ret = params_to_proj(params, resolution)
-    print(f"Final error: {calc_error(ret, Features(board, corners)):0.3f}")
+    # print(f"Final error: {calc_error(ret, Features(board, corners)):0.3f}")
     return ret, hist

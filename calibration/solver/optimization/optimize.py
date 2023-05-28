@@ -102,17 +102,17 @@ def optimize_optax(
                 fx, fy = params["focal_length"] / pixel_size
                 cx, cy = resolution / 2
                 intrinsic_matrix = jnp.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]])
-                print(f"R: {np.linalg.norm(R - proj_.R)}, "
-                      f"t: {np.linalg.norm(t - proj_.t)}, "
-                      f"lambdas: {np.linalg.norm(lambdas - proj_.lambdas)}, "
-                      f"intrinsics: {np.linalg.norm(intrinsic_matrix - proj_.camera.intrinsic_matrix)}")
-                print(f"Resolution: {np.linalg.norm(resolution - proj_.camera.resolution)}"
-                      f"Sensor size: {np.linalg.norm(params['sensor_size'] - proj_.camera.sensor_size)}"
-                      f"Focal length: {np.linalg.norm(params['focal_length'] - proj_.camera.focal_length)}"
-                      f"Skew: {proj_.camera.skew}")
+                # print(f"R: {np.linalg.norm(R - proj_.R)}, "
+                #       f"t: {np.linalg.norm(t - proj_.t)}, "
+                #       f"lambdas: {np.linalg.norm(lambdas - proj_.lambdas)}, "
+                #       f"intrinsics: {np.linalg.norm(intrinsic_matrix - proj_.camera.intrinsic_matrix)}")
+                # print(f"Resolution: {np.linalg.norm(resolution - proj_.camera.resolution)}"
+                #       f"Sensor size: {np.linalg.norm(params['sensor_size'] - proj_.camera.sensor_size)}"
+                #       f"Focal length: {np.linalg.norm(params['focal_length'] - proj_.camera.focal_length)}"
+                #       f"Skew: {proj_.camera.skew}")
 
                 board__ = backproject(corners, R, t, lambdas, intrinsic_matrix)
-                print(f"Board error: {np.linalg.norm(board_ - board__)}")
+                # print(f"Board error: {np.linalg.norm(board_ - board__)}")
                 board_error = np.linalg.norm(board_ - board)
                 # print(f"Board error: {np.linalg.norm(board_ - board)}")
 
@@ -123,12 +123,12 @@ def optimize_optax(
                     jnp.abs(board_ - board) * (1 + weights * 10).reshape(-1, 1)
                 )
 
-                print(
-                    f"iteration: {i}, loss {loss_val}/{np.array(loss_)}, phase: {phase}, "
-                    f"corners error: {corners_error:0.3f} vs {best_corners_error:0.3f}, "
-                    f"board error: {board_error:0.3f} vs {best_board_error:0.3f}, "
-                    f"error: {calc_error(proj_, features):0.3f} vs {best_error:0.3f}"
-                )
+                # print(
+                #     f"iteration: {i}, loss {loss_val}/{np.array(loss_)}, phase: {phase}, "
+                #     f"corners error: {corners_error:0.3f} vs {best_corners_error:0.3f}, "
+                #     f"board error: {board_error:0.3f} vs {best_board_error:0.3f}, "
+                #     f"error: {calc_error(proj_, features):0.3f} vs {best_error:0.3f}"
+                # )
 
         hist.append(loss_val)
         if loss_val < best_loss:

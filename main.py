@@ -16,8 +16,8 @@ from calibration.solver.optimization.solve import solve
 
 
 def run_benchmark():
-    # for aug in [None, "overlay", "prune_corners"]:
-    for aug in [None]:
+    for aug in [None, "overlay", "prune_corners"]:
+    # for aug in [None]:
         path = f"babelcalib_results_{aug}.pkl"
         if True or not os.path.isfile(path):
             # babelcalib_results = benchmark_babelcalib(aug=aug)

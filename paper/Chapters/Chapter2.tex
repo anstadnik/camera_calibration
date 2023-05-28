@@ -26,7 +26,7 @@ the image. Initially, the chessboard~\citep{OpenCVCameraCalibration,
 
 Later, ArUco
 ~\citep{garrido-juradoAutomaticGenerationDetection2014} (\cref{fig:gboriginal}) and
-AprilTag~\citep{olsonAprilTagRobustFlexible2011a} (\cref{fig:apriltag})
+AprilTag~\citep{olsonAprilTagRobustFlexible2011} (\cref{fig:apriltag})
 allowed detecting the
 orientation of the pattern, as well as uniquely identifying each located pattern
 even under occlusion. Based on ArUco,
@@ -115,8 +115,6 @@ Recently, on \citedate{duisterhofTartanCalibIterativeWideAngle2022},
 approach to camera calibration, which outperforms the previous state-of-the-art
 approaches for wide-angle cameras.
 
-\todo{Add the paper about the feature detection}
-
 % The camera calibration depends a lot on the physical camera properties, choice
 % of the camera model, calibration method, number of images used for calibration,
 % prior knowledge of the camera, and many other variables. Therefore, currently,
@@ -138,6 +136,9 @@ implementation of the chessboard detection~\citep{OpenCVCameraCalibration}.
 
 Because of that, other methods were proposed, such as
 \cite{fuersattelOCPADOccludedCheckerboard2016} and
-\cite{geigerAutomaticCameraRange2012}. Those method can detect the board under
+\cite{geigerAutomaticCameraRange2012}. Those method can detect the board and
+associate the corners with the borders' corners under
 the partial occlusion and do not require prior knowledge of the board's geometry.
 
+\cite{chenNewSubPixelDetector2005} proposed using Hessian to find pixel
+positions of the corners.

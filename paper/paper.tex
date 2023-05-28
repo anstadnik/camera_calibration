@@ -78,6 +78,8 @@ openany
 \usepackage{multicol}
 \usepackage{float}
 \usepackage{cases}
+\usepackage{pgfplots}
+\usepackage{pgf-pie}
 \graphicspath{ {images/} }
 
 %----------------------------------------------------------------------------------------
@@ -201,21 +203,24 @@ openany
 
 \begin{abstract}
 	\addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-	The Thesis Abstract is written here (and usually kept to just this page). The page is kept centered vertically so can expand into the blank space above the title too\ldots
+	% The Thesis Abstract is written here (and usually kept to just this page). The page is kept centered vertically so can expand into the blank space above the title too\ldots
 
-	Camera calibration is a crucial step in many computer vision applications.
-  Typically, it involves taking a set of images of a calibration pattern,
-  detecting its' features, and estimating the camera parameters. However, under
-  certain conditions (including occlusions, bad lightning, highly distorted
-  images etc.), feature detectors might fail to detect some of the
-  features.\todo{Do I have to justify it?}.
-
-  In this paper, we propose a novel approach to feature detection in the context
-  of camera calibration. After the initial feature detection and calibration,
-  we use the intermediate camera parameters to predict the possible positions
-  of the previously undetected features. Those features are filtered using the
-  binary classifier, and the remaining features are used to further constrain
-  the camera calibration.
+	Current state-of-the-art techniques occasionally fail to accurately estimate
+	the camera parameters for wide-angle lenses, as most of the algorithms assume
+	lens with medium to small distortion. Partially it occurs due to extreme
+	distortion at the edges of the image, which poses additional challenges to
+	feature detection algorithms. We propose a novel approach for detecting
+	additional features on the imaged calibration pattern using intermediate
+	camera calibration. Utilizing the prior information about the calibration
+	pattern's geometry, we can estimate the possible positions of the previously
+	undetected features. Those features are filtered using the binary classifier,
+	and the remaining ones are used to further constrain the camera calibration.
+	The proposed method consists of three key steps: \((1)\) feature
+	detection and estimation of the lattice geometry, \((2)\) initial camera
+	calibration by solving the two-steps linear minimization problem, and \((3)\)
+	estimation the possible positions of the undetected features by projecting the
+	imputed and extended lattice geometry onto the image plane, and filtering them
+	using the binary classifier.
 
 	% In this paper, we propose a novel approach to camera calibration. We want to
 	% use a robust solver to estimate the geometry between the correspondence of
@@ -315,11 +320,11 @@ openany
 
 \include{Chapters/Plan}
 \include{Chapters/Chapter1}
-\include{Chapters/Chapter2} 
+\include{Chapters/Chapter2}
 \include{Chapters/Chapter3}
-\include{Chapters/Chapter4} 
-\include{Chapters/Chapter5} 
-\include{Chapters/Chapter6} 
+\include{Chapters/Chapter4}
+\include{Chapters/Chapter5}
+\include{Chapters/Chapter6}
 
 %----------------------------------------------------------------------------------------
 %	THESIS CONTENT - APPENDICES
@@ -343,4 +348,5 @@ openany
 %----------------------------------------------------------------------------------------
 
 \end{document}
+
 

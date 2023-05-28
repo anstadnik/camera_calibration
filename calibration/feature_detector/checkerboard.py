@@ -98,8 +98,8 @@ TPROPS = [
     [0, pi / 2],
     [pi / 4, -pi / 4],
     # [0, pi/4], [0, -pi/4],
-    [pi / 4, pi / 2],
-    [-pi / 4, pi / 2],
+    # [pi / 4, pi / 2],
+    # [-pi / 4, pi / 2],
 ]
 # [-3*pi/8, 3*pi/8], [-pi/8, pi/8],
 # [-pi/8, -3*pi/8], [pi/8, 3*pi/8]]
@@ -113,6 +113,9 @@ def detect_corners(gray, radiuses=RADIUS):
     for angle_1, angle_2 in TPROPS:
         for radius in radiuses:
             temp = create_correlation_patch(angle_1, angle_2, radius)
+            import plotly.express as px
+            # for t_i, t in enumerate(temp):
+            #     px.imshow(t, title=f"{angle_1=}, {angle_2=}, {radius=}, {t_i=}").show()
             corr = detect_corners_template(gray, temp)
             out = np.max([corr, out], axis=0)
 

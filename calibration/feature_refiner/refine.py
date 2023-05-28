@@ -36,7 +36,7 @@ def view1D(a, b):  # a, b are arrays
 
 def refine_features_single(
     r: BenchmarkResult, solver_name: str="Optimization", pan_size: int = 1,
-    thr=28.7
+    thr=0.0019
 ) -> RefinedResult | None:
     assert isinstance(r.input, Entry) and r.input.image is not None
     board = r.features.board.astype(int)
