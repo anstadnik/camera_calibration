@@ -109,6 +109,8 @@ def prune_corners(
 ) -> tuple[np.ndarray, np.ndarray]:
     # cornerness = detect_corners(np.array(ImageOps.grayscale(image)))
     cornerness = hessian_response(np.array(ImageOps.grayscale(image)))
+    import plotly.express as px
+    px.imshow(cornerness).show()
     if cornerness.shape[0] == image.size[1] // 2:
         assert cornerness.shape[1] == image.size[0] // 2
         cornerness = cornerness.repeat(2, axis=0).repeat(2, axis=1)
@@ -141,8 +143,8 @@ def get_corner_responses(r: BenchmarkResult):
     assert isinstance(r.input, Entry)
     assert r.input.image is not None
     assert r.features is not None
-    cornerness = detect_corners(np.array(ImageOps.grayscale(r.input.image)))
-    # cornerness = hessian_response(np.array(ImageOps.grayscale(r.input.image)))
+    # cornerness = detect_corners(np.array(ImageOps.grayscale(r.input.image)))
+    cornerness = hessian_response(np.array(ImageOps.grayscale(r.input.image)))
     if cornerness.shape[0] == r.input.image.size[1] // 2:
         assert cornerness.shape[1] == r.input.image.size[0] // 2
         cornerness = cornerness.repeat(2, axis=0).repeat(2, axis=1)

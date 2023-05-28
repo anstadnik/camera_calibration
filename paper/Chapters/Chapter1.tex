@@ -30,7 +30,7 @@ As reported by \textcite{duisterhofTartanCalibIterativeWideAngle2022} on
 \citedate{duisterhofTartanCalibIterativeWideAngle2022}, the current state-of-the-art
 methods
 \citep{olsonAprilTagRobustFlexible2011, schopsWhyHaving102020,
-krogiusFlexibleLayoutsFiducial2019}
+	krogiusFlexibleLayoutsFiducial2019}
 fail on images with high distortion.
 \cite{duisterhofTartanCalibIterativeWideAngle2022} suggested an iterative
 the approach of image undistortion and target reprojection, achieving the superior
@@ -48,8 +48,19 @@ order to eliminate false positives.
 
 This additional points will further constrain the camera calibration, improving
 the accuracy of the calibration parameters.
-\todo{Explain why more features is better}
-\missingfigure{Show the example of the calibration board and the image}
+
+\begin{figure}
+	\begin{tikzpicture}[spy using outlines={circle,yellow,magnification=4,size=3cm, connect spies}]
+		\node[anchor=south west,inner sep=0] (image) at (0,0)
+    % {\includegraphics[width=0.6\textwidth]{distorted_image}};
+    {\includegraphics[width=0.8\textwidth]{distorted_image}};
+		\begin{scope}[x={(image.south east)},y={(image.north west)}]
+			\spy[red] on (3.3,1.7) in node [left] at (10.1,1.7);
+			\spy[blue] on (4.6,3.2) in node [right] at (8.1,5.3);
+		\end{scope}
+	\end{tikzpicture}
+  \caption{Example of corners near the center of the image and near the edge}
+\end{figure}
 
 \section{Research objective}\label{sec:research_objective}
 
@@ -58,10 +69,10 @@ calibration by finding previously undetected features on the calibration
 board \todo{Probably rephrase if I won't compare the actual calibration}. For
 that, we formulate the set of research questions:
 \begin{itemize}
-  \item How to find additional features on the calibration board which were not
-    detected by the feature detector?
-  \item How to filter out falsely detected features?
-    \todo{Add more}
+	\item How to find additional features on the calibration board which were not
+	      detected by the feature detector?
+	\item How to filter out falsely detected features?
+	      \todo{Add more}
 \end{itemize}
 
 \section{Thesis structure}\label{sec:thesis_structure}
