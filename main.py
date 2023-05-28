@@ -16,15 +16,16 @@ from calibration.solver.optimization.solve import solve
 
 
 def run_benchmark():
-    for aug in [None, "overlay", "prune_corners"]:
+    # for aug in [None, "overlay", "prune_corners"]:
+    for aug in [None]:
         path = f"babelcalib_results_{aug}.pkl"
         if True or not os.path.isfile(path):
-            babelcalib_results = benchmark_babelcalib(aug=aug)
-
-            with open(path, "wb") as f:
-                pkl.dump(babelcalib_results, f)
-            # with open(path, "rb") as f:
-            #     babelcalib_results = pkl.load(f)
+            # babelcalib_results = benchmark_babelcalib(aug=aug)
+            #
+            # with open(path, "wb") as f:
+            #     pkl.dump(babelcalib_results, f)
+            with open(path, "rb") as f:
+                babelcalib_results = pkl.load(f)
             refined_babelcalib_results = refine_features(babelcalib_results)
             with open(f"refined_babelcalib_results_{aug}.pkl", "wb") as f:
                 pkl.dump(refined_babelcalib_results, f)

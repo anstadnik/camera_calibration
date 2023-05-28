@@ -59,13 +59,13 @@ This equation can be written using the homogeneous coordinates as:
 \begin{equation} \label{eq:perspective_projection}
 	\alpha \begin{pmatrix}
 		u \\ v \\ 1
-	\end{pmatrix}^{T} = \begin{bmatrix}
+	\end{pmatrix} = \begin{bmatrix}
 		f & 0 & 0 & 0 \\
 		0 & f & 0 & 0 \\
 		0 & 0 & 1 & 0
 	\end{bmatrix} \begin{pmatrix}
 		X \\ Y \\ Z \\ 1
-	\end{pmatrix}^{T},
+	\end{pmatrix},
 \end{equation}
 where \(\alpha = \sfrac{1}{Z}\) is a scale factor.
 
@@ -226,7 +226,7 @@ lenses, and is wildly used \todo{Add reference}. The model is defined as:
 where \(\lambda_n\) are the distortion coefficients.
 
 The function \(\psi(r)\) is not invertible in general.
-Let \(\mathbf{X} = \begin{pmatrix}
+Let \(\mathbf{\widehat{X}} = \begin{pmatrix}
 	X, Y, Z
 \end{pmatrix}^{T} = \alpha g(\mathbf{u})\) be a ray\todo{Should I explain
 	somewhere how the rays are defined?} in the camera coordinate system.
@@ -236,7 +236,7 @@ Then,
 	\frac{\mathbf{X}}{Z} & =
 	\begin{pmatrix}
 		\frac{X}{Z}, \frac{Y}{Z}, 1
-	\end{pmatrix}^{T}                               \\                            & =
+	\end{pmatrix}^{T}                               \\                                & =
 	\begin{pmatrix}
 		\frac{\alpha u}{\alpha \psi(r(\mathbf{u}))},
 		\frac{\alpha v}{\alpha \psi(r(\mathbf{u}))},
@@ -269,4 +269,18 @@ Now, let \(\widehat{r}\) be a root of
 	\frac{Y * \psi \left( r\right))}{Z}^{2}
 } = r\).
 
-Then, \(\mathbf{u} = \frac{\widehat{r}}{r(\mathbf{X})}\mathbf{X}\).
+Then, \(\mathbf{u} = f(\mathbf{X}) =
+\frac{\widehat{r}}{r(\mathbf{X})}\mathbf{X}\),
+where \(f(\cdot)\) is the inverse of \(g(\cdot)\).
+
+\subsection{Complete projection and backprojection}\label{sub:complete_projection_and_backprojection}
+
+Now, the complete projection and backprojection can be formulated as follows:
+\begin{align}
+	\alpha \mathbf{u} & = K f(H\mathbf{X})
+	\tag{Projection} \label{eq:projection}                              \\
+	\alpha \mathbf{X} & = H^{-1} g(K^{-1}\mathbf{u}) \tag{Back
+		projection} \label{eq:back_projection}
+\end{align}.
+
+

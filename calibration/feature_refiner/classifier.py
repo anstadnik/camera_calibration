@@ -13,8 +13,8 @@ def find_modes_meanshift(hist):
 
     hist = hist.astype(int)
     samples = np.repeat(np.arange(len(hist)), hist).reshape(-1, 1)
-    bandwidth = estimate_bandwidth(samples, quantile=0.2, n_samples=500)
-    ms = MeanShift(bandwidth=bandwidth, bin_seeding=True).fit(samples)
+    # bandwidth = estimate_bandwidth(samples, quantile=0.2, n_samples=500)
+    ms = MeanShift(bin_seeding=True).fit(samples)
 
     # Retrieve unique labels and cluster centers
     labels_unique = np.unique(ms.labels_)
@@ -81,7 +81,7 @@ def compute_orientation(img, positions, window_size):
                 window, bins=32, weights=weights, range=(-np.pi, np.pi)
             )
 
-            if histogram.sum() == 0:
+            if np.allclose(histogram, 0):
                 passes.append(False)
                 continue
             # ms = MeanShift(bin_seeding=True)

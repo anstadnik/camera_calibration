@@ -21,7 +21,7 @@ def show_refined_corners(
     }
 
     responses_all = np.full_like(mask, -1)
-    responses_all[(mask > 0) & (mask < 3)] = responses
+    # responses_all[(mask > 0) & (mask < 3)] = responses
     points = [
         {
             "n": i,

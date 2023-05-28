@@ -35,7 +35,8 @@ def view1D(a, b):  # a, b are arrays
 
 
 def refine_features_single(
-    r: BenchmarkResult, solver_name: str="Optimization", pan_size: int = 1, thr=13.8
+    r: BenchmarkResult, solver_name: str="Optimization", pan_size: int = 1,
+    thr=28.7
 ) -> RefinedResult | None:
     assert isinstance(r.input, Entry) and r.input.image is not None
     board = r.features.board.astype(int)
@@ -56,13 +57,19 @@ def refine_features_single(
     proj = r.predictions[solver_name]
     try:
         new_corners = proj.project(new_board)
+        # new_corners = proj.project(r.features.board)
     except ValueError:
         return None
-    print(new_corners.shape)
-    print(board.shape)
-    print(new_board.shape)
+    # import plotly.express as px
+    # px.scatter(x=new_corners[:, 0],
+    #                y=new_corners[:, 1]).show()
+    # px.scatter(x=r.features.corners[:, 0],
+    #            y=r.features.corners[:, 1]).show()
+    # print(new_corners.shape)
+    # print(board.shape)
+    # print(new_board.shape)
     responses, new_mask = prune_corners(new_corners, mask, r.input.image, thr)
-    print(new_corners.shape)
+    # print(new_corners.shape)
     return RefinedResult(
         r.input,
         r.features,

@@ -70,6 +70,6 @@ def backprojection_loss(
 
     board_ = backproject(corners, R, t, lambdas, intrinsic_matrix)
     weights = jnp.abs(corners / resolution - 0.5).mean(axis=1)
-    weights = 1
+    weights = jnp.array([1])
     return jnp.mean(jnp.abs(board_ - board) * (1 + weights * 10).reshape(-1, 1))
     # return jnp.mean(jnp.square(board_ - board))
