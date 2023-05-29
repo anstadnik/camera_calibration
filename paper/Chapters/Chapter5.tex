@@ -47,7 +47,7 @@ AprilGrid nor CharuCO boards. The feature detector is the only limiting factor.
 \textcite{lochmanBabelCalibUniversalApproach2021} collected a wide number of
 datasets, typically used in the field for the benchmarking of the camera
 calibration. They're provided in a Deltille \cite{DeltilleDetector2023} format,
-and are well documented:
+and are well documented.
 
 \textbf{Kalibr} \citep{mayeSelfsupervisedCalibrationRobotic2013} contains several established datasets that are commonly used for testing
 the accuracy of camera calibration frameworks: Double Sphere
@@ -104,7 +104,7 @@ AprilGrid patterns, as the toolchain doesn't support a chessboard.
 	\caption{Images from the datasets}
 \end{figure}
 
-\section{Camera calibration}\label{sec:camera_calibration}
+\section{Camera calibration}\label{sec:camera_calibration_exp}
 
 \begin{minipage}{0.5\linewidth}
 	To get accurate predictions for the possibly missing points, we need
@@ -182,7 +182,7 @@ AprilGrid patterns, as the toolchain doesn't support a chessboard.
 	\caption{Final calibration's reprojection error histogram}
 \end{figure}
 
-\section{Additional features detection}\label{sec:additional_features_detection}
+\section{Additional features detection}\label{sec:additional_features_detection_exp}
 
 As discussed in \cref{sec:additional_features_detection}, we filled the gaps in
 the originally detected board points, and then padded it for 1 additional
@@ -274,42 +274,46 @@ them.
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}[h]{0.45\linewidth}
-		\begin{tikzpicture}
-			\begin{axis}[
-					ybar interval,
-					ymin=0,
-					ylabel={Frequency},
-					xlabel={Value},
-					height=0.5\linewidth,
-					width=\linewidth,
-					ticklabel style = {font=\tiny},
-					title={Histogram of the points before refinement}
-				]
-				\addplot+ [hist={data min=0,data max=600,bins=10}] table [y index=0]
-					% \addplot+ [hist={bins=30}] table [y index=0]
-					{data/pruned_number_of_features.txt};
-			\end{axis}
-		\end{tikzpicture}
+		\resizebox{\linewidth}{!}{
+			\begin{tikzpicture}
+				\begin{axis}[
+						ybar interval,
+						ymin=0,
+						ylabel={Frequency},
+						xlabel={Value},
+						height=0.5\linewidth,
+						width=\linewidth,
+						ticklabel style = {font=\tiny},
+						title={Histogram of points before refinement}
+					]
+					\addplot+ [hist={data min=0,data max=600,bins=10}] table [y index=0]
+						% \addplot+ [hist={bins=30}] table [y index=0]
+						{data/pruned_number_of_features.txt};
+				\end{axis}
+			\end{tikzpicture}
+		}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.45\linewidth}
 		% \centering
-		\begin{tikzpicture}
-			\begin{axis}[
-					ybar interval,
-					ymin=0,
-					ylabel={Frequency},
-					xlabel={Value},
-					height=0.5\linewidth,
-					width=\linewidth,
-					ticklabel style = {font=\tiny},
-					title={Histogram of the points after refinement}
-				]
-				\addplot+ [hist={data min=0,data max=600,bins=10}] table [y index=0]
-					% \addplot+ [hist={bins=30}] table [y index=0]
-					{data/recovered_pruned_number_of_features.txt};
-			\end{axis}
-		\end{tikzpicture}
+		\resizebox{\linewidth}{!}{
+			\begin{tikzpicture}
+				\begin{axis}[
+						ybar interval,
+						ymin=0,
+						ylabel={Frequency},
+						xlabel={Value},
+						height=0.5\linewidth,
+						width=\linewidth,
+						ticklabel style = {font=\tiny},
+						title={Histogram of points after refinement}
+					]
+					\addplot+ [hist={data min=0,data max=600,bins=10}] table [y index=0]
+						% \addplot+ [hist={bins=30}] table [y index=0]
+						{data/recovered_pruned_number_of_features.txt};
+				\end{axis}
+			\end{tikzpicture}
+		}
 	\end{subfigure}
 	\begin{subfigure}[h]{\linewidth}
 		\centering
@@ -334,43 +338,46 @@ initial feature detector failed to detect points near the occlusion.
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}[h]{0.45\linewidth}
-		\begin{tikzpicture}
-			\begin{axis}[
-					ybar interval,
-					ymin=0,
-					ylabel={Frequency},
-					xlabel={Value},
-					height=0.5\linewidth,
-					width=\linewidth,
-					ticklabel style = {font=\tiny},
-					title={Histogram of the points before the refinement}
-				]
-				\addplot+ [hist={data min=0,data max=500,bins=20}] table [y index=0]
-					% \addplot+ [hist={bins=30}] table [y index=0]
-					{data/occluded_number_of_features.txt};
-			\end{axis}
-		\end{tikzpicture}
-		\caption{}
+		\resizebox{\linewidth}{!}{
+			\begin{tikzpicture}
+				\begin{axis}[
+						ybar interval,
+						ymin=0,
+						ylabel={Frequency},
+						xlabel={Value},
+						height=0.5\linewidth,
+						width=\linewidth,
+						ticklabel style = {font=\tiny},
+						title={Histogram of points before refinement}
+					]
+					\addplot+ [hist={data min=0,data max=500,bins=10}] table [y index=0]
+						% \addplot+ [hist={bins=30}] table [y index=0]
+						{data/occluded_number_of_features.txt};
+				\end{axis}
+			\end{tikzpicture}
+		}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[h]{0.45\linewidth}
 		% \centering
-		\begin{tikzpicture}
-			\begin{axis}[
-					ybar interval,
-					ymin=0,
-					ylabel={Frequency},
-					xlabel={Value},
-					height=0.5\linewidth,
-					width=\linewidth,
-					ticklabel style = {font=\tiny},
-					title={Histogram of the points after the refinement}
-				]
-				\addplot+ [hist={data min=0,data max=500,bins=20}] table [y index=0]
-					% \addplot+ [hist={bins=30}] table [y index=0]
-					{data/recovered_occluded_number_of_features.txt};
-			\end{axis}
-		\end{tikzpicture}
+		\resizebox{\linewidth}{!}{
+			\begin{tikzpicture}
+				\begin{axis}[
+						ybar interval,
+						ymin=0,
+						ylabel={Frequency},
+						xlabel={Value},
+						height=0.5\linewidth,
+						width=\linewidth,
+						ticklabel style = {font=\tiny},
+						title={Histogram of points after refinement}
+					]
+					\addplot+ [hist={data min=0,data max=500,bins=10}] table [y index=0]
+						% \addplot+ [hist={bins=30}] table [y index=0]
+						{data/recovered_occluded_number_of_features.txt};
+				\end{axis}
+			\end{tikzpicture}
+		}
 	\end{subfigure}
 	\begin{subfigure}[h]{\linewidth}
 		\centering
@@ -388,51 +395,55 @@ initial feature detector failed to detect points near the occlusion.
 \newpage
 \subsection{Recovery of previously undetected points}\label{sub:recovery_of_previously_undetected_points}
 
-\begin{minipage}[t]{0.3\linewidth}
-	Lastly, we recovered the points that were not detected by the initial feature
-	detector.
-	From a visual inspection, most of the points were recovered correctly
-	\cref{fig:recovered_good_points}.
-	On the top image, for example, there are green points close to the edge.
-	Those corners weren't detected initially due to high distortion. On the bottom
-	image, the algorithm found another row of corners, which weren't detected previously.
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.6\linewidth}
-	\includegraphics[width=\linewidth]{refined_corners1.png}
-	\includegraphics[width=\linewidth]{refined_corners2.png}
+Lastly, we recovered the points that were not detected by the initial feature
+detector.
+From a visual inspection, most of the points were recovered correctly
+\cref{fig:recovered_good_points}.
+On the top image, for example, there are green points close to the edge.
+Those corners weren't detected initially due to high distortion. On the bottom
+image, the algorithm found another row of corners, which weren't detected previously.
 
-	\captionof{figure}{Recovered points
+% \begin{minipage}[t]{0.80\linewidth}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.75\linewidth]{refined_corners1.png}
+	\includegraphics[width=0.75\linewidth]{refined_corners2.png}
+
+	\caption{Recovered points
 		(\textcolor[HTML]{1f77b4}{unchanged}
 		\textcolor[HTML]{ff7f0e}{filtered out}
 		\textcolor[HTML]{2ca02c}{new corner}
 		\textcolor[HTML]{d62728}{out of image})}
 	\label{fig:recovered_good_points}
-\end{minipage}
+\end{figure}
+% \end{minipage}
 
-\begin{minipage}[t]{0.3\linewidth}
-	However,
-	because of the occlusions, or similar to the board patterns in the background,
-	there were false positives \cref{fig:recovered_bad_points}. Many images didn't
-	have undetected corners, hence it's hard to make a general statement about the
-	performance of the feature detector solely based on this experiment
-	\cref{fig:recovered_points_histogram}.
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.6\linewidth}
-	\includegraphics[width=\linewidth]{refined_corners_bad.png}
-	\captionof{figure}{Occlusion on the board with distinct features}
-	\includegraphics[width=\linewidth]{refined_corners_bad_bad.png}
-	\captionof{figure}{Similar pattern to the board in the background}
-	\label{fig:recovered_bad_points}
-\end{minipage}
+\newpage
+However,
+because of the occlusions, or similar to the board patterns in the background,
+there were false positives (\cref{fig:recovered_bad_points}). Many images didn't
+have undetected corners, hence it's hard to make a general statement about the
+performance of the feature detector solely based on this experiment
+(\cref{fig:recovered_points_histogram}.)
 
 \begin{figure}[h]
+	\centering
+	\begin{subfigure}[h]{0.6\linewidth}
+		\includegraphics[width=\linewidth]{refined_corners_bad.png}
+		\caption{Occlusion on the board with distinct features}
+	\end{subfigure}
+	\begin{subfigure}[h]{0.6\linewidth}
+		\includegraphics[width=\linewidth]{refined_corners_bad_bad.png}
+		\caption{Similar pattern to the board in the background}
+	\end{subfigure}
+	\label{fig:recovered_bad_points}
+\end{figure}
+
+\begin{figure}[h!]
 	\begin{tikzpicture}
 		\begin{axis}			[
 				ymode=log,
 				ybar interval,
-				ymin=0,
 				ylabel={Frequency},
 				xlabel={Value},
 				height=0.3\linewidth,
@@ -440,7 +451,7 @@ initial feature detector failed to detect points near the occlusion.
 				ticklabel style = {font=\tiny},
 				% title={Initial calibration}
 			]
-			\addplot+ [hist={data min=0,data max=100,bins=20}] table [y index=0]
+			\addplot+ [hist={data min=0,data max=50,bins=20}] table [y index=0]
 				% \addplot+ [hist={bins=30}] table [y index=0]
 				{data/number_of_refined_points.txt};
 		\end{axis}

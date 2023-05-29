@@ -29,7 +29,7 @@ Later, ArUco
 AprilTag~\citep{olsonAprilTagRobustFlexible2011} (\cref{fig:apriltag})
 allowed detecting the
 orientation of the pattern, as well as uniquely identifying each located pattern
-even under occlusion. Based on ArUco,
+even under occlusion. Later, based on ArUco pattern,
 ChArUcO~\citep{OpenCVCameraCalibration} (\cref{fig:charuco}) was
 proposed as more robust.
 
@@ -78,7 +78,8 @@ model~\citep{kannalaGenericCameraModel2006}, and the Field-of-View
 model~\citep{devernayStraightLinesHave2001}.
 In the ill-posed problem of camera calibration, the common choice
 of the camera model is the division
-model~\citep{fitzgibbonSimultaneousLinearEstimation2001}.
+model~\citep{fitzgibbonSimultaneousLinearEstimation2001}. This model is
+discussed in details in \cref{sub:distortion}.
 However, \cite{schopsWhyHaving102020} shows that they tend to have
 significantly higher errors than the non-parametric (general) models.
 The \cite{lochmanBabelCalibUniversalApproach2021} suggested a framework for
@@ -94,19 +95,19 @@ time, for example, \cite{schaffalitzkyGeometricGroupingRepeated1998} in
 
 % Camera calibration is a crucial step for many computer vision tasks,
 % hence many methods were proposed to solve this problem (e.g.,
-% ~\cite{brownCloseRangeCameraCalibration1971},
-% ~\cite{heikkilaFourstepCameraCalibration1997},
-% ~\cite{fitzgibbonSimultaneousLinearEstimation2001},
-% ~\cite{sturmGenericConceptCamera2004},
-% ~\cite{clausRationalFunctionLens2005},
-% ~\cite{meiSingleViewPoint2007},
-% ~\cite{ramalingamUnifyingModelCamera2017}).
+% ~\cite{brownCloseRangeCameraCalibration1971,
+% heikkilaFourstepCameraCalibration1997,
+% fitzgibbonSimultaneousLinearEstimation2001,
+% sturmGenericConceptCamera2004,
+% clausRationalFunctionLens2005,
+% meiSingleViewPoint2007,
+% ramalingamUnifyingModelCamera2017}).
 
 Nevertheless, camera calibration is still an open problem; recently,
 multiple new approaches have arisen.
 \cite{scaramuzzaToolboxEasilyCalibrating2006} proposed an automatic algorithm
 for camera calibration, which did not use any model of the specific omnidirectional
-sensor.
+sensor. Is is described in details in \cref{sub:initial_approximation}.
 \cite{lochmanBabelCalibUniversalApproach2021} suggest a universal approach
 to camera calibration, with a separate step of converting between camera models.
 \cite{huDeepChArUcoDark2019} used deep learning to detect ChArUcO boards.
@@ -136,9 +137,9 @@ implementation of the chessboard detection~\citep{OpenCVCameraCalibration}.
 
 Because of that, other methods were proposed, such as
 \cite{fuersattelOCPADOccludedCheckerboard2016} and
-\cite{geigerAutomaticCameraRange2012}. Those methods can detect the board and
+\cite{geigerAutomaticCameraRange2012} (\cref{sub:corner_detection}). Those methods can detect the board and
 associate the corners with the borders' corners under
 the partial occlusion and do not require prior knowledge of the board's geometry.
 
-\cite{chenNewSubPixelDetector2005} proposed using Hessian to find pixel
+\cite{chenNewSubPixelDetector2005} (\cref{sub:corner_detection}) proposed using Hessian to find pixel
 positions of the corners.

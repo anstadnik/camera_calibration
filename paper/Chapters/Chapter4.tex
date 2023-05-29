@@ -22,7 +22,7 @@ two parameters to allow for better flexibility during the optimization.
 The reprojection error is the distance between the reprojected point and the
 measured one. It is used to evaluate the quality of the camera calibration.
 
-We chose to minimize the reprojection error between the board and back-projected
+We minimized the reprojection error between the board and back-projected
 corners, which were initially detected. The projection and back-projection are
 the inverse of each other, hence minimizing the error between the projection of
 the board and the detected corners and minimizing the error between the
