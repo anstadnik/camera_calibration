@@ -126,17 +126,17 @@ approaches for wide-angle cameras.
 
 The detection of the calibration board's features is a crucial step in the
 camera calibration pipeline. The detection accuracy directly affects the
-calibration accuracy. Besides the feature detection, it's also important to
+calibration accuracy. Besides feature detection, it's also important to
 associate the detected features with the board's corners.
 
-There are various of the feature detection methods. Many of them require
+There are various feature detection methods. Many of them require
 prior knowledge of the board's geometry, such as the number of rows and columns,
 and require the full visibility of the board. For example, the default OpenCV
 implementation of the chessboard detection~\citep{OpenCVCameraCalibration}.
 
 Because of that, other methods were proposed, such as
 \cite{fuersattelOCPADOccludedCheckerboard2016} and
-\cite{geigerAutomaticCameraRange2012}. Those method can detect the board and
+\cite{geigerAutomaticCameraRange2012}. Those methods can detect the board and
 associate the corners with the borders' corners under
 the partial occlusion and do not require prior knowledge of the board's geometry.
 

@@ -34,7 +34,7 @@
 \section{Camera model}\label{sec:camera_model}
 
 In this paper, scene and image points are represented using homogeneous
-coordinates. This approach allows representing many geometric transformations as
+coordinates. This approach allows to represent many geometric transformations as
 linear, which simplifies the mathematical representation of the camera model.
 
 \subsection{Perspective projection}\label{sub:perspective_projection}
@@ -55,7 +55,7 @@ of projection. It is given by the perspective projection equation:
 		X, Y
 	\end{pmatrix}^{T}.
 \]
-This equation can be written using the homogeneous coordinates as:
+This equation can be written using the homogeneous coordinates:
 \begin{equation} \label{eq:perspective_projection}
 	\alpha \begin{pmatrix}
 		u \\ v \\ 1
@@ -92,7 +92,7 @@ can be written as:
 \subsection{Camera to image projection}\label{sub:camera_to_image_projection}
 
 To project a point from the camera coordinate system to the image plane, we
-need to apply a homography encoding the camera intrinsic parameters.
+need to apply a homography encoding the camera's intrinsic parameters.
 This is a \(3 \times 3\) upper-triangular matrix:
 \begin{equation}
 	\begin{bmatrix}
@@ -147,7 +147,7 @@ we can simplify it to:
 
 \subsection{Camera matrix}\label{sub:camera_matrix}
 
-The composition of positioning and orienting the camera, projection, and the
+The composition of positioning and orienting the camera, projection, and 
 imaging transformation can be represented by a $3 \times 4$ camera
 matrix \citep{scaramuzzaFlexibleTechniqueAccurate2006}. This matrix can be expressed as:
 
@@ -274,7 +274,7 @@ where \(f(\cdot)\) is the inverse of \(g(\cdot)\).
 
 \subsection{Complete projection and backprojection}\label{sub:complete_projection_and_backprojection}
 
-Now, the complete projection and backprojection can be formulated as follows:
+Now, the complete projection and back-projection can be formulated as follows:
 \begin{align}
 	\alpha \mathbf{u} & = K f(H\mathbf{X})
 	\tag{Projection} \label{eq:projection}                     \\

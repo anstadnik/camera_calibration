@@ -2,7 +2,7 @@
 
 \section{Feature detection}\label{sec:feature_detection}
 
-For the feature detection, we used the approach, proposed by
+For feature detection, we used the approach, proposed by
 \cite{geigerAutomaticCameraRange2012} (see \cref{sec:boards_features_detection,
 	sec:feature_detection}).
 
@@ -10,12 +10,12 @@ For the feature detection, we used the approach, proposed by
 
 In this work, we obtained the camera calibration in two steps: first, we
 used the approach, proposed by \cite{scaramuzzaToolboxEasilyCalibrating2006} to
-obtain the initial approximation of the camera parameters. Then, we used the
+obtain the initial approximation of the camera parameters. Then, we used 
 optimization to minimize the reprojection error between the board and the
-back-projected corners. A division model is very powerful, and is able to
-express a wide number of range of distortions
+back-projected corners. A division model is very powerful and can
+express a wide range of distortions
 \citep{prittsMinimalSolversRectifying2021}. In this work, we used a model with
-two parameters to allow for a better flexibility during the optimization.
+two parameters to allow for better flexibility during the optimization.
 
 \subsection{Reprojection error}\label{sub:reprojection_error}
 
@@ -130,8 +130,8 @@ camera calibration, which consisted of the following steps:
 	\item Non-linear refinement
 \end{itemize}
 
-In this work, we focused on the single image, while the original approach relied
-on the multiple images. Therefore, we used only the first two steps of the
+In this work, we focused on a single image, while the original approach relied
+on multiple images. Therefore, we used only the first two steps of the
 algorithm.
 
 \subsubsection{Solving for the camera extrinsic parameters}\label{ssub:solving_for_the_camera_extrinsic_parameters}
@@ -267,14 +267,14 @@ point, and it would be projected to   \(\begin{pmatrix}
 \end{pmatrix}^{T}\) to \(\begin{pmatrix}
 	X, Y
 \end{pmatrix}^{T}\) of the corner, which is associated with the board's corner
-with corrdinates \(\begin{pmatrix}
+with coordinates \(\begin{pmatrix}
 	0, 0
 \end{pmatrix}^{T}\).
 
 However, often the algorithm finds who matrices \(H\) such that they have the
 same \(t_1\) and \(t_2 \), but different \(r_{11}\), \(r_{12}\), \(r_{21}\). To
-find the best matrix, we found the intrinsic values for each of them, and
-backprojected the board's corners using both matrices.
+find the best matrix, we found the intrinsic values for each of them and
+back-projected the board's corners using both matrices.
 Then, we used the one which gave the smallest reprojection error.
 
 \subsubsection{Solving for the camera intrinsic parameters}\label{subsub:solving_for_the_camera_intrinsic_parameters}
@@ -328,20 +328,20 @@ For the initial guess, we used the randomly chosen constant small values.
 
 The model converged to the same results compared to the initial parameters, set
 using the Scaramuzza solver, unless the initial guess was very degenerate (i.e.
-\(R\) was such that the board plane passed through the principal point, and all
-backprojected points were projected onto the same line).
+\(R\) was such that the board plane passed through the principal point and all
+back-projected points were projected onto the same line).
 
-This issue also occured with random small initial values, due to the best
+This issue also occurred with random small initial values, due to the best
 approximation for \(R\) which minimizes \(L\) when the distance from the
-back-projected board from the measure one was high (i.e., the \(t\) was far from
+back-projected board from measure one was high (i.e., the \(t\) was far from
 the true value) being the degenerate solution\todo{Am I using the term
-	correctly?}. In order to avoid this issue, we first optimized only the \(t\),
+	correctly?}. To avoid this issue, we first optimized only the \(t\),
 until the loss function converged, meaning that \(t\) is close to the true
 value.
 
 However, another issue was that when the board was rotated close to the
 \(180^{\circ}\), \(R\) once again converged to the degenerate solution. In order
-to avoid this issue, we found the solution with initial \(\theta_z\) set to
+to avoid this issue, we found the solution with the initial \(\theta_z\) set to
 value, close to \(0^{\circ}\) and \(180^{\circ}\), and then used the solution
 which minimized the loss function.
 
@@ -500,14 +500,14 @@ corners we already detected.
 
 For each of the detected corners on all images, we collected the values of the
 response function at the previously detected corners, and around them.
-We didn't collect the values of all of the pixels, in order to reduce the number
+We didn't collect the values of all of the pixels, to reduce the number
 of very simple examples.
 
 To determine the threshold for the classification, we used the ROC curve, and
 found the threshold which maximizes
 the geometric mean of the true positive rate and the false positive rate.
 
-We used both of the approaches to train the classifier, and compared the
+We used both approaches to train the classifier and compared the
 results in \cref{sec:classification}.
 
 

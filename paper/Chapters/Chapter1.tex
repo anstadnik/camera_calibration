@@ -22,7 +22,7 @@ robustly challenging.
 
 Typically, camera calibration is obtained by capturing an image of a known
 calibration pattern, which is then used to estimate the camera parameters.
-Alternatively, some methods do not use a calibration pattern but instead infer
+Alternatively, some methods do not use a calibration pattern but instead, infer
 geometric constraints directly from the scene. However, this approach is
 generally less accurate.
 
@@ -46,20 +46,20 @@ features. It can be done by projecting the board onto the image using the
 intermediate camera calibration, and then filtering the possible positions in
 order to eliminate false positives.
 
-This additional points will further constrain the camera calibration, improving
+These additional points will further constrain the camera calibration, improving
 the accuracy of the calibration parameters.
 
 \begin{figure}
 	\begin{tikzpicture}[spy using outlines={circle,yellow,magnification=4,size=3cm, connect spies}]
 		\node[anchor=south west,inner sep=0] (image) at (0,0)
-    % {\includegraphics[width=0.6\textwidth]{distorted_image}};
-    {\includegraphics[width=0.8\textwidth]{distorted_image}};
+		% {\includegraphics[width=0.6\textwidth]{distorted_image}};
+		{\includegraphics[width=0.8\textwidth]{distorted_image}};
 		\begin{scope}[x={(image.south east)},y={(image.north west)}]
 			\spy[red] on (3.3,1.7) in node [left] at (10.1,1.7);
 			\spy[blue] on (4.6,3.2) in node [right] at (8.1,5.3);
 		\end{scope}
 	\end{tikzpicture}
-  \caption{Example of corners near the center of the image and near the edge}
+	\caption{Example of corners near the center of the image and the edge}
 \end{figure}
 
 \section{Research objective}\label{sec:research_objective}
@@ -88,7 +88,6 @@ dataset analysis, feature detector, and conjugately translated points simulator.
 In \autoref{sec:summary_and_future_work}, we will summarize the results and
 outline future work.
 \todo{Update}
-
-\endinput
+\todo{add the link to the repo}
 
 

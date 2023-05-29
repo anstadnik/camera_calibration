@@ -1,3 +1,25 @@
 \chapter{Conclusions}\label{cha:conclusions}
 
+In this thesis, we have presented a new approach for feature detection
+improvement. We used the feature detector, proposed by
+\cite{geigerAutomaticCameraRange2012}, to detect the initial features. Then, we
+found the camera calibration for the camera model, proposed by
+\cite{scaramuzzaToolboxEasilyCalibrating2006}, and then improved it by
+minimizing the reprojection error between the back-projection of the detected
+features and the board. Lastly, we used the improved camera calibration to
+project the imputed and extended board back into the image and used a binary
+classification to find the previously undetected features. We tested the method
+on a real-world dataset and showed that it can improve the feature detection.
+
+\subsection{Future work}\label{sub:future_work}
+
+The method, presented in this thesis can be improved in several ways. First, the
+feature detection algorithm can be tweaked to use alternating step sizes while
+constructing the board. It would allow to also match other types of the boars,
+such as ArUco or AprilTag. Second, the method can be extended to multiple boards
+on the same image, and multiple images. It would improve the robustness of the
+camera calibration, and reduce the number of detected points on the wrong board
+when there is overlap. Lastly, additional improvements can be made to the corner
+classification algorithm, specifically to the response function. One thing that
+could work is resizing the image, to find the corners of different sizes.
 

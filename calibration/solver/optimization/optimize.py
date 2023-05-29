@@ -19,23 +19,24 @@ def optimize_optax(
     board: jArr,
     resolution: jArr,
     # step_size=0.001,
-    step_size=0.05,
-    patience=1000,
+    step_size=0.005,
+    patience=100,
 ) -> dict[str, jArr]:
     # optimizer = optax.rmsprop(step_size)
     # optimizer = optax.adam(step_size)
+    optimizer = optax.amsgrad(step_size)
     # schedule1 = optax.warmup_cosine_decay_schedule(0.001, 0.05, 1000, 2000,
     #                                               0.001)
 
-    schedule1 = optax.warmup_cosine_decay_schedule(0.001, 0.1, 1000, 5000, 0.000001)
-    schedule2 = optax.warmup_cosine_decay_schedule(
-        0.000001, 0.001, 1000, 5000, 0.000001
-    )
+    # schedule1 = optax.warmup_cosine_decay_schedule(0.001, 0.1, 1000, 5000, 0.000001)
+    # schedule2 = optax.warmup_cosine_decay_schedule(
+    #     0.000001, 0.001, 1000, 5000, 0.000001
+    # )
     # schedule2=    optax.warmup_cosine_decay_schedule(0.001, 0.1, 1000, 5000, 0.001)
-    schedule = optax.join_schedules([schedule1, schedule2], [5000] * 1)
+    # schedule = optax.join_schedules([schedule1, schedule2], [5000] * 1)
     # schedule = optax.join_schedules([schedule1, schedule2], [5000])
     # optimizer = optax.amsgrad(step_size)
-    optimizer = optax.amsgrad(schedule)
+    # optimizer = optax.amsgrad(schedule)
 
     phase_l = [
         ["t", "theta_z"],
@@ -82,46 +83,46 @@ def optimize_optax(
             i, params, opt_state, loss_history, phase
         )
         loss_val = loss_history[i % patience]
-        if i % 1000 == 0:
-            proj_ = params_to_proj(params.copy(), np.array(resolution))
-            if proj_ is not None:
-                try:
-                    corners_ = proj_.project(np.array(board))
-                    corners_error = np.linalg.norm(corners_ - corners)
-                    # print(f"Corners error: {np.linalg.norm(corners_ - corners)}")
-                except Exception:
-                    corners_error = np.inf
-                    # print("failed projecting")
-                board_ = proj_.backproject(np.array(corners).astype(np.float32))
-                theta = jnp.concatenate([params["theta_x"], params["theta_y"], params["theta_z"]])
-                R = euler_angles_to_rotation_matrix(theta)
-                t = params["t"]
-                lambdas = params["lambdas"]
-
-                pixel_size = params["sensor_size"] / resolution
-                fx, fy = params["focal_length"] / pixel_size
-                cx, cy = resolution / 2
-                intrinsic_matrix = jnp.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]])
-                # print(f"R: {np.linalg.norm(R - proj_.R)}, "
-                #       f"t: {np.linalg.norm(t - proj_.t)}, "
-                #       f"lambdas: {np.linalg.norm(lambdas - proj_.lambdas)}, "
-                #       f"intrinsics: {np.linalg.norm(intrinsic_matrix - proj_.camera.intrinsic_matrix)}")
-                # print(f"Resolution: {np.linalg.norm(resolution - proj_.camera.resolution)}"
-                #       f"Sensor size: {np.linalg.norm(params['sensor_size'] - proj_.camera.sensor_size)}"
-                #       f"Focal length: {np.linalg.norm(params['focal_length'] - proj_.camera.focal_length)}"
-                #       f"Skew: {proj_.camera.skew}")
-
-                board__ = backproject(corners, R, t, lambdas, intrinsic_matrix)
-                # print(f"Board error: {np.linalg.norm(board_ - board__)}")
-                board_error = np.linalg.norm(board_ - board)
-                # print(f"Board error: {np.linalg.norm(board_ - board)}")
-
-                weights = jnp.abs(corners.astype(np.float32) / resolution - 0.5).mean(
-                    axis=1
-                )
-                loss_ = jnp.mean(
-                    jnp.abs(board_ - board) * (1 + weights * 10).reshape(-1, 1)
-                )
+        # if i % 1000 == 0:
+        #     proj_ = params_to_proj(params.copy(), np.array(resolution))
+            # if proj_ is not None:
+            #     try:
+            #         corners_ = proj_.project(np.array(board))
+            #         corners_error = np.linalg.norm(corners_ - corners)
+            #         # print(f"Corners error: {np.linalg.norm(corners_ - corners)}")
+            #     except Exception:
+            #         corners_error = np.inf
+            #         # print("failed projecting")
+            #     board_ = proj_.backproject(np.array(corners).astype(np.float32))
+            #     theta = jnp.concatenate([params["theta_x"], params["theta_y"], params["theta_z"]])
+            #     R = euler_angles_to_rotation_matrix(theta)
+            #     t = params["t"]
+            #     lambdas = params["lambdas"]
+            #
+            #     pixel_size = params["sensor_size"] / resolution
+            #     fx, fy = params["focal_length"] / pixel_size
+            #     cx, cy = resolution / 2
+            #     intrinsic_matrix = jnp.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]])
+            #     # print(f"R: {np.linalg.norm(R - proj_.R)}, "
+            #     #       f"t: {np.linalg.norm(t - proj_.t)}, "
+            #     #       f"lambdas: {np.linalg.norm(lambdas - proj_.lambdas)}, "
+            #     #       f"intrinsics: {np.linalg.norm(intrinsic_matrix - proj_.camera.intrinsic_matrix)}")
+            #     # print(f"Resolution: {np.linalg.norm(resolution - proj_.camera.resolution)}"
+            #     #       f"Sensor size: {np.linalg.norm(params['sensor_size'] - proj_.camera.sensor_size)}"
+            #     #       f"Focal length: {np.linalg.norm(params['focal_length'] - proj_.camera.focal_length)}"
+            #     #       f"Skew: {proj_.camera.skew}")
+            #
+            #     board__ = backproject(corners, R, t, lambdas, intrinsic_matrix)
+            #     # print(f"Board error: {np.linalg.norm(board_ - board__)}")
+            #     board_error = np.linalg.norm(board_ - board)
+            #     # print(f"Board error: {np.linalg.norm(board_ - board)}")
+            #
+            #     weights = jnp.abs(corners.astype(np.float32) / resolution - 0.5).mean(
+            #         axis=1
+            #     )
+            #     loss_ = jnp.mean(
+            #         jnp.abs(board_ - board) * (1 + weights * 10).reshape(-1, 1)
+            #     )
 
                 # print(
                 #     f"iteration: {i}, loss {loss_val}/{np.array(loss_)}, phase: {phase}, "
@@ -134,16 +135,16 @@ def optimize_optax(
         if loss_val < best_loss:
             best_loss = loss_val
             best_params = params
-            proj_ = params_to_proj(params.copy(), np.array(resolution))
-            if proj_ is not None:
-                try:
-                    corners_ = proj_.project(np.array(board))
-                    best_corners_error = np.linalg.norm(corners_ - corners)
-                except Exception:
-                    corners_error = np.inf
-                board_ = proj_.backproject(np.array(corners))
-                best_board_error = np.linalg.norm(board_ - board)
-                best_error = calc_error(proj_, features)
+            # proj_ = params_to_proj(params.copy(), np.array(resolution))
+            # if proj_ is not None:
+            #     try:
+            #         corners_ = proj_.project(np.array(board))
+            #         best_corners_error = np.linalg.norm(corners_ - corners)
+            #     except Exception:
+            #         corners_error = np.inf
+            #     board_ = proj_.backproject(np.array(corners))
+            #     best_board_error = np.linalg.norm(board_ - board)
+            #     best_error = calc_error(proj_, features)
 
         if i >= patience and loss_history[i % patience] >= loss_history.max():
             phase += 1
@@ -156,4 +157,6 @@ def optimize_optax(
         i += 1
 
     assert isinstance(params, dict)
+    # import plotly.express as px
+    # px.line(hist).show()
     return best_params, hist

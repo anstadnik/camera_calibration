@@ -33,6 +33,7 @@ def calibrate(
         partial(_calibrate_helper, solvers=solvers),
         feature_and_camera,
         chunksize=10,
+        max_workers=8,
         leave=False,
         desc="Calibrating",
     )

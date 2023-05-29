@@ -44,10 +44,29 @@ def show_refined_corners(
         )
     ]
     df = pd.DataFrame(points)
+    colors = [
+        "#1f77b4",  ## muted blue
+        "#ff7f0e",  ## safety orange
+        "#2ca02c",  ## cooked asparagus green
+        "#d62728",  ## brick red
+        "#9467bd",  ## muted purple
+        "#8c564b",  ## chestnut brown
+        "#e377c2",  ## raspberry yogurt pink
+        "#7f7f7f",  ## middle gray
+        "#bcbd22",  ## curry yellow-green
+        "#17becf",  ## blue-teal
+    ]
+
     fig2 = px.scatter(
         # df, x="x", y="y", color="resp", symbol="mask", hover_data=["i", "j"]
-        df, x="x", y="y", color="mask", hover_data=["i", "j", "resp"]
+        df,
+        x="x",
+        y="y",
+        color="mask",
+        hover_data=["i", "j", "resp"],
         # df, x="x", y="y", hover_data=["i", "j", "resp"]
-    ).update_traces(marker=dict(size=6))
+        color_discrete_sequence=colors,
+        category_orders={"mask": list(mask_mapping.values())},
+    ).update_traces(marker=dict(size=10))
     assert isinstance(fig1.data, tuple) and isinstance(fig2.data, tuple)
-    return go.Figure(data=fig1.data+ fig2.data)
+    return go.Figure(data=fig1.data + fig2.data)
