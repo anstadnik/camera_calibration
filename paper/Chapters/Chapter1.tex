@@ -77,17 +77,18 @@ that, we formulate the set of research questions:
 
 \section{Thesis structure}\label{sec:thesis_structure}
 
-This paper has the following structure: in \autoref{sec:related_work}, we will describe the related work, including the
-literature search method and methodology, various subtopics of the camera
-calibration, mention conjugate translations, and outline the state-of-the-art
-solutions. We define the research gap in \autoref{sec:gap_analysis} and outline
-the proposed approach to solution and evaluation in
-\autoref{sec:problem_setting_and_approach_to_solution}. We will describe the
-early results in \autoref{sec:early_results_and_discussion}, including the
-dataset analysis, feature detector, and conjugately translated points simulator.
-In \autoref{sec:summary_and_future_work}, we will summarize the results and
-outline future work.
-\todo{Update}
-\todo{add the link to the repo}
+This paper has the following structure: in \cref{related_work}, we will describe
+various subtopics of the camera calibration, and outline the current state-of-the-art solutions.
+In \cref{cha:background}, we will describe the key concepts of the camera
+calibration. Also, there we provide additional details on the underlying math,
+for example, the derivation of the division model invertion. In
+\cref{cha:approach}, we will describe the steps of the proposed method in
+details, including the feature detection, initial camera calibration, camera
+parameters estimation via minimization of the reprojection error, and the
+process of searching and filtering the previously undetected features. In
+\cref{Experiments}, we will describe the metrics we used, provide details about
+the datasets, show the results of each of the algorithm's steps, and evaluate it
+on multiple metrics. Finally, in \cref{cha:conclusions}, we will summarize the
+results and outline future work.
 
 

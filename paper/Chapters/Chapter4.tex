@@ -10,7 +10,7 @@ For feature detection, we used the approach, proposed by
 
 In this work, we obtained the camera calibration in two steps: first, we
 used the approach, proposed by \cite{scaramuzzaToolboxEasilyCalibrating2006} to
-obtain the initial approximation of the camera parameters. Then, we used 
+obtain the initial approximation of the camera parameters. Then, we used
 optimization to minimize the reprojection error between the board and the
 back-projected corners. A division model is very powerful and can
 express a wide range of distortions
@@ -349,7 +349,7 @@ which minimized the loss function.
 
 Often, not all of the board's corners were detected initially. Firstly, we
 assumed that the whole board was detected, and imputed the missing points in the
-board space \cref{fig:extended_board_img}. Then, we tried extending the board
+board space (\cref{fig:extended_board_img}). Then, we tried extending the board
 points.
 
 We used the obtained camera parameters to then project the imputed board points
@@ -435,6 +435,14 @@ In this work, we directly used the following steps from the algorithm:
 			\includegraphics[width=0.24\textwidth]{./template_2_d.png}
 		\end{minipage}
 		\caption{Corner prototype 2 (A, B, C, D)}
+	\end{subfigure}
+	\begin{subfigure}{0.3\linewidth}
+		\includegraphics[width=\textwidth]{10.png}
+		\caption{Input image}
+	\end{subfigure}
+	\begin{subfigure}{0.3\linewidth}
+		\includegraphics[width=\textwidth]{11.png}
+		\caption{Corner likelihood}
 	\end{subfigure}
 
 	\caption{Corner prototypes \citep{geigerAutomaticCameraRange2012}}

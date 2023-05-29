@@ -144,45 +144,44 @@ AprilGrid patterns, as the toolchain doesn't support a chessboard.
 	\captionof{figure}{Final calibration}
 \end{minipage}
 
-% \begin{figure}[h]
-% 	\begin{tikzpicture}
-% 		\begin{axis}[
-% 				ybar interval,
-% 				ymin=0,
-% 				ylabel={Frequency},
-% 				xlabel={Value},
-% 				height=0.3\linewidth,
-% 				width=\linewidth,
-% 				ticklabel style = {font=\tiny},
-% 				% title={Initial calibration}
-% 			]
-% 			\addplot+ [hist={data min=0,data max=10,bins=20}] table [y index=0]
-% 				% \addplot+ [hist={bins=30}] table [y index=0]
-% 				{data/reprojection_error_init.txt};
-% 		\end{axis}
-% 	\end{tikzpicture}
-% 	\caption{Initial calibration's reprojection error histogram}
-% \end{figure}
-% \begin{figure}[h]
-% 	\begin{tikzpicture}
-% 		\begin{axis}[
-% 				ybar interval,
-% 				ymin=0,
-% 				ylabel={Frequency},
-% 				xlabel={Value},
-% 				height=0.3\linewidth,
-% 				width=\linewidth,
-% 				ticklabel style = {font=\tiny},
-% 				% title={Reprojection error}
-% 			]
-% 			\addplot+ [hist={data min=0,data max=10,bins=20}] table [y index=0]
-% 				% \addplot+ [hist={bins=30}] table [y index=0]
-% 				{data/reprojection_error_final.txt};
-% 		\end{axis}
-% 	\end{tikzpicture}
-% 	\caption{Final calibration's reprojection error histogram}
-% \end{figure}
-\todo{Add data and enable}
+\begin{figure}[h]
+	\begin{tikzpicture}
+		\begin{axis}[
+				ybar interval,
+				ymin=0,
+				ylabel={Frequency},
+				xlabel={Value},
+				height=0.3\linewidth,
+				width=\linewidth,
+				ticklabel style = {font=\tiny},
+				% title={Initial calibration}
+			]
+			\addplot+ [hist={data min=0,data max=10,bins=20}] table [y index=0]
+				% \addplot+ [hist={bins=30}] table [y index=0]
+				{data/reprojection_error_init.txt};
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Initial calibration's reprojection error histogram}
+\end{figure}
+\begin{figure}[h]
+	\begin{tikzpicture}
+		\begin{axis}[
+				ybar interval,
+				ymin=0,
+				ylabel={Frequency},
+				xlabel={Value},
+				height=0.3\linewidth,
+				width=\linewidth,
+				ticklabel style = {font=\tiny},
+				% title={Reprojection error}
+			]
+			\addplot+ [hist={data min=0,data max=10,bins=20}] table [y index=0]
+				% \addplot+ [hist={bins=30}] table [y index=0]
+				{data/reprojection_error_final.txt};
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Final calibration's reprojection error histogram}
+\end{figure}
 
 \section{Additional features detection}\label{sec:additional_features_detection}
 
@@ -253,11 +252,11 @@ element.
 
 \begin{figure}
 	\centering
-	\begin{subfigure}[t]{\linewidth}
+	\begin{subfigure}[t]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{hist_response_hessian.png}
 		\caption{Histogram of Hessian response}
 	\end{subfigure}
-	\begin{subfigure}[t]{\linewidth}
+	\begin{subfigure}[t]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{hist_response_other.png}
 		\caption{Histogram of response used by \cite{geigerAutomaticCameraRange2012}}
 	\end{subfigure}
@@ -273,64 +272,166 @@ element.
 We removed 20\% of the points from the original board, and then tried to recover
 them.
 
-\begin{figure}
-  \includegraphics[width=\linewidth]{refined_pruned_corners.png}
-  \caption{Recovered occluded points}
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[h]{0.45\linewidth}
+		\begin{tikzpicture}
+			\begin{axis}[
+					ybar interval,
+					ymin=0,
+					ylabel={Frequency},
+					xlabel={Value},
+					height=0.5\linewidth,
+					width=\linewidth,
+					ticklabel style = {font=\tiny},
+					title={Histogram of the points before refinement}
+				]
+				\addplot+ [hist={data min=0,data max=600,bins=10}] table [y index=0]
+					% \addplot+ [hist={bins=30}] table [y index=0]
+					{data/pruned_number_of_features.txt};
+			\end{axis}
+		\end{tikzpicture}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[h]{0.45\linewidth}
+		% \centering
+		\begin{tikzpicture}
+			\begin{axis}[
+					ybar interval,
+					ymin=0,
+					ylabel={Frequency},
+					xlabel={Value},
+					height=0.5\linewidth,
+					width=\linewidth,
+					ticklabel style = {font=\tiny},
+					title={Histogram of the points after refinement}
+				]
+				\addplot+ [hist={data min=0,data max=600,bins=10}] table [y index=0]
+					% \addplot+ [hist={bins=30}] table [y index=0]
+					{data/recovered_pruned_number_of_features.txt};
+			\end{axis}
+		\end{tikzpicture}
+	\end{subfigure}
+	\begin{subfigure}[h]{\linewidth}
+		\centering
+		\includegraphics[width=0.7\linewidth]{refined_pruned_corners.png}
+		\caption{Recovered pruned points
+			(\textcolor[HTML]{1f77b4}{unchanged}
+			\textcolor[HTML]{ff7f0e}{filtered out}
+			\textcolor[HTML]{2ca02c}{new corner}
+			\textcolor[HTML]{d62728}{out of image})}
+	\end{subfigure}
+	\hfill
+	\caption{Feature refinement on the board with 80\% of the points}
 \end{figure}
 
-\begin{figure}[h]
-	\begin{tikzpicture}
-		\begin{axis}[
-				ybar interval,
-				ymin=0,
-				ylabel={Frequency},
-				xlabel={Value},
-				height=0.3\linewidth,
-				width=\linewidth,
-				ticklabel style = {font=\tiny},
-				% title={Initial calibration}
-			]
-			\addplot+ [hist={data min=0,data max=500,bins=20}] table [y index=0]
-				% \addplot+ [hist={bins=30}] table [y index=0]
-				{data/pruned_number_of_features.txt};
-		\end{axis}
-	\end{tikzpicture}
-	\caption{Initial calibration's reprojection error histogram}
-\end{figure}
-\begin{figure}[h]
-	\begin{tikzpicture}
-		\begin{axis}[
-				ybar interval,
-				ymin=0,
-				ylabel={Frequency},
-				xlabel={Value},
-				height=0.3\linewidth,
-				width=\linewidth,
-				ticklabel style = {font=\tiny},
-				% title={Reprojection error}
-			]
-			\addplot+ [hist={data min=0,data max=500,bins=20}] table [y index=0]
-				% \addplot+ [hist={bins=30}] table [y index=0]
-				{data/recovered_pruned_number_of_features.txt};
-		\end{axis}
-	\end{tikzpicture}
-	\caption{Final calibration's reprojection error histogram}
-\end{figure}
-
+\newpage
 \subsection{Performance under occlusion}\label{sub:performance_under_occlusion}
 
 Occlusions pose additional complications for the feature detection. We added an
 image on top of the board, and tried to recover additional points. Often the
 initial feature detector failed to detect points near the occlusion.
 
-\begin{figure}
-  \includegraphics[width=\linewidth]{refined_overlayed_corners.png}
-  \caption{Recovered occluded points}
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[h]{0.45\linewidth}
+		\begin{tikzpicture}
+			\begin{axis}[
+					ybar interval,
+					ymin=0,
+					ylabel={Frequency},
+					xlabel={Value},
+					height=0.5\linewidth,
+					width=\linewidth,
+					ticklabel style = {font=\tiny},
+					title={Histogram of the points before the refinement}
+				]
+				\addplot+ [hist={data min=0,data max=500,bins=20}] table [y index=0]
+					% \addplot+ [hist={bins=30}] table [y index=0]
+					{data/occluded_number_of_features.txt};
+			\end{axis}
+		\end{tikzpicture}
+		\caption{}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[h]{0.45\linewidth}
+		% \centering
+		\begin{tikzpicture}
+			\begin{axis}[
+					ybar interval,
+					ymin=0,
+					ylabel={Frequency},
+					xlabel={Value},
+					height=0.5\linewidth,
+					width=\linewidth,
+					ticklabel style = {font=\tiny},
+					title={Histogram of the points after the refinement}
+				]
+				\addplot+ [hist={data min=0,data max=500,bins=20}] table [y index=0]
+					% \addplot+ [hist={bins=30}] table [y index=0]
+					{data/recovered_occluded_number_of_features.txt};
+			\end{axis}
+		\end{tikzpicture}
+	\end{subfigure}
+	\begin{subfigure}[h]{\linewidth}
+		\centering
+		\includegraphics[width=0.7\linewidth]{refined_pruned_corners.png}
+		\caption{Recovered pruned points
+			(\textcolor[HTML]{1f77b4}{unchanged}
+			\textcolor[HTML]{ff7f0e}{filtered out}
+			\textcolor[HTML]{2ca02c}{new corner}
+			\textcolor[HTML]{d62728}{out of image})}
+	\end{subfigure}
+	\hfill
+	\caption{Feature refinement on the board with partial board occlusion}
 \end{figure}
+
+\newpage
+\subsection{Recovery of previously undetected points}\label{sub:recovery_of_previously_undetected_points}
+
+\begin{minipage}[t]{0.3\linewidth}
+	Lastly, we recovered the points that were not detected by the initial feature
+	detector.
+	From a visual inspection, most of the points were recovered correctly
+	\cref{fig:recovered_good_points}.
+	On the top image, for example, there are green points close to the edge.
+	Those corners weren't detected initially due to high distortion. On the bottom
+	image, the algorithm found another row of the corners, which weren't detected previously.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.6\linewidth}
+	\includegraphics[width=\linewidth]{refined_corners1.png}
+	\includegraphics[width=\linewidth]{refined_corners2.png}
+
+	\captionof{figure}{Recovered points
+		(\textcolor[HTML]{1f77b4}{unchanged}
+		\textcolor[HTML]{ff7f0e}{filtered out}
+		\textcolor[HTML]{2ca02c}{new corner}
+		\textcolor[HTML]{d62728}{out of image})}
+	\label{fig:recovered_good_points}
+\end{minipage}
+
+\begin{minipage}[t]{0.3\linewidth}
+	However,
+	because of the occlusions, or similar to the board patterns in the background,
+	there were false positives \cref{fig:recovered_bad_points}. Many images didn't
+	have undetected corners, hence it's hard to make a general statement about the
+	performance of the feature detector solely based on this experiment
+	\cref{fig:recovered_points_histogram}.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.6\linewidth}
+	\includegraphics[width=\linewidth]{refined_corners_bad.png}
+	\captionof{figure}{Occlusion on the board with distinct features}
+	\includegraphics[width=\linewidth]{refined_corners_bad_bad.png}
+	\captionof{figure}{Similar pattern to the board in the background}
+	\label{fig:recovered_bad_points}
+\end{minipage}
 
 \begin{figure}[h]
 	\begin{tikzpicture}
-		\begin{axis}[
+		\begin{axis}			[
+				ymode=log,
 				ybar interval,
 				ymin=0,
 				ylabel={Frequency},
@@ -340,36 +441,13 @@ initial feature detector failed to detect points near the occlusion.
 				ticklabel style = {font=\tiny},
 				% title={Initial calibration}
 			]
-			\addplot+ [hist={data min=0,data max=500,bins=20}] table [y index=0]
+			\addplot+ [hist={data min=0,data max=100,bins=20}] table [y index=0]
 				% \addplot+ [hist={bins=30}] table [y index=0]
-				{data/occluded_number_of_features.txt};
+				{data/number_of_refined_points.txt};
 		\end{axis}
 	\end{tikzpicture}
-	\caption{Initial calibration's reprojection error histogram}
+	\caption{Histogram of the newly recovered features}
+	\label{fig:recovered_points_histogram}
 \end{figure}
-\begin{figure}[h]
-	\begin{tikzpicture}
-		\begin{axis}[
-				ybar interval,
-				ymin=0,
-				ylabel={Frequency},
-				xlabel={Value},
-				height=0.3\linewidth,
-				width=\linewidth,
-				ticklabel style = {font=\tiny},
-				% title={Reprojection error}
-			]
-			\addplot+ [hist={data min=0,data max=500,bins=20}] table [y index=0]
-				% \addplot+ [hist={bins=30}] table [y index=0]
-				{data/recovered_occluded_number_of_features.txt};
-		\end{axis}
-	\end{tikzpicture}
-	\caption{Final calibration's reprojection error histogram}
-\end{figure}
-
-\subsection{Recovery of previously undetected points}\label{sub:recovery_of_previously_undetected_points}
-
-\missingfigure{Compare the number of points with the provided by babelcalib}
-\missingfigure{Compare the reprojection error}
 
 
