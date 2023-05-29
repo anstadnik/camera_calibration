@@ -2,14 +2,14 @@
 
 \section{Feature detection}\label{sec:feature_detection}
 
-For feature detection, we used the approach, proposed by
-\cite{geigerAutomaticCameraRange2012} (see \cref{sec:boards_features_detection,
-	sec:feature_detection}).
+For feature detection, we used the approach, proposed
+by~\cite{geigerAutomaticCameraRange2012} (see \cref{sec:boards_features_detection,
+	sec:classifier}).
 
 \section{Camera calibration}\label{sec:camera_calibration}
 
 In this work, we obtained the camera calibration in two steps: first, we
-used the approach, proposed by \cite{scaramuzzaToolboxEasilyCalibrating2006} to
+used the approach, proposed by~\cite{scaramuzzaToolboxEasilyCalibrating2006} to
 obtain the initial approximation of the camera parameters. Then, we used
 optimization to minimize the reprojection error between the board and the
 back-projected corners. A division model is very powerful and can
@@ -50,7 +50,7 @@ From \(\boldsymbol{\theta}\), the rotation matrix $R$ can be calculated as follo
 
 \begin{equation}
 	R = R(\theta_x) R(\theta_y) R(\theta_z)
-\end{equation} \todo{Is the notation ok?}
+\end{equation}
 
 where
 
@@ -149,7 +149,7 @@ To derive the solver for the camera extrinsic parameters, start from
 	       \end{pmatrix}^{T} & = H\mathbf{X}                                 \\
 \end{align}
 
-For \(K\) we used the placeholder values. \(f\) was set to a constant value for
+For \(K\) we used the placeholder values.\ \(f\) was set to a constant value for
 the typical consumer camera, and \(c_x, c_y\) were set to the center of the
 image.
 The correct values will be computed during the optimization \cref{sub:optimization}.
@@ -184,10 +184,13 @@ homogeneous equations:
 
 Only \cref{eq:scaramuzza_system_3} is linear in the unknowns. Each point gives a
 single equation. Now, by rewriting the equation in the matrix form
-\(M \cdot H = 0\), where \(H = \begin{pmatrix}
-	r_{11}, r_{12}, r_{12}, r_{22}, t_1, t_2
-\end{pmatrix}\) we get:
-
+\(M \cdot H = 0\), where
+\[
+	H = \begin{pmatrix}
+		r_{11}, r_{12}, r_{12}, r_{22}, t_1, t_2
+	\end{pmatrix}
+\]
+we get:
 \begin{equation}
 	M = \begin{bmatrix}
 		-\widehat{v}_1 X_1 & -\widehat{v}_1 Y_1 & -\widehat{u}_1 X_1 & -\widehat{u}_1 Y_1 & -\widehat{v}_1 & -\widehat{u}_1 \\
@@ -219,14 +222,14 @@ Now, to solve for \(t_1\) and \(t_2 \), first find possible values for
 	\text{Solve eq. (\ref{eq:orthonormality_1}) for \(t_1\)}
 	\label{eq:orthonormality_4}                                                \\
 	\\
-	\sqrt{\lambda^{2} \left( \frac{r_{11} r_{12} + r_{12} r_{22})^{2}}{t_2 ^{2}} +
+  \sqrt{\lambda^{2} \left( \frac{(r_{11} r_{12} + r_{12} r_{22})^{2}}{t_2 ^{2}} +
 	r_{11}^{2} + r_{12}^{2}\right)}                               & = 1   &  &
 	\text{Substitute into eq. (\ref{eq:orthonormality_2})}                     \\
-	\lambda^{2} (\frac{(r_{11} r_{12} + r_{12} r_{22})^{2}}{t_2 ^{2}} +
-	r_{11}^{2} + r_{12}^{2})                                      & = 1   &  &
+  \lambda^{2} \left( \frac{(r_{11} r_{12} + r_{12} r_{22})^{2}}{t_2 ^{2}}\right) +
+	r_{11}^{2} + r_{12}^{2}                                      & = 1   &  &
 	\text{Square both sides}                                                   \\
-	\lambda^{2} (\frac{(r_{11} r_{12} + r_{12} r_{22})^{2}}{t_2 ^{2}} +
-	r_{11}^{2} + r_{12}^{2} - r_{12}^{2} - r_{22}^{2} - t_2 ^{2}) & = 0   &  &
+  \lambda^{2} \left(\frac{(r_{11} r_{12} + r_{12} r_{22})^{2}}{t_2 ^{2}} \right) +
+	r_{11}^{2} + r_{12}^{2} - r_{12}^{2} - r_{22}^{2} - t_2 ^{2} & = 0   &  &
 	\text{Subtract eq. (\ref{eq:orthonormality_3})}
 	\label{eq:orthonormality_5}
 	\\
@@ -334,8 +337,7 @@ back-projected points were projected onto the same line).
 This issue also occurred with random small initial values, due to the best
 approximation for \(R\) which minimizes \(L\) when the distance from the
 back-projected board from measure one was high (i.e., the \(t\) was far from
-the true value) being the degenerate solution\todo{Am I using the term
-	correctly?}. To avoid this issue, we first optimized only the \(t\),
+the true value) being the degenerate solution. To avoid this issue, we first optimized only the \(t\),
 until the loss function converged, meaning that \(t\) is close to the true
 value.
 

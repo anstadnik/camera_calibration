@@ -57,7 +57,7 @@ VI \cite{schubertTUMVIBenchmark2018}, and ENTANIYA 1
 \cite{Calibration250degFisheye}.
 The Kalibr calibration framework was used in the
 original publications cited above, hence the name of the dataset.
-As a calibration pattern, AprilGrid with 6x6 tags of 88 mm size was used.
+As a calibration pattern, AprilGrid with  \(6\times_6\) tags of 88 mm size was used.
 In total, the datasets contain approximately 800 images.
 
 \textbf{OCamCalib} \citep{scaramuzzaFlexibleTechniqueAccurate2006} is a dataset
@@ -66,12 +66,12 @@ As a calibration pattern, the checkerboard pattern of different sizes was used.
 
 \textbf{UZH} \citep{AreWeReady} is a dataset of approximately 800 images
 collected using the following cameras:
-As a calibration pattern, AprilGrid with 4x5 tags of 75 mm size was used.
+As a calibration pattern, AprilGrid with \(4\times_5\) tags of 75 mm size was used.
 The dataset contains approximately 800 images.
 
 \textbf{OV} \citep{lochmanBabelCalibUniversalApproach2021} is a dataset of
 approximately 1400 images. It was collected using eight stereo cameras.
-As a calibration pattern, the checkerboard pattern with 9x6 tags of 22 mm size
+As a calibration pattern, the checkerboard pattern with \(9\times_6\) tags of 22 mm size
 was used.
 
 \textcite{duisterhofTartanCalibIterativeWideAngle2022} also provide their
@@ -116,7 +116,7 @@ AprilGrid patterns, as the toolchain doesn't support a chessboard.
 	that all of the points lay within the image, or they get out of the borders
 	a little bit (we use the constant \(1.1\) of the maximum radius). If the
 	camera calibration is poor, the root-finding might fail. On the initial
-	calibration the number of the failed root-findings was much higher.
+	calibration the number of failed root-findings was much higher.
 \end{minipage}
 \hfill
 \begin{minipage}{0.4\linewidth}
@@ -269,7 +269,7 @@ element.
 
 \subsection{Recovery of artificially removed points}\label{sub:recovery_of_artificially_removed_points}
 
-We removed 20\% of the points from the original board, and then tried to recover
+We removed 20\% of the points from the original board and then tried to recover
 them.
 
 \begin{figure}[h]
@@ -328,8 +328,8 @@ them.
 \newpage
 \subsection{Performance under occlusion}\label{sub:performance_under_occlusion}
 
-Occlusions pose additional complications for the feature detection. We added an
-image on top of the board, and tried to recover additional points. Often the
+Occlusions pose additional complications for feature detection. We added an
+image on top of the board and tried to recover additional points. Often the
 initial feature detector failed to detect points near the occlusion.
 
 \begin{figure}[h]
@@ -396,7 +396,7 @@ initial feature detector failed to detect points near the occlusion.
 	\cref{fig:recovered_good_points}.
 	On the top image, for example, there are green points close to the edge.
 	Those corners weren't detected initially due to high distortion. On the bottom
-	image, the algorithm found another row of the corners, which weren't detected previously.
+	image, the algorithm found another row of corners, which weren't detected previously.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.6\linewidth}
