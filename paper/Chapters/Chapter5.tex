@@ -18,15 +18,27 @@ Typically, the reprojection error is used as a metric for the camera
 calibration, but it depends on multiple factors: type of the calibration
 pattern, the camera model, and the types of the lens.
 
-Also, by using more features, we can get better calibration, as we have more
-constraints, but the reprojection error might be higher.
+% Also, by using more features, we can get better calibration, as we have more
+% constraints, but the reprojection error might be higher.
 
 As currently the algorithm only supports processing a single checkerboard, we
 cannot compare to \cite{duisterhofTartanCalibIterativeWideAngle2022}, which uses
 AprilTags, nor to the \cite{lochmanBabelCalibUniversalApproach2021}, who
 provides the detected corners for all of the boards.
 
-Because of that, we instead artificially removed some of the points from the
+The paper's main contribution is finding additional calibration boards' features, which
+then can be used as an input to any other camera calibration algorithm. The
+measurements' error is assumed to be Gaussian with zero mean and a constant
+variance \citep{hartleyMultipleViewGeometry2004}. As calibration process
+minimizes the geometric distance between the projected and the measured points,
+it is equivalent to performing the maximum likelihood estimation
+\citep{hartleyMultipleViewGeometry2004}. As the number of the measurement grows,
+the estimated camera parameters converge to the true values, hence adding
+additional measurements improves the calibration (especially from the edge of
+the image, where the distortion is the highest).
+
+However, the above statement assumes that the measurements are true positives.
+To evaluate that, we instead artificially removed some of the points from the
 detections, to ensure that we can recover them. We also created
 artificially occluded points by overlaying a separate image, as it poses
 problems for the feature detector.
@@ -436,6 +448,7 @@ performance of the feature detector solely based on this experiment
 		\includegraphics[width=\linewidth]{refined_corners_bad_bad.png}
 		\caption{Similar pattern to the board in the background}
 	\end{subfigure}
+  \caption{Examples of false positives}
 	\label{fig:recovered_bad_points}
 \end{figure}
 

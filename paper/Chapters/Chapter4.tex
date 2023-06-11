@@ -49,7 +49,7 @@ From the rotation vector, we can compute the rotation matrix \(\mathbf{R}\) as:
 From \(\boldsymbol{\theta}\), the rotation matrix $R$ can be calculated as follows:
 
 \begin{equation}
-	R = R(\theta_x) R(\theta_y) R(\theta_z)
+	R = R(\theta_x) R(\theta_y) R(\theta_z),
 \end{equation}
 
 where
@@ -90,7 +90,7 @@ where
 		\cos(\theta_z) & -\sin(\theta_z) & 0 \\
 		\sin(\theta_z) & \cos(\theta_z)  & 0 \\
 		0              & 0               & 1
-	\end{bmatrix}
+	\end{bmatrix}.
 \end{align}
 
 Then, \(H\) is given by:
@@ -102,12 +102,12 @@ Then, \(H\) is given by:
 
 We can compute the intrinsic camera matrices as follows:
 \begin{equation}
-	K = \begin{pmatrix}
+	K = \begin{bmatrix}
 		\frac{f r_x}{s_x} & 0                 & \frac{r_x}{2} \\
 		0                 & \frac{f r_y}{s_y} & \frac{r_y}{2} \\
 		0                 & 0                 & 1
-	\end{pmatrix},
-\end{equation}.
+	\end{bmatrix}.
+\end{equation}
 
 Then, the back-projection of a 2D point \(\mathbf{u} = \begin{pmatrix}
 	u, v, 1
@@ -139,14 +139,14 @@ algorithm.
 To derive the solver for the camera extrinsic parameters, start from
 \cref{eq:projection}:
 \begin{align}
-	\alpha \mathbf{u}                                  & = K f(H\mathbf{X})                  \\
-	\alpha K^{-1} \mathbf{u}                           & = f(H\mathbf{X})    &  &
-	\text{Move \(K\) to the left side}                                                       \\
-	\alpha g( K^{-1}\mathbf{u})                        & = g(f(H\mathbf{X})) &  &
-	\text{Set \(\mathbf{\widehat{u}} = K^{-1}\mathbf{u}\); apply \(g(\cdot)\) to both sides} \\
+	\alpha \mathbf{u}                                                          & = K f(H\mathbf{X})       \\
+	\alpha K^{-1} \mathbf{u}                                                   & = f(H\mathbf{X})    &  &
+	\text{Move \(K\) to the left side}                                                                    \\
+	\alpha g( K^{-1}\mathbf{u})                                                & = g(f(H\mathbf{X})) &  &
+	\text{Set \(\mathbf{\widehat{u}} = K^{-1}\mathbf{u}\); apply \(g(\cdot)\) to both sides}              \\
 	\alpha \begin{pmatrix}
 		       \widehat{u}_x \\ \widehat{u}_y \\ \psi(r(\mathbf{\widehat{u}}))
-	       \end{pmatrix}^{T} & = H\mathbf{X}                                 \\
+	       \end{pmatrix}^{T} & = H\mathbf{X}.
 \end{align}
 
 For \(K\) we used the placeholder values.\ \(f\) was set to a constant value for
@@ -165,30 +165,30 @@ vectorially by \(g(\mathbf{\widehat{u}})\):
 	\end{pmatrix}^{T} \times \begin{bmatrix}
 		\mathbf{r_1} & \mathbf{r_2} & \mathbf{t}
 	\end{bmatrix}^{T} \mathbf{X} = 0
-	\label{eq:eq_no_multiplier}
-\end{equation}.
+	\label{eq:eq_no_multiplier}.
+\end{equation}
 
 From \cref{eq:eq_no_multiplier}, we can see that a point contributes to three
 homogeneous equations:
 \begin{align}
-	\widehat{v} (t_1X + t_2 Y + t_3) -
-	g(r(\mathbf{\widehat{u}})) (r_{12}X + r_{22}Y + t_2 ) & = 0
+	\widehat{v} (r_{31}X + r_{32} Y + t_3) -
+	g(r(\mathbf{\widehat{u}})) (r_{21}X + r_{22}Y + t_2 ) & = 0
 	\label{eq:scaramuzza_system_1}                              \\
 	g(r(\mathbf{\widehat{u}})) (r_{11}X + r_{12}Y + t_1) -
-	\widehat{u} (t_1X + t_2 Y + t_3)                      & = 0
+	\widehat{u} (r_{31}X + r_{32} Y + t_3)                      & = 0
 	\label{eq:scaramuzza_system_2}                              \\
-	\widehat{u} (r_{12}X + r_{22}Y + t_2 ) -
+	\widehat{u} (r_{21}X + r_{22}Y + t_2 ) -
 	\widehat{v} (r_{11}X + r_{12}Y + t_1)                 & = 0
-	\label{eq:scaramuzza_system_3}
+	\label{eq:scaramuzza_system_3}.
 \end{align}
 
 Only \cref{eq:scaramuzza_system_3} is linear in the unknowns. Each point gives a
 single equation. Now, by rewriting the equation in the matrix form
-\(M \cdot H = 0\), where
+\(M \cdot \mathbf{h} = 0\), where
 \[
-	H = \begin{pmatrix}
-		r_{11}, r_{12}, r_{12}, r_{22}, t_1, t_2
-	\end{pmatrix}
+	\mathbf{h} = \begin{pmatrix}
+		r_{11}, r_{12}, r_{21}, r_{22}, t_1, t_2
+	\end{pmatrix}^{T},
 \]
 we get:
 \begin{equation}
@@ -199,74 +199,75 @@ we get:
 	\end{bmatrix}
 \end{equation}, where \(N\) is the number of points.
 
-The linear estimate of \(H\) is found by minimizing \(\left\lVert M \cdot H
-\right\rVert ^{2}\) using SVD. The solution is known up to a scale factor.
+The linear estimate of \(\mathbf{h}\) is found by minimizing \(\left\lVert M \cdot
+\mathbf{h} \right\rVert ^{2}\) using SVD. The solution is known up to a scale factor.
 
 To find \(t_1\) and \(t_2 \), note that \(\mathbf{r_1}\) and
 \(\mathbf{r_2}\) are orthonormal:
 \begin{subnumcases}{}
-	\lambda^{2} r_{11} r_{12} + \lambda^{2} r_{12} r_{22} + \lambda^{2} t_1
-	t_2  = 0
+	\lambda^{2} r_{11} r_{12} + \lambda^{2} r_{21} r_{22} + \lambda^{2} r_{31}
+	r_{32}  = 0
 	\label{eq:orthonormality_1}                                                     \\
-	\lambda \sqrt{r_{11}^{2} + r_{12}^{2} + t_1^{2}}                            = 1
+	\lambda \sqrt{r_{11}^{2} + r_{21}^{2} + r_{31}^{2}}                            = 1
 	\label{eq:orthonormality_2}                                                     \\
-	\lambda \sqrt{r_{12}^{2} + r_{22}^{2} + t_2 ^{2}}                            = 1
-	\label{eq:orthonormality_3}
-\end{subnumcases},
+	\lambda \sqrt{r_{12}^{2} + r_{22}^{2} + r_{32} ^{2}}                            = 1
+	\label{eq:orthonormality_3},
+\end{subnumcases}
 where \(\lambda\) is non-zero multiplier.
 
-Now, to solve for \(t_1\) and \(t_2 \), first find possible values for
-\(t_2 ^{2}\):
+Now, to solve for \(r_{31}\) and \(r_{32} \), first find possible values for
+\(r_{32} ^{2}\):
 \begin{align}
-	- \frac{r_{11} r_{12} + r_{12} r_{22}}{t_2 }                  & = t_1 &  &
-	\text{Solve eq. (\ref{eq:orthonormality_1}) for \(t_1\)}
-	\label{eq:orthonormality_4}                                                \\
+	- \frac{r_{11} r_{12} + r_{21} r_{22}}{r_{32} }                         & = r_{31} &  &
+	\text{Solve eq. (\ref{eq:orthonormality_1}) for \(r_{31}\)}
+	\label{eq:orthonormality_4}
 	\\
-  \sqrt{\lambda^{2} \left( \frac{(r_{11} r_{12} + r_{12} r_{22})^{2}}{t_2 ^{2}} +
-	r_{11}^{2} + r_{12}^{2}\right)}                               & = 1   &  &
-	\text{Substitute into eq. (\ref{eq:orthonormality_2})}                     \\
-  \lambda^{2} \left( \frac{(r_{11} r_{12} + r_{12} r_{22})^{2}}{t_2 ^{2}}\right) +
-	r_{11}^{2} + r_{12}^{2}                                      & = 1   &  &
-	\text{Square both sides}                                                   \\
-  \lambda^{2} \left(\frac{(r_{11} r_{12} + r_{12} r_{22})^{2}}{t_2 ^{2}} \right) +
-	r_{11}^{2} + r_{12}^{2} - r_{12}^{2} - r_{22}^{2} - t_2 ^{2} & = 0   &  &
+	\sqrt{\lambda^{2} \left( \frac{(r_{11} r_{12} + r_{21} r_{22})^{2}}{r_{32} ^{2}} +
+	r_{11}^{2} + r_{21}^{2}\right)}                                      & = 1   &  &
+	\text{Substitute into eq. (\ref{eq:orthonormality_2})}                            \\
+	\lambda^{2} \left( \frac{(r_{11} r_{12} + r_{21} r_{22})^{2}}{r_{32} ^{2}} +
+	r_{11}^{2} + r_{21}^{2}\right)                                       & = 1   &  &
+	\text{Square both sides}                                                          \\
+	\lambda^{2} \left(\frac{(r_{11} r_{12} + r_{21} r_{22})^{2}}{r_{32} ^{2}} +
+	r_{11}^{2} + r_{21}^{2} - r_{12}^{2} - r_{22}^{2} - r_{32} ^{2} \right) & = 0   &  &
 	\text{Subtract eq. (\ref{eq:orthonormality_3})}
 	\label{eq:orthonormality_5}
 	\\
-	\frac{(r_{11} r_{12} + r_{12} r_{22})^{2}}{t_2 ^{2}} +
-	r_{11}^{2} + r_{12}^{2} - r_{12}^{2} - r_{22}^{2} - t_2 ^{2}  & = 0   &  &
-	\text{Divide both by \(\lambda ^{2}\)}                                     \\
-	t_2 ^{4} - (r_{11}^{2} + r_{12}^{2} - r_{12}^{2} -
-	r_{22}^{2}) t_2 ^{2} - (r_{11} r_{12} + r_{12} r_{22})^{2}    & = 0   &  &
-	\text{Multiply by \(t_2 ^{2}\)}
-	\label{eq:orthonormality_6}
+	\frac{(r_{11} r_{12} + r_{21} r_{22})^{2}}{r_{32} ^{2}} +
+	r_{11}^{2} + r_{21}^{2} - r_{12}^{2} - r_{22}^{2} - r_{32} ^{2}         & = 0   &  &
+	\text{Divide both by \(\lambda ^{2}\)}                                            \\
+	r_{32} ^{4} - (r_{11}^{2} + r_{21}^{2} - r_{12}^{2} -
+	r_{22}^{2}) r_{32} ^{2} - (r_{11} r_{12} + r_{21} r_{22})^{2}           & = 0   &  &
+	\text{Multiply by \(r_{32} ^{2}\)}
+	\label{eq:orthonormality_6}.
 \end{align}
 
-Now, solve \cref{eq:orthonormality_6} for \(t_2 ^{2}\), and take a root to find
-possible values for \(t_2 \).
+Now, solve \cref{eq:orthonormality_6} for \(r_{32} ^{2}\), and take a root to find
+possible values for \(r_{32} \).
 
-To find \(t_1\), substitute the found values for \(t_2 \) into
-\cref{eq:orthonormality_4} or \cref{eq:orthonormality_5} depending on the value
-of \(t_2 \):
+To find \(r_{31}\), substitute the found values for \(r_{32} \) into
+\cref{eq:orthonormality_4} or subtract \cref{eq:orthonormality_3} from
+\cref{eq:orthonormality_2} and solve for \(r_{31}\) depending on the value
+of \(r_{32} \):
 \begin{subnumcases}{}
-	t_1  = - \frac{r_{11} r_{12} + r_{12} r_{22}}{t_2 } &
-	\text{\(t_2  \neq 0\)} \\
-	t_1  =  r_{11}^{2} + r_{12}^{2} - r_{12}^{2} - r_{22}^{2} &
-	\text{\(t_2  = 0\)}
+	r_{31}  = - \frac{r_{11} r_{12} + r_{21} r_{22}}{r_{32} } &
+	\text{\(r_{32}  \neq 0\)} \\
+	r_{31}  =  r_{11}^{2} + r_{21}^{2} - r_{12}^{2} - r_{22}^{2} &
+	\text{\(r_{32}  = 0\)}.
 \end{subnumcases}
 
-Now, it's possible to find \(H\) for each of the pairs of \(t_1\) and
-\(t_2 \).
+Now, it's possible to find \(H\) for each of the pairs of \(r_{31}\) and
+\(r_{32} \).
 
 Lastly, to select the correct \(H\), the author assumes that one of the boards'
 corners has the coordinates \( \begin{pmatrix}
 	0, 0
 \end{pmatrix}^{T}\). Then, the rotation wouldn't affect this
 point, and it would be projected to   \(\begin{pmatrix}
-	t_1, t_2
+	r_{31}, r_{32}
 \end{pmatrix}^{T}\). Hence, the best matrix would be such that has the closest
 \(\begin{pmatrix}
-	t_1, t_2
+	r_{31}, r_{32}
 \end{pmatrix}^{T}\) to \(\begin{pmatrix}
 	X, Y
 \end{pmatrix}^{T}\) of the corner, which is associated with the board's corner
@@ -275,7 +276,7 @@ with coordinates \(\begin{pmatrix}
 \end{pmatrix}^{T}\).
 
 However, often the algorithm finds who matrices \(H\) such that they have the
-same \(t_1\) and \(t_2 \), but different \(r_{11}\), \(r_{12}\), \(r_{21}\). To
+same \(r_{31}\) and \(r_{32} \), but different \(r_{11}\), \(r_{21}\), \(r_{12}\). To
 find the best matrix, we found the intrinsic values for each of them and
 back-projected the board's corners using both matrices.
 Then, we used the one which gave the smallest reprojection error.
@@ -305,14 +306,14 @@ parameter to be equal to 2, and the scalar multiplier to be equal to 1
 		\cdots    \\
 		B_N - A_N \\
 		D_N - C_N
-	\end{bmatrix}
-\end{equation},
+	\end{bmatrix},
+\end{equation}
 where
 \begin{align}
-	A_i & = r_{21} X_i + r_{22} Y_i + t_2 \\
-	B_i & = v_i (r_{31} X_i + r_{32} Y_i) \\
-	C_i & = r_{11} X_i + r_{12} Y_i + t_1 \\
-	D_i & = u_i (r_{31} X_i + r_{32} Y_i) \\
+	A_i & = r_{21} X_i + r_{22} Y_i + t_2  \\
+	B_i & = v_i (r_{31} X_i + r_{32} Y_i)  \\
+	C_i & = r_{11} X_i + r_{12} Y_i + t_1  \\
+	D_i & = u_i (r_{31} X_i + r_{32} Y_i).
 \end{align}
 
 The solution can be found using the least squares method.
@@ -467,7 +468,7 @@ $c$ at each pixel is computed by:
 		s_1^i & =\min \left(\min \left(f_A^i, f_B^i\right)-\mu, \mu-\min \left(f_C^i, f_D^i\right)\right) \\
 		s_2^i & =\min \left(\mu-\min \left(f_A^i, f_B^i\right), \min \left(f_C^i, f_D^i\right)-\mu\right) \\
 		\mu   & =0.25\left(f_A^i+f_B^i+f_C^i+f_D^i\right)
-	\end{aligned}
+	\end{aligned}.
 \end{equation}
 
 Then, the authors apply the conservative non-maximum suppression to the
@@ -519,5 +520,4 @@ the geometric mean of the true positive rate and the false positive rate.
 
 We used both approaches to train the classifier and compared the
 results in \cref{sec:classification}.
-
 

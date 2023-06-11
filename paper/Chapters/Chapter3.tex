@@ -99,7 +99,7 @@ This is a \(3 \times 3\) upper-triangular matrix:
 		\alpha_x & \alpha_x \cot \theta & c_x \\
 		0        & \alpha_y \sin \theta & c_y \\
 		0        & 0                    & 1
-	\end{bmatrix}
+	\end{bmatrix},
 \end{equation}
 
 where:
@@ -113,16 +113,16 @@ where:
 	      %       directions in pixel units.
 	      % \item $k$ represents the skew.
 \end{itemize}
-For a typical camera, \(\theta = \sfrac{\pi}{2}\) and \(\alpha_x = \alpha_y = 1
-\) \cite{hartleyMultipleViewGeometry2004}.
+For a typical camera, \(\theta = \sfrac{\pi}{2}\) and \(\alpha_x = \alpha_y\)
+\cite{hartleyMultipleViewGeometry2004}.
 
 Conventionally, the intrinsic matrix incorporates the scaling, introduced
 by the focal length:
 \begin{equation}
 	K = \begin{bmatrix}
-		\alpha_x f & \alpha_x \cot \theta & c_x \\
-		0          & \alpha_y f           & c_y \\
-		0          & 0                    & 1
+		\alpha_x & \alpha_x \cot \theta & c_x \\
+		0        & \alpha_y             & c_y \\
+		0        & 0                    & 1
 	\end{bmatrix} \begin{bmatrix}
 		f & 0 & 0 \\
 		0 & f & 0 \\
@@ -146,7 +146,7 @@ we can simplify it to:
 
 \subsection{Camera matrix}\label{sub:camera_matrix}
 
-The composition of positioning and orienting the camera, projection, and 
+The composition of positioning and orienting the camera, projection, and
 imaging transformation can be represented by a $3 \times 4$ camera
 matrix \citep{scaramuzzaFlexibleTechniqueAccurate2006}. This matrix can be expressed as:
 
@@ -168,7 +168,7 @@ Hence, the transformation of a point in the scene by the camera $\mathrm{P}^{3 \
 		R \vert \mathbf{t}
 	\end{bmatrix} \begin{pmatrix}
 		X, Y, Z, 1
-	\end{pmatrix}^{T}
+	\end{pmatrix}^{T},
 \end{equation}
 
 with $\alpha$ being $1 / Z$.
@@ -217,8 +217,8 @@ principal point.
 \subsubsection{Back-projection using the Division Model}\label{subsub:back_projection_using_the_division_model}
 
 The division model has a good ability to model the distortion of the wide-angle
-lenses, and is wildly used \citep{prittsMinimalSolversRectifying2021,
-scaramuzzaFlexibleTechniqueAccurate2006}. The model is defined as:
+lenses \citep{fitzgibbonSimultaneousLinearEstimation2001}, and is wildly used \citep{prittsMinimalSolversRectifying2021,
+	scaramuzzaFlexibleTechniqueAccurate2006}. The model is defined as:
 \begin{equation}
 	\psi(r) = 1 + \sum_{n = 1}^{N} \lambda_n r^{2n},
 \end{equation}
@@ -234,7 +234,7 @@ Then,
 	\frac{\mathbf{X}}{Z} & =
 	\begin{pmatrix}
 		\frac{X}{Z}, \frac{Y}{Z}, 1
-	\end{pmatrix}^{T}                               \\                                 & =
+	\end{pmatrix}^{T}                               \\                                  & =
 	\begin{pmatrix}
 		\frac{\alpha u}{\alpha \psi(r(\mathbf{u}))},
 		\frac{\alpha v}{\alpha \psi(r(\mathbf{u}))},
@@ -245,7 +245,7 @@ Then,
 		\frac{u}{\psi(r(\mathbf{u}))},
 		\frac{v}{\psi(r(\mathbf{u}))},
 		1
-	\end{pmatrix}^{T}
+	\end{pmatrix}^{T}.
 \end{align}
 
 From \ref{eq:division_derivation1} we see that
@@ -257,7 +257,7 @@ From \ref{eq:division_derivation1} we see that
 	\begin{cases}
 		u = \frac{X \psi(r(\mathbf{u}))}{Z} \\
 		v = \frac{Y \psi(r(\mathbf{u}))}{Z}
-	\end{cases}
+	\end{cases}.
 \end{equation}
 
 Now, let \(\widehat{r}\) be a root of
@@ -278,7 +278,6 @@ Now, the complete projection and back-projection can be formulated as follows:
 	\alpha \mathbf{u} & = K f(H\mathbf{X})
 	\tag{Projection} \label{eq:projection}                     \\
 	\alpha \mathbf{X} & = H^{-1} g(K^{-1}\mathbf{u}) \tag{Back
-		projection} \label{eq:back_projection}
-\end{align}.
-
+		projection} \label{eq:back_projection}.
+\end{align}
 
