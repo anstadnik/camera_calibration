@@ -82,7 +82,7 @@ The dataset contains approximately 800 images.
 
 \textbf{OV} \citep{lochmanBabelCalibUniversalApproach2021} is a dataset of
 approximately 1400 images. It was collected using eight stereo cameras.
-As a calibration pattern, the checkerboard pattern with \(9\times_6\) tags of 22 mm size
+As a calibration pattern, the checkerboard pattern with \(9\times 6\) tags of 22 mm size
 was used.
 
 \textcite{duisterhofTartanCalibIterativeWideAngle2022} also provide their
@@ -134,9 +134,9 @@ AprilGrid patterns, as the toolchain doesn't support a chessboard.
 	\resizebox{\linewidth}{!}{
 		\begin{tikzpicture}
 			\pie[rotate=90, explode=0.1, sum=auto, color={green!60, blue!60, red!60}, text=legend]{
-				115/Correctly detected,
+				254/Correctly detected,
 				80/Reprojection error > 10,
-				254/Not correctly detected
+				458/Not correctly detected
 			}
 		\end{tikzpicture}
 	}
@@ -393,7 +393,7 @@ initial feature detector failed to detect points near the occlusion.
 	\end{subfigure}
 	\begin{subfigure}[h]{\linewidth}
 		\centering
-		\includegraphics[width=0.7\linewidth]{refined_pruned_corners.png}
+		\includegraphics[width=0.7\linewidth]{refined_overlayed_corners.png}
 		\caption{Recovered pruned points
 			(\textcolor[HTML]{1f77b4}{unchanged}
 			\textcolor[HTML]{ff7f0e}{filtered out}
@@ -448,7 +448,7 @@ performance of the feature detector solely based on this experiment
 		\includegraphics[width=\linewidth]{refined_corners_bad_bad.png}
 		\caption{Similar pattern to the board in the background}
 	\end{subfigure}
-  \caption{Examples of false positives}
+	\caption{Examples of false positives}
 	\label{fig:recovered_bad_points}
 \end{figure}
 
@@ -472,5 +472,4 @@ performance of the feature detector solely based on this experiment
 	\caption{Histogram of the newly recovered features}
 	\label{fig:recovered_points_histogram}
 \end{figure}
-
 

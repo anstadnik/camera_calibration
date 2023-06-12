@@ -324,7 +324,7 @@ The loss function is the sum of the squared reprojection errors between the boar
 the back-projected corners, which were initially detected:
 \begin{equation}
 	L = \sum_{i=1}^{N} \left\lVert
-	H g_{\lambda_1, \lambda_2}(K^{-1} \mathbf{u_i}) -
+	H^{-1} g_{\lambda_1, \lambda_2}(K^{-1} \mathbf{u_i}) -
 	\mathbf{X_i} \right\rVert^2.
 \end{equation}
 
