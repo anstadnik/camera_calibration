@@ -1,3 +1,5 @@
+name: Build pdfs
+
 on:
   pull_request:
     # paths:
@@ -14,8 +16,8 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - run: cp paper/paper.pdf original_copy.pdf
       - run: cp paper/presentation.pdf original_copy.pdf
-      - run: tectonic paper/paper.pdf
-      - run: tectonic paper/presentation.pdf
+      - run: tectonic paper/paper.tex
+      - run: tectonic paper/presentation.tex
       - name: Compare paper/paper.pdf with paper/paper_copy.pdf
         run: |
           if ! cmp --silent paper/paper.pdf paper/paper_copy.pdf; then
