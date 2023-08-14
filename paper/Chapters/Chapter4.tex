@@ -111,11 +111,11 @@ We can compute the intrinsic camera matrices as follows:
 
 Then, the back-projection of a 2D point \(\mathbf{u} = \begin{pmatrix}
 	u, v, 1
-\end{pmatrix}\) into a scene point with \(Z = 0\) \(\mathbf{X} = \begin{pmatrix}
-	X, Y, 1
+\end{pmatrix}\) into a scene point with \(z = 0\) \(\mathbf{x} = \begin{pmatrix}
+	x, y, 1
 \end{pmatrix}\) is given by:
 \begin{equation}
-	\mathbf{X} = H g_{\lambda_1, \lambda_2}(K^{-1} \mathbf{u}).
+	\mathbf{x} = H g_{\lambda_1, \lambda_2}(K^{-1} \mathbf{u}).
 \end{equation}
 
 \subsection{Initial approximation}\label{sub:initial_approximation}
@@ -139,14 +139,14 @@ algorithm.
 To derive the solver for the camera extrinsic parameters, start from
 \cref{eq:projection}:
 \begin{align}
-	\alpha \mathbf{u}                                                          & = K f(H\mathbf{X})       \\
-	\alpha K^{-1} \mathbf{u}                                                   & = f(H\mathbf{X})    &  &
+	\alpha \mathbf{u}                                                          & = K f(H\mathbf{x})       \\
+	\alpha K^{-1} \mathbf{u}                                                   & = f(H\mathbf{x})    &  &
 	\text{Move \(K\) to the left side}                                                                    \\
-	\alpha g( K^{-1}\mathbf{u})                                                & = g(f(H\mathbf{X})) &  &
+	\alpha g( K^{-1}\mathbf{u})                                                & = g(f(H\mathbf{x})) &  &
 	\text{Set \(\mathbf{\widehat{u}} = K^{-1}\mathbf{u}\); apply \(g(\cdot)\) to both sides}              \\
 	\alpha \begin{pmatrix}
 		       \widehat{u}_x \\ \widehat{u}_y \\ \psi(r(\mathbf{\widehat{u}}))
-	       \end{pmatrix}^{T} & = H\mathbf{X}.
+	       \end{pmatrix}^{T} & = H\mathbf{x}.
 \end{align}
 
 For \(K\) we used the placeholder values.\ \(f\) was set to a constant value for
@@ -158,27 +158,27 @@ To eliminate the dependency on the scale \(\alpha\), multiply both sides
 vectorially by \(g(\mathbf{\widehat{u}})\):
 \begin{equation}
 	\alpha g(\mathbf{\widehat{u}}) \times g(\mathbf{\widehat{u}})
-	= g(\mathbf{\widehat{u}}) \times H\mathbf{X}
+	= g(\mathbf{\widehat{u}}) \times H\mathbf{x}
 	= 0 \implies
 	\begin{pmatrix}
 		\widehat{u}, \widehat{v}, \psi(r(\mathbf{\widehat{u}}))
 	\end{pmatrix}^{T} \times \begin{bmatrix}
 		\mathbf{r_1} & \mathbf{r_2} & \mathbf{t}
-	\end{bmatrix}^{T} \mathbf{X} = 0
+	\end{bmatrix}^{T} \mathbf{x} = 0
 	\label{eq:eq_no_multiplier}.
 \end{equation}
 
 From \cref{eq:eq_no_multiplier}, we can see that a point contributes to three
 homogeneous equations:
 \begin{align}
-	\widehat{v} (r_{31}X + r_{32} Y + t_3) -
-	g(r(\mathbf{\widehat{u}})) (r_{21}X + r_{22}Y + t_2 ) & = 0
+	\widehat{v} (r_{31}x + r_{32} y + t_3) -
+	g(r(\mathbf{\widehat{u}})) (r_{21}x + r_{22}y + t_2 ) & = 0
 	\label{eq:scaramuzza_system_1}                              \\
-	g(r(\mathbf{\widehat{u}})) (r_{11}X + r_{12}Y + t_1) -
-	\widehat{u} (r_{31}X + r_{32} Y + t_3)                      & = 0
+	g(r(\mathbf{\widehat{u}})) (r_{11}x + r_{12}y + t_1) -
+	\widehat{u} (r_{31}x + r_{32} y + t_3)                      & = 0
 	\label{eq:scaramuzza_system_2}                              \\
-	\widehat{u} (r_{21}X + r_{22}Y + t_2 ) -
-	\widehat{v} (r_{11}X + r_{12}Y + t_1)                 & = 0
+	\widehat{u} (r_{21}x + r_{22}y + t_2 ) -
+	\widehat{v} (r_{11}x + r_{12}y + t_1)                 & = 0
 	\label{eq:scaramuzza_system_3}.
 \end{align}
 
@@ -187,15 +187,15 @@ single equation. Now, by rewriting the equation in the matrix form
 \(M \cdot \mathbf{h} = 0\), where
 \[
 	\mathbf{h} = \begin{pmatrix}
-		r_{11}, r_{12}, r_{21}, r_{22}, t_1, t_2
+		r_{11}, r_{12}, r_{21}, r_{22}, r_{31}, r_{32}
 	\end{pmatrix}^{T},
 \]
 we get:
 \begin{equation}
 	M = \begin{bmatrix}
-		-\widehat{v}_1 X_1 & -\widehat{v}_1 Y_1 & -\widehat{u}_1 X_1 & -\widehat{u}_1 Y_1 & -\widehat{v}_1 & -\widehat{u}_1 \\
+		-\widehat{v}_1 x_1 & -\widehat{v}_1 y_1 & -\widehat{u}_1 x_1 & -\widehat{u}_1 y_1 & -\widehat{v}_1 & -\widehat{u}_1 \\
 		\vdots             & \vdots             & \vdots             & \vdots             & \vdots         & \vdots         \\
-		-\widehat{v}_N X_N & -\widehat{v}_N Y_N & -\widehat{u}_N X_N & -\widehat{u}_N Y_N & -\widehat{v}_N & -\widehat{u}_N
+		-\widehat{v}_N x_N & -\widehat{v}_N y_N & -\widehat{u}_N x_N & -\widehat{u}_N y_N & -\widehat{v}_N & -\widehat{u}_N
 	\end{bmatrix}
 \end{equation}, where \(N\) is the number of points.
 
@@ -269,7 +269,7 @@ point, and it would be projected to   \(\begin{pmatrix}
 \(\begin{pmatrix}
 	r_{31}, r_{32}
 \end{pmatrix}^{T}\) to \(\begin{pmatrix}
-	X, Y
+	x, y
 \end{pmatrix}^{T}\) of the corner, which is associated with the board's corner
 with coordinates \(\begin{pmatrix}
 	0, 0
@@ -310,10 +310,10 @@ parameter to be equal to 2, and the scalar multiplier to be equal to 1
 \end{equation}
 where
 \begin{align}
-	A_i & = r_{21} X_i + r_{22} Y_i + t_2  \\
-	B_i & = v_i (r_{31} X_i + r_{32} Y_i)  \\
-	C_i & = r_{11} X_i + r_{12} Y_i + t_1  \\
-	D_i & = u_i (r_{31} X_i + r_{32} Y_i).
+	A_i & = r_{21} x_i + r_{22} y_i + t_2  \\
+	B_i & = v_i (r_{31} x_i + r_{32} y_i)  \\
+	C_i & = r_{11} x_i + r_{12} y_i + t_1  \\
+	D_i & = u_i (r_{31} x_i + r_{32} y_i).
 \end{align}
 
 The solution can be found using the least squares method.
@@ -325,7 +325,7 @@ the back-projected corners, which were initially detected:
 \begin{equation}
 	L = \sum_{i=1}^{N} \left\lVert
 	H^{-1} g_{\lambda_1, \lambda_2}(K^{-1} \mathbf{u_i}) -
-	\mathbf{X_i} \right\rVert^2.
+	\mathbf{x_i} \right\rVert^2.
 \end{equation}
 
 For the initial guess, we used the randomly chosen constant small values.

@@ -12,8 +12,8 @@
 		\(\mathbf{u} = \begin{pmatrix}
 			               u, v, 1
 		               \end{pmatrix}^{T}\) & A point in the board coordinate system                                                             \\
-		\(\mathbf{X} = \begin{pmatrix}
-			               X, Y, Z, 1
+		\(\mathbf{x} = \begin{pmatrix}
+			               x, y, z, 1
 		               \end{pmatrix}^{T}\) & A point in the world coordinate system                                                             \\
 		\(R\)                          & A \(3 \times 3\) rotation matrix                                                                       \\
 		\(\mathbf{t}\)                 & A \(3 \times 1\) translation vector                                                                    \\
@@ -40,7 +40,7 @@ linear, which simplifies the mathematical representation of the camera model.
 \subsection{Perspective projection}\label{sub:perspective_projection}
 
 The perspective projection is a mapping from a 3D point \(\begin{pmatrix}
-	X, Y, Z
+	x, y, z
 \end{pmatrix}^{T}\)
 in the world coordinate
 to the 2D coordinate \(\begin{pmatrix}
@@ -51,8 +51,8 @@ of projection. It is given by the perspective projection equation:
 \[
 	\begin{pmatrix}
 		u, v
-	\end{pmatrix}^{T} = \frac{f}{Z} \begin{pmatrix}
-		X, Y
+	\end{pmatrix}^{T} = \frac{f}{z} \begin{pmatrix}
+		x, y
 	\end{pmatrix}^{T}.
 \]
 This equation can be written using the homogeneous coordinates:
@@ -64,18 +64,18 @@ This equation can be written using the homogeneous coordinates:
 		0 & f & 0 & 0 \\
 		0 & 0 & 1 & 0
 	\end{bmatrix} \begin{pmatrix}
-		X \\ Y \\ Z \\ 1
+		x \\ y \\ z \\ 1
 	\end{pmatrix},
 \end{equation}
-where \(\alpha = \sfrac{1}{Z}\) is a scale factor.
+where \(\alpha = \sfrac{1}{z}\) is a scale factor.
 
 \subsection{Scene to camera projection}\label{sub:scene_to_camera_projection}
 
 A 3D scene point \(\begin{pmatrix}
-	X, Y, Z
+	x, y, z
 \end{pmatrix}^{T}\) can be projected onto the image plane as
 \(R \begin{pmatrix}
-	X, Y, Z
+	x, y, z
 \end{pmatrix}^{T} + \mathbf{t}\), where \(R\) is a \(3 \times 3\) rotation matrix
 and \(\mathbf{t}\) is
 a \(3 \times 1\) translation vector. Using the homogeneous coordinates, this
@@ -85,7 +85,7 @@ can be written as:
 		R              & \mathbf{t} \\
 		\mathbf{0}^{T} & 1
 	\end{bmatrix} \begin{pmatrix}
-		X \\ Y \\ Z \\ 1
+		x \\ y \\ z \\ 1
 	\end{pmatrix}.
 \end{equation}
 
@@ -167,16 +167,16 @@ Hence, the transformation of a point in the scene by the camera $\mathrm{P}^{3 \
 	\alpha(u, v, 1)^{T} = K \begin{bmatrix}
 		R \vert \mathbf{t}
 	\end{bmatrix} \begin{pmatrix}
-		X, Y, Z, 1
+		x, y, z, 1
 	\end{pmatrix}^{T},
 \end{equation}
 
-with $\alpha$ being $1 / Z$.
+with $\alpha$ being $1 / z$.
 
 \subsection{Projection of the points from the scene plane}\label{sub:projection_of_the_points_from_the_scene_plane}
 
 When working with the coplanar scene points, we can simplify the projection
-by assuming that the scene plane is located at \(Z = 0\). In this case, the
+by assuming that the scene plane is located at \(z = 0\). In this case, the
 projection of the point becomes:
 \begin{equation}
 	\alpha \begin{pmatrix}
@@ -184,16 +184,16 @@ projection of the point becomes:
 	\end{pmatrix} = K \begin{bmatrix}
 		\mathbf{r_1} & \mathbf{r_2} & \mathbf{r_3} & \mathbf{t}
 	\end{bmatrix} \begin{pmatrix}
-		X \\ Y \\ 0 \\ 1
+		x \\ y \\ 0 \\ 1
 		% \end{pmatrix} = \begin{bmatrix}
 		%   \mathbf{p_1} & \mathbf{p_2} & \mathbf{p_4}
 		% \end{bmatrix} \begin{pmatrix}
-		%   X \\ Y \\ 1
+		%   x \\ y \\ 1
 		% \end{pmatrix}.
 	\end{pmatrix} = K \underbrace{\begin{bmatrix}
 			\mathbf{r_1} & \mathbf{r_2} & \mathbf{t}
 		\end{bmatrix}}_{H} \begin{pmatrix}
-		X \\ Y \\ 1
+		x \\ y \\ 1
 	\end{pmatrix}.
 \end{equation}
 
@@ -225,15 +225,15 @@ lenses \citep{fitzgibbonSimultaneousLinearEstimation2001}, and is wildly used \c
 where \(\lambda_n\) are the distortion coefficients.
 
 The function \(\psi(r)\) is not invertible in general.
-Let \(\mathbf{\widehat{X}} = \begin{pmatrix}
-	X, Y, Z
+Let \(\mathbf{\widehat{x}} = \begin{pmatrix}
+	x, y, z
 \end{pmatrix}^{T} = \alpha g(\mathbf{u})\) be a ray in the camera coordinate system.
 
 Then,
 \begin{align}
-	\frac{\mathbf{X}}{Z} & =
+	\frac{\mathbf{x}}{z} & =
 	\begin{pmatrix}
-		\frac{X}{Z}, \frac{Y}{Z}, 1
+		\frac{x}{z}, \frac{y}{z}, 1
 	\end{pmatrix}^{T}                               \\                                  & =
 	\begin{pmatrix}
 		\frac{\alpha u}{\alpha \psi(r(\mathbf{u}))},
@@ -251,33 +251,33 @@ Then,
 From \ref{eq:division_derivation1} we see that
 \begin{equation} \label{eq:division_derivation2}
 	\begin{cases}
-		\frac{X}{Z} = \frac{u}{\psi(r(\mathbf{u}))} \\
-		\frac{Y}{Z} = \frac{v}{\psi(r(\mathbf{u}))}
+		\frac{x}{z} = \frac{u}{\psi(r(\mathbf{u}))} \\
+		\frac{y}{z} = \frac{v}{\psi(r(\mathbf{u}))}
 	\end{cases} \implies \\
 	\begin{cases}
-		u = \frac{X \psi(r(\mathbf{u}))}{Z} \\
-		v = \frac{Y \psi(r(\mathbf{u}))}{Z}
+		u = \frac{x \psi(r(\mathbf{u}))}{z} \\
+		v = \frac{y \psi(r(\mathbf{u}))}{z}
 	\end{cases}.
 \end{equation}
 
 Now, let \(\widehat{r}\) be a root of
 \(r(\mathbf{u})
 = \sqrt{
-	\frac{X * \psi \left( r\right)}{Z}^{2} +
-	\frac{Y * \psi \left( r\right)}{Z}^{2}
+	\frac{x * \psi \left( r\right)}{z}^{2} +
+	\frac{y * \psi \left( r\right)}{z}^{2}
 } = r\).
 
-Then, \(\mathbf{u} = f(\mathbf{X}) =
-\frac{\widehat{r}}{r(\mathbf{X})}\mathbf{X}\),
+Then, \(\mathbf{u} = f(\mathbf{x}) =
+\frac{\widehat{r}}{r(\mathbf{x})}\mathbf{x}\),
 where \(f(\cdot)\) is the inverse of \(g(\cdot)\).
 
 \subsection{Complete projection and backprojection}\label{sub:complete_projection_and_backprojection}
 
 Now, the complete projection and back-projection can be formulated as follows:
 \begin{align}
-	\alpha \mathbf{u} & = K f(H\mathbf{X})
+	\alpha \mathbf{u} & = K f(H\mathbf{x})
 	\tag{Projection} \label{eq:projection}                     \\
-	\alpha \mathbf{X} & = H^{-1} g(K^{-1}\mathbf{u}) \tag{Back
+	\alpha \mathbf{x} & = H^{-1} g(K^{-1}\mathbf{u}) \tag{Back
 		projection} \label{eq:back_projection}.
 \end{align}
 

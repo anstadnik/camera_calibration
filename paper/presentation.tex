@@ -1,3 +1,4 @@
+% \documentclass[aspectratio=169]{beamer}
 \documentclass{beamer}
 % \documentclass[notes]{beamer}
 
@@ -8,6 +9,10 @@
 % \usepackage{algorithm}
 % \usepackage{algpseudocode}
 \usepackage{subcaption}
+\usepackage{pifont}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{tabularx}
 \usepackage{caption}
 \usepackage{pgf-pie}
 % \usepackage{tikz}
@@ -24,11 +29,19 @@
 
 % \usetikzlibrary{calc}
 % \usetikzlibrary{3d}
-\usetikzlibrary{spy,arrows}
+\usetikzlibrary{spy,arrows,shapes, arrows, positioning}
 
 % \usepackage{biblatex}
 \usepackage[backend=biber,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
 \addbibresource{references.bib}
+
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\newcommand\headercell[1]{%
+   \smash[b]{\begin{tabular}[t]{@{}c@{}} #1 \end{tabular}}}
+
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
 
 \graphicspath{ {images/} }
 
@@ -46,15 +59,15 @@
 
 \begin{document}
 
-\begin{frame}
+\begin{frame}[plain]
 	\titlegraphic{\hfill\includegraphics[height=1cm]{UCU-Apps2022_.png}}
 	\titlepage
 \end{frame}
 
-\begin{frame}
-	\frametitle{Structure of the presentation}
-	\tableofcontents
-\end{frame}
+% \begin{frame}
+% 	\frametitle{Structure of the presentation}
+% 	\tableofcontents
+% \end{frame}
 
 \section{Introduction}\label{sec:introduction}
 
@@ -76,32 +89,39 @@
 	\end{figure}
 \end{frame}
 
+% \begin{frame}
+% 	\frametitle{Motivation}
+% 	Accurate camera calibration is required for many applications, such as:
+% 	\begin{itemize}
+% 		\item 3D reconstruction
+% 		\item Robotics and automation
+% 		\item Augmented reality
+% 		\item Photogrammetry
+% 		\item Stereo vision
+% 	\end{itemize}
+% \end{frame}
+
 \begin{frame}
 	\frametitle{Motivation}
-	Accurate camera calibration is required for many applications, such as:
-	\begin{itemize}
-		\item 3D reconstruction
-		\item Robotics and automation
-		\item Augmented reality
-		\item Photogrammetry
-		\item Stereo vision
-		\item And many more\ldots
-	\end{itemize}
-\end{frame}
 
-\begin{frame}
-	\frametitle{Challenges}
-	% \begin{columns}[T,onlytextwidth]
-	% \column{0.6\textwidth}
-	Camera calibration is
-	a challenging task, especially for highly distorted images.
+	\begin{columns}[T,onlytextwidth]
+		\column{0.6\textwidth}
+		Accurate camera calibration is required for many applications, such as:
+		\begin{itemize}
+			\item 3D reconstruction
+			\item Robotics and automation
+			\item Augmented reality
+			\item Photogrammetry
+			\item Stereo vision
+		\end{itemize}
 
-	The challenges include:
-	\begin{itemize}
-		\item Robust keypoint detection
-		\item Accurate distortion modeling
-		\item Stability of the calibration
-	\end{itemize}
+		\column{0.4\textwidth}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.8\textwidth]{high_distortion.png}
+			\caption{Image with a high distortion}
+		\end{figure}
+	\end{columns}
 \end{frame}
 
 \begin{frame}
@@ -117,17 +137,16 @@
 				\spy[blue] on (3.5,3.0) in node [right] at (8.1,4.3);
 			\end{scope}
 		\end{tikzpicture}
-		\caption{Example of corners near the center of the image and at the edge}
+		\caption{Corners near the center of the image and at the edge}
 	\end{figure}
 	% \end{columns}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Research objective}
-
-	Improve the detection of
-	calibration board fiducials from calibration imagery taken by wide-angle or
-	fisheye lenses.
+	\textbf{Improve the detection of
+		calibration board fiducials from calibration imagery taken by wide-angle or
+		fisheye lenses.}
 
 	% Add additional constrains to the camera
 	% calibration by finding previously undetected features on the calibration
@@ -143,14 +162,185 @@
 	\end{itemize}
 \end{frame}
 
-\section{Background}\label{sec:background}
+\section{Related work}\label{sec:related_work}
+
+\begin{frame}
+	\frametitle{TartanCalib\footcite{duisterhofTartanCalibIterativeWideAngle2022}}
+
+	\begin{columns}
+		\begin{column}{0.4\textwidth}
+			\textbf{Algorithm}
+			\begin{enumerate}
+				\item Run the calibration toolchain
+				\item Undistort the image
+				\item Subpixel refinement
+				\item Repeat
+			\end{enumerate}
+		\end{column}
+		\begin{column}{0.6\textwidth}
+			\textbf{Issues}
+			\begin{itemize}
+				\item Runs complete calibration toolchain each iteration
+				\item Does not use the geometry information
+				\item Not self-contained
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Models comparison}
+	\begingroup
+	\scriptsize
+
+	% \begin{figure}
+	% 	\begin{subfigure}{0.45\linewidth}
+	% 		\resizebox{\linewidth}{!}{
+	% 			\centering
+	% 			\begin{tikzpicture}
+	% 				\begin{axis}[
+	% 						xlabel={$x$},
+	% 						ylabel={$y$},
+	% 						grid=major,
+	% 						title={Original board},
+	% 					]
+	% 					\addplot[
+	% 						only marks,
+	% 					] table {data/original_board.txt};
+	% 				\end{axis}
+	% 			\end{tikzpicture}
+	% 		}
+	\setlength\tabcolsep{1.5pt} % default value: 6pt
+	\begin{table}
+		\begin{tabularx}{\textwidth}{@{} L *{5}{c} @{}}
+			\toprule
+			\multicolumn{1}{c}{\multirow{2}{*}{\centering\textbf{Supports}}}           &
+			\multicolumn{5}{c@{}}{\textbf{Name}}                                                           \\
+			\cmidrule(l){2-6}                                                          &
+			\textbf{OpenCV\footcite{dudaAccurateDetectionLocalization2018}}            &
+			\textbf{TartanKalib\footcite{duisterhofTartanCalibIterativeWideAngle2022}} &
+			\textbf{Kalibr\footcite{mayeSelfsupervisedCalibrationRobotic2013}}         &
+			\textbf{OCamCalib\footcite{scaramuzzaToolboxEasilyCalibrating2006}}        &
+			\textbf{LIBCBDETECT\footcite{geigerAutomaticCameraRange2012}}                                  \\
+			\midrule
+			Unknown board shape                                                        & \xmark & \cmark &
+			\cmark                                                                     & \cmark & \cmark   \\
+			\hline
+			Occlusion                                                                  & \xmark & \cmark &
+			\cmark                                                                     & \cmark & \cmark   \\
+			\hline
+			Model-based extra features detection                                       & \xmark & \cmark &
+			\xmark                                                                     & \xmark & \xmark   \\
+			\hline
+			Geometry-based extra features detection                                    & \xmark & \xmark &
+			\xmark                                                                     & \xmark & \xmark   \\
+			\bottomrule
+		\end{tabularx}
+		\caption{Comparison of feature detectors}
+	\end{table}
+	\endgroup
+\end{frame}
+
+\section{Approach}\label{sec:approach}
+
+% \section*{Intuition}\label{sec:intuition}
+%
+\begin{frame}
+	\frametitle{Intuition (image)}
+	Can you guess where the missing corners could be?
+
+	% \begin{figure}
+	% 	\includegraphics[width=0.7\textwidth]{example_board.png}
+	% 	\caption{Example board detection}
+	% \end{figure}
+	\begin{figure}
+		\begin{tikzpicture}[spy using outlines={circle,yellow,magnification=3,size=5cm, connect spies}]
+			\node[anchor=south west,inner sep=0] (image) at (0,0)
+			% {\includegraphics[width=0.6\textwidth]{distorted_image}};
+			{\includegraphics[width=0.7\linewidth]{example_board.png}};
+			\begin{scope}[x={(image.south east)},y={(image.north west)}]
+				% \spy[red] on (2.5,1.4) in node [left] at (10.1,1.7);
+				\spy[blue] on (5.5,1.0) in node [right] at (6.5,3.3);
+			\end{scope}
+		\end{tikzpicture}
+		\caption{Example board detection}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Intuition (corners)}
+	Can you now?
+
+	\begin{figure}
+		\resizebox{0.7\textwidth}{!}{
+			\centering
+			\begin{tikzpicture}
+				\begin{axis}[
+						xlabel={$x$},
+						ylabel={$y$},
+						grid=major,
+						title={Corners},
+					]
+					\addplot[
+						only marks,
+					] table {data/example_corners.txt};
+				\end{axis}
+			\end{tikzpicture}
+		}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Intuition (board)}
+	What about here?
+
+	\begin{figure}
+		\resizebox{0.7\textwidth}{!}{
+			\centering
+			\begin{tikzpicture}
+				\begin{axis}[
+						xlabel={$x$},
+						ylabel={$y$},
+						grid=major,
+						title={Board},
+					]
+					\addplot[
+						only marks,
+					] table {data/example_board.txt};
+				\end{axis}
+			\end{tikzpicture}
+		}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[standout]
+	Use the board's geometry to find missing corners!
+\end{frame}
+
+\section*{Method}\label{sec:method}
+
+\begin{frame}
+	\frametitle{Pipeline overview}
+
+	\begin{enumerate}
+		\item Feature detection.
+		\item Camera calibration.
+		      \begin{enumerate}
+			      \item Initialize camera parameters using the solver.
+			      \item Refine camera parameters by optimization.
+		      \end{enumerate}
+		\item Impute the gaps in the board and extend it.
+		\item Get positions of new points on the image.
+		\item Filter out false positives.
+	\end{enumerate}
+\end{frame}
 
 \begin{frame}
 	\frametitle{Notation}
 	The column vectors will be denoted by bold lowercase letters (e.g.
 	\(\mathbf{u} = \begin{pmatrix}
 		u, v, 1
-	\end{pmatrix}^{T}\)), matrices will be denoted by bold uppercase letters (e.g.
+	\end{pmatrix}^{T}\)), matrices will be denoted by uppercase letters (e.g.
 	\(H = \begin{bmatrix}
 		\mathbf{r_1} & \mathbf{r_2} & \mathbf{t}
 	\end{bmatrix}
@@ -180,44 +370,26 @@
 	\frametitle{Definition of the camera model}
 	\begin{exampleblock}{Definition}
 		\begin{align}
-			\alpha \mathbf{u} & = K f_{\boldsymbol{\lambda}}(H\mathbf{X})
+			\alpha \mathbf{u} & = K f_{\boldsymbol{\lambda}}(H\mathbf{x})
 			\tag{Projection} \label{eq:projection}                                            \\
-			\alpha \mathbf{X} & = H^{-1} g_{\boldsymbol{\lambda}}(K^{-1}\mathbf{u}) \tag{Back
+			\beta \mathbf{x}  & = H^{-1} g_{\boldsymbol{\lambda}}(K^{-1}\mathbf{u}) \tag{Back
 				projection} \label{eq:back_projection}.
 		\end{align}
 		where \(K\) is the camera matrix, \(g_{\boldsymbol{\lambda}}(\cdot)\) is the division distortion
-		model \citep{fitzgibbonSimultaneousLinearEstimation2001}, \(f(\cdot)\) is the
-		inverse of \(g(\cdot)\) and \(H\) is the homography matrix, and \(\alpha\)
-		is a non-zero scalar.
+		model \footcite{fitzgibbonSimultaneousLinearEstimation2001}, \(f(\cdot)\) is the
+		inverse of \(g(\cdot)\) and \(H\) is the homography matrix, and \(\alpha,
+		\beta\) are non-zero scalars.
 	\end{exampleblock}
 
 	\begin{alertblock}{Note}
-		Slides with the detailed explanation can be demonstrated upon request during the Q\&A session.
+		You have printed materials with the details about the camera model.
+		% Slides with the detailed explanation can be demonstrated upon request during the Q\&A session.
 		% The explanation of the used camera model does not fit into the
 		% presentation duration. However, the appendix of this presentation contains
 		% the detailed explanation of each element of the equation, and will be
 		% happily discussed/presented during the Q\&A session.
 	\end{alertblock}
 
-\end{frame}
-
-\section{Approach}\label{sec:approach}
-
-\begin{frame}
-	\frametitle{Pipeline overview}
-
-	\begin{enumerate}
-		\item Feature detection.
-		\item Camera calibration.
-		      \begin{enumerate}
-			      \item Initialize camera parameters (\(R\), \(\mathbf{t}\),
-			            \(\boldsymbol{\lambda}\)) using the solver.
-			      \item Refine camera parameters and estimate \(K\) by optimization.
-		      \end{enumerate}
-		\item Impute the gaps in the board, and extend it.
-		\item Get positions of new points on the image.
-		\item Filter out false positives.
-	\end{enumerate}
 \end{frame}
 
 \begin{frame}
@@ -251,11 +423,10 @@
 \begin{frame}
 	\frametitle{Camera calibration 1}
 
-	\begin{enumerate}
-		\item Initialize camera parameters (\(R\), \(\mathbf{t}\),
-		      \(\boldsymbol{\lambda}\)) using the method, proposed by
-		      \cite{scaramuzzaToolboxEasilyCalibrating2006}.
-	\end{enumerate}
+	Initialize camera parameters (\(R\), \(\mathbf{t}\),
+	\(\boldsymbol{\lambda}\)) using the method, proposed by
+	\cite{scaramuzzaToolboxEasilyCalibrating2006}.
+
 	\begin{exampleblock}{Overview}
 		The author proposes the multistage solver for the projection equation,
 		assuming that the camera matrix is known.
@@ -264,11 +435,10 @@
 
 \begin{frame}
 	\frametitle{Camera calibration 2}
-	\begin{enumerate}
-		\item Refine the values of \(R\), \(\mathbf{t}\), \(\boldsymbol{\lambda}\), and
-		      estimate \(K\) by minimizing the reprojection error between the
-		      board and the back-projected corners.
-	\end{enumerate}
+
+	Refine the values of \(R\), \(\mathbf{t}\), \(\boldsymbol{\lambda}\), and
+	estimate \(K\) by minimizing the reprojection error between the
+	board and the back-projected corners.
 
 	\begin{exampleblock}{Reprojection error}
 		The reprojection error is the distance between the reprojected point and the
@@ -332,7 +502,7 @@
 	\frametitle{Binary classification}
 	\begin{itemize}
 		\item Compute the corner likelihood map for the image.
-		\item Use the ROC curve, and pick the threshold which maximizes the G-mean.
+		\item Use the ROC curve and pick the threshold which maximizes the G-mean.
 	\end{itemize}
 
 	We tested the approach of \cite{geigerAutomaticCameraRange2012}, and,
@@ -371,7 +541,7 @@
 
 \begin{frame}
 	\frametitle{Camera calibration 1}
-	Compare the initial camera calibration with camera calibration obtained via
+	Compare the initial camera calibration with the camera calibration obtained via
 	optimization of reprojection error.
 
 	\begin{figure}
@@ -511,7 +681,7 @@
 \begin{frame}
 	\frametitle{Classification}
 
-	The Hessian approach proved to be more robust, as the other gave too many false
+	The Hessian approach proved to be more robust, as the alternative gave too many false
 	positives, especially for the edges.
 
 	\begin{figure}
@@ -557,8 +727,7 @@
 
 \begin{frame}
 	\frametitle{Evaluation (artificially removed points)}
-	We removed 20\% of the points from the original board and then tried to recover
-	them.
+	We removed 20\% of the points and then tried to recover them.
 
 	\begin{figure}[h]
 		\centering
@@ -609,15 +778,22 @@
 \end{frame}
 \begin{frame}
 	\frametitle{Evaluation (artificially removed points) 2}
+
 	\begin{figure}
-		\centering
-		\includegraphics[width=0.7\linewidth]{refined_pruned_corners.png}
-		\caption{Recovered pruned points
+		\begin{tikzpicture}[spy using outlines={circle,yellow,magnification=3,size=4cm, connect spies}]
+			\node[anchor=south west,inner sep=0] (image) at (0,0)
+			% {\includegraphics[width=0.6\textwidth]{distorted_image}};
+			{\includegraphics[width=0.7\linewidth]{refined_pruned_corners.png}};
+			\begin{scope}[x={(image.south east)},y={(image.north west)}]
+				% \spy[red] on (2.5,1.4) in node [left] at (10.1,1.7);
+				\spy[blue] on (3.5,3.0) in node [right] at (6.1,3.3);
+			\end{scope}
+		\end{tikzpicture}
+		\caption{Feature recovery on the board with 80\% of the points
 			(\textcolor[HTML]{1f77b4}{unchanged}
 			\textcolor[HTML]{ff7f0e}{filtered out}
 			\textcolor[HTML]{2ca02c}{new corner}
 			\textcolor[HTML]{d62728}{out of image})}
-		\caption{Feature refinement on the board with 80\% of the points}
 	\end{figure}
 
 \end{frame}
@@ -625,7 +801,7 @@
 \begin{frame}
 	\frametitle{Evaluation (artificial occlusion)}
 
-	Occlusions pose additional complications for feature detection.
+	Occlusions pose complications for feature detection.
 
 	\begin{figure}[h]
 		\centering
@@ -675,18 +851,22 @@
 \end{frame}
 \begin{frame}
 	\frametitle{Evaluation (artificial occlusion) 2}
+
 	\begin{figure}
-		\begin{subfigure}[h]{\linewidth}
-			\centering
-			\includegraphics[width=0.7\linewidth]{refined_overlayed_corners.png}
-			\caption{Recovered pruned points
-				(\textcolor[HTML]{1f77b4}{unchanged}
-				\textcolor[HTML]{ff7f0e}{filtered out}
-				\textcolor[HTML]{2ca02c}{new corner}
-				\textcolor[HTML]{d62728}{out of image})}
-		\end{subfigure}
-		\hfill
-		\caption{Feature refinement on the board with partial board occlusion}
+		\begin{tikzpicture}[spy using outlines={circle,yellow,magnification=3,size=5cm, connect spies}]
+			\node[anchor=south west,inner sep=0] (image) at (0,0)
+			% {\includegraphics[width=0.6\textwidth]{distorted_image}};
+			{\includegraphics[width=0.7\linewidth]{refined_overlayed_corners.png}};
+			\begin{scope}[x={(image.south east)},y={(image.north west)}]
+				% \spy[red] on (2.5,1.4) in node [left] at (10.1,1.7);
+				\spy[blue] on (3.5,3.0) in node [right] at (6.1,3.3);
+			\end{scope}
+		\end{tikzpicture}
+		\caption{Additional features detection on the board with partial board occlusion
+			(\textcolor[HTML]{1f77b4}{unchanged}
+			\textcolor[HTML]{ff7f0e}{filtered out}
+			\textcolor[HTML]{2ca02c}{new corner}
+			\textcolor[HTML]{d62728}{out of image})}
 	\end{figure}
 
 \end{frame}
@@ -696,38 +876,64 @@
 	Lastly, we recovered the points that were not detected by the initial feature
 	detector.
 
-	% \begin{minipage}[t]{0.80\linewidth}
-	\begin{figure}[h]
-		\centering
-		\includegraphics[width=0.75\linewidth]{refined_corners1.png}
-		\includegraphics[width=0.75\linewidth]{refined_corners2.png}
-
-		\caption{Recovered points
+	\begin{figure}
+		\begin{tikzpicture}[spy using outlines={circle,yellow,magnification=4,size=4cm, connect spies}]
+			\node[anchor=south west,inner sep=0] (image) at (0,0)
+			% {\includegraphics[width=0.6\textwidth]{distorted_image}};
+			{\includegraphics[width=0.6\linewidth]{refined_corners1.png}};
+			\begin{scope}[x={(image.south east)},y={(image.north west)}]
+				% \spy[red] on (2.5,1.4) in node [left] at (10.1,1.7);
+				\spy[blue] on (4.8,2.5) in node [right] at (6.1,3.3);
+			\end{scope}
+		\end{tikzpicture}
+		\caption{Newly detected points
 			(\textcolor[HTML]{1f77b4}{unchanged}
 			\textcolor[HTML]{ff7f0e}{filtered out}
 			\textcolor[HTML]{2ca02c}{new corner}
 			\textcolor[HTML]{d62728}{out of image})}
-		\label{fig:recovered_good_points}
-	\end{figure}
-	% \end{minipage}
-
-\end{frame}
-
-\begin{frame}
-	\frametitle{Evaluation (real data, false positives) 1}
-
-	\begin{figure}
-		\includegraphics[width=0.8\linewidth]{refined_corners_bad.png}
-		\caption{Occlusion on the board with distinct features}
 	\end{figure}
 
 \end{frame}
 
 \begin{frame}
-	\frametitle{Evaluation (real data, false positives) 2}
+	\frametitle{Evaluation (real data) 2}
+
 	\begin{figure}
-		\includegraphics[width=\linewidth]{refined_corners_bad_bad.png}
-		% \caption{Similar pattern to the board in the background}
+		\begin{tikzpicture}[spy using outlines={circle,yellow,magnification=4,size=5cm, connect spies}]
+			\node[anchor=south west,inner sep=0] (image) at (0,0)
+			% {\includegraphics[width=0.6\textwidth]{distorted_image}};
+			{\includegraphics[width=0.75\linewidth]{refined_corners2.png}};
+			\begin{scope}[x={(image.south east)},y={(image.north west)}]
+				% \spy[red] on (2.5,1.4) in node [left] at (10.1,1.7);
+				\spy[blue] on (3.0,2.4) in node [right] at (6.1,3.3);
+			\end{scope}
+		\end{tikzpicture}
+		\caption{Newly detected points
+			(\textcolor[HTML]{1f77b4}{unchanged}
+			\textcolor[HTML]{ff7f0e}{filtered out}
+			\textcolor[HTML]{2ca02c}{new corner}
+			\textcolor[HTML]{d62728}{out of image})}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Evaluation (real data, false positives)}
+
+	\begin{figure}
+		\begin{tikzpicture}[spy using outlines={circle,yellow,magnification=4,size=5cm, connect spies}]
+			\node[anchor=south west,inner sep=0] (image) at (0,0)
+			% {\includegraphics[width=0.6\textwidth]{distorted_image}};
+			{\includegraphics[width=0.7\linewidth]{refined_corners_bad_bad.png}};
+			\begin{scope}[x={(image.south east)},y={(image.north west)}]
+				% \spy[red] on (2.5,1.4) in node [left] at (10.1,1.7);
+				\spy[blue] on (2.6,2.0) in node [right] at (6.1,3.3);
+			\end{scope}
+		\end{tikzpicture}
+		\caption{Example of false positives
+			(\textcolor[HTML]{1f77b4}{unchanged}
+			\textcolor[HTML]{ff7f0e}{filtered out}
+			\textcolor[HTML]{2ca02c}{new corner}
+			\textcolor[HTML]{d62728}{out of image})}
 	\end{figure}
 
 \end{frame}
@@ -758,17 +964,156 @@
 
 \end{frame}
 
+\begin{frame}
+	\frametitle{Comparison}
+	\begingroup
+	\scriptsize
+
+	\setlength\tabcolsep{1.5pt} % default value: 6pt
+	\begin{table}
+		\begin{tabularx}{\textwidth}{@{} L *{6}{c} @{}}
+			\toprule
+			\multicolumn{1}{c}{\multirow{2}{*}{\centering\textbf{Supports}}}           &
+			\multicolumn{6}{c@{}}{\textbf{Name}}                                                                  \\
+			\cmidrule(l){2-7}                                                          &
+			\textbf{OpenCV\footcite{dudaAccurateDetectionLocalization2018}}            &
+			\textbf{TartanKalib\footcite{duisterhofTartanCalibIterativeWideAngle2022}} &
+			\textbf{Kalibr\footcite{mayeSelfsupervisedCalibrationRobotic2013}}         &
+			\textbf{OCamCalib\footcite{scaramuzzaToolboxEasilyCalibrating2006}}        &
+			\textbf{LIBCBDETECT\footcite{geigerAutomaticCameraRange2012}}              &
+			{\normalsize \textbf{Ours}}                                                                           \\
+			\midrule
+			Unknown board shape                                                        & \xmark & \cmark & \cmark
+			                                                                           & \cmark & \cmark & \cmark \\
+			\hline
+			Occlusion                                                                  & \xmark & \cmark & \cmark
+			                                                                           & \cmark & \cmark & \cmark \\
+			\hline
+			Model-based extra features detection                                       & \xmark & \cmark & \xmark
+			                                                                           & \xmark & \xmark & \cmark \\
+			\hline
+			Geometry-based extra features detection                                    & \xmark & \xmark & \xmark
+			                                                                           & \xmark & \xmark & \cmark \\
+			\bottomrule
+		\end{tabularx}
+		\caption{Comparison of feature detectors}
+	\end{table}
+	\endgroup
+\end{frame}
+
 \section{Conclusions}\label{sec:conclusions}
 
 \begin{frame}
-	\frametitle{Reviewers' comments}
+	\frametitle{Answers to the research questions}
 
-	\textbf{No comparison was made to classical camera calibration results and no
-		discussion why results differ.}
+	\begin{itemize}
+		\item \textbf{How to find additional features on the calibration board which were not
+			      detected by the feature detector?}\\
 
-	The main contribution is the feature detection step. The user can use the
-	found camera parameters, or pass the obtained features to any camera
-	calibration toolchain.
+		      This thesis proposes a model-based approach to improve the detection of
+		      calibration board fiducials from calibration imagery taken by wide-angle or
+		      fisheye lenses.
+		\item \textbf{How to filter out falsely detected features?}\\
+
+		      We proposed a classifier that filters false positives, and
+		      shown that it works well on real data.
+		\item \textbf{Is there a need for finding additional features on the calibration
+			      board? Are all of the points detected?}\\
+
+		      We demonstrated that the proposed method successfully detected
+		      additional features on the real data.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Reviewers' comments 1}
+	\textbf{No comparison was made to classical camera calibration results}
+
+	The main contribution is the feature detection step.
+
+	The algorithm estimates camera parameters, but we don't claim that they are
+	better than state-of-the-art. The user can use those, or pass the refined
+	features into any camera calibration toolchain.
+	% The user can use the
+	% obtained camera parameters, however, we do not claim that they will always beat the
+	% SOTA. Alternatively, the user should pass the refined features to any camera
+	% calibration toolchain.
+\end{frame}
+
+\begin{frame}
+	\frametitle{Reviewers' comments 2}
+	\textbf{The literature review
+		does not include a review of methods that solve the feature detection step in
+		a different way}
+
+	A review of feature detection methods is presented in the paper.
+
+	The specific subtask of model-based missed
+	feature detection is not big enough to have a separate review. However, we
+	included TartanKalib\footcite{duisterhofTartanCalibIterativeWideAngle2022}.
+\end{frame}
+
+\begin{frame}
+	\frametitle{Reviewers' comments 3}
+	\textbf{There is no general block diagram of the algorithm}
+
+	\begin{figure}
+		\begin{tikzpicture}[
+				block/.style={rectangle, draw, align=center, minimum width=2cm, minimum
+						height=1cm, font=\footnotesize},
+				line/.style={draw, -latex}
+			]
+			\node [block] (block1) {Feature\\ detection};
+			\node [block, right=of block1, minimum width=8cm, minimum height=3cm] (block2) {};
+			\node [block, at={(block2.center)}, xshift=-2.0cm] (block3) {Initialize camera\\ parameters (\(R\), \(\mathbf{t}\), \(\boldsymbol{\lambda}\))\\ using the solver};
+			\node [block, at={(block2.center)}, xshift=2.0cm] (block4) {Refine camera\\ parameters and\\ estimate \(K\)\\ by optimization};
+			\node [block, below=of block4] (block5) {Impute the gaps in\\ the board, and\\ extend it};
+			\node [block, left=of block5] (block6) {Get positions of\\ new points on\\ the image};
+			\node [block, left=of block6] (block7) {Filter out\\ false positives};
+
+			\node [above of=block2, node distance=1.8cm] {Camera calibration};
+
+			\path [line] (block1) -- (block3);
+			\path [line] (block3) -- (block4);
+			% \path [line] (block2) -| (block3);
+			% \path [line] (block2) -| (block4);
+			% \path [line] (block3) -- (block5);
+			\path [line] (block4) -- (block5);
+			\path [line] (block5) -- (block6);
+			\path [line] (block6) -- (block7);
+		\end{tikzpicture}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Reviewers' comments 4}
+	\textbf{It is not sufficiently described what results are obtained on
+		test sets}
+
+	The datasets we used did not contain the ground truth camera calibration.
+	Also, the algorithm does not include the learning step, hence there is no
+	reason to use the test set.
+	% Also, we used three datasets with different setup.
+\end{frame}
+
+\begin{frame}
+	\frametitle{Reviewers' comments 4}
+	\textbf{The questions "How to filter incorrectly defined grid points" and "Is there a
+		need to search for additional grid points" posed in the work are insufficiently disclosed}
+
+	Addressed in section Conclusions.
+\end{frame}
+
+\begin{frame}
+	\frametitle{Reviewers' comments 5}
+	\textbf{A comparison of the results with other feature detection methods has not been made}
+
+	We have added a feature-wise comparison to the state-of-the-art methods, and
+	numerical comparison to the
+	LIBCBDETECT\footcite{geigerAutomaticCameraRange2012} method.
+
+	The TartanKalib\footcite{duisterhofTartanCalibIterativeWideAngle2022} method
+	currently supports only AprilGrid boards.
 \end{frame}
 
 \begin{frame}[standout]
