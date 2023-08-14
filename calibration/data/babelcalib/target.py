@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Iterator
 
 import numpy as np
+from numpy.typing import NDArray
 
 
 class BoardType(enum.Enum):
@@ -26,7 +27,9 @@ class Target:
     pts: list[
         tuple[float, float, float]
     ]  # Designed positions of points in mm (x, y, z)
-    Rt: np.ndarray | None = None  # Rotation and translation matrix for the board
+    Rt: NDArray[
+        np.float64
+    ] | None = None  # Rotation and translation matrix for the board
 
 
 def _load_tp_file(tp_file: str, targets: list[Target]) -> list[Target]:

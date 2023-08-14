@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 import numpy as np
 from cbdetect_py import CornerType, Params, boards_from_corners, find_corners
+from numpy.typing import NDArray
 from tqdm.contrib.concurrent import process_map
 
 from calibration.data.babelcalib.babelcalib import Dataset
@@ -13,8 +14,8 @@ from calibration.projector.projector import Projector
 
 @dataclass
 class Features:
-    board: np.ndarray
-    corners: np.ndarray
+    board: NDArray[np.float64]
+    corners: NDArray[np.float64]
 
 
 SIMUL_INP = tuple[Projector, Features | None]
@@ -22,7 +23,7 @@ BABELCALIB_INP = tuple[Entry, Features | None]
 
 
 # TODO: Add noise
-def _simul_features(args: tuple[dict, np.ndarray]) -> SIMUL_INP:
+def _simul_features(args: tuple[dict, NDArray[np.float64]]) -> SIMUL_INP:
     kwargs, board = args
     p = Projector(**kwargs)
     with contextlib.suppress(ValueError):
@@ -37,7 +38,7 @@ def _simul_features(args: tuple[dict, np.ndarray]) -> SIMUL_INP:
     return (p, None)
 
 
-def simul_features(n: int, board: np.ndarray, kwargs: dict) -> list[SIMUL_INP]:
+def simul_features(n: int, board: NDArray[np.float64], kwargs: dict) -> list[SIMUL_INP]:
     # TODO: try partial
     args = ((kwargs, board) for _ in range(n))
     return process_map(

@@ -1,9 +1,11 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from functools import partial
-import numpy as np
-from tqdm.contrib.concurrent import process_map
-from calibration.benchmark.benchmark_result import BenchmarkResult, calc_error
 
+import numpy as np
+from numpy.typing import NDArray
+from tqdm.contrib.concurrent import process_map
+
+from calibration.benchmark.benchmark_result import BenchmarkResult
 from calibration.benchmark.features import Features
 from calibration.data.babelcalib.entry import Entry
 from calibration.feature_refiner.classifier import prune_corners
@@ -15,13 +17,13 @@ class RefinedResult:
     input: Entry
     features: Features
     refined_features: Features
-    responses: np.ndarray
+    responses: NDArray[np.float64]
     # Mask:
     # 0 - unchanged
     # 1 - filtered out
     # 2 - new corner
     # 3 - out of image
-    new_board_mask: np.ndarray
+    new_board_mask: NDArray[np.int_]
     prediction: Projector
     error: float
 
@@ -35,8 +37,7 @@ def view1D(a, b):  # a, b are arrays
 
 
 def refine_features_single(
-    r: BenchmarkResult, solver_name: str="Optimization", pan_size: int = 1,
-    thr=0.0019
+    r: BenchmarkResult, solver_name: str = "Optimization", pan_size: int = 1, thr=0.0019
 ) -> RefinedResult | None:
     assert isinstance(r.input, Entry) and r.input.image is not None
     board = r.features.board.astype(int)

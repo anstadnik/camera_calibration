@@ -1,14 +1,12 @@
 import numpy as np
 from tqdm.contrib.concurrent import process_map
+
 from calibration.augmentations.augmentations import overlay_img, prune_corners
 from calibration.benchmark.benchmark_result import BenchmarkResult
-
 from calibration.benchmark.calib import calibrate
-
 from calibration.benchmark.features import (
     BABELCALIB_INP,
     SIMUL_INP,
-    Features,
     babelcalib_features,
     simul_features,
 )

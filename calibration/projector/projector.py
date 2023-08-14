@@ -2,12 +2,13 @@ from dataclasses import dataclass, field
 
 import numpy as np
 from numpy.linalg import qr
+from numpy.typing import NDArray
 from scipy.optimize import root_scalar
 
 from .camera import Camera
 
 
-def _gen_lambdas() -> np.ndarray:
+def _gen_lambdas() -> NDArray[np.float64]:
     l1 = np.random.uniform(-5.0, 1.0)
     l2 = np.random.uniform(
         -2.61752136752137 * l1 - 6.85141810943093,
@@ -23,49 +24,51 @@ class Projector:
     onto a 2D image plane.
 
     Attributes:
-        R (np.ndarray):
+        R (NDArray[np.float64]):
             A 3x3 orthogonal matrix representing the projection rotation
             matrix (default: random).
-        t (np.ndarray):
+        t (NDArray[np.float64]):
             A 3D vector representing the projection translation vector
             (default: random).
-        lambdas (np.ndarray):
+        lambdas (NDArray[np.float64]):
             A 1D array of radial distortion coefficients (default: random).
         camera (Camera):
             A Camera object representing the camera intrinsics (default: Camera()).
-        distortion_center (np.ndarray):
+        distortion_center (NDArray[np.float64]):
             A 3D vector representing the distortion center
             (default: center of the image).
     """
 
-    R: np.ndarray = field(default_factory=lambda: qr(np.random.randn(3, 3))[0])
-    t: np.ndarray = field(
+    R: NDArray[np.float64] = field(default_factory=lambda: qr(np.random.randn(3, 3))[0])
+    t: NDArray[np.float64] = field(
         default_factory=lambda: np.random.uniform([-1.0, -0.7, 2.5], [0.0, -0.3, 4.0])
     )
-    lambdas: np.ndarray = field(default_factory=_gen_lambdas)
+    lambdas: NDArray[np.float64] = field(default_factory=_gen_lambdas)
     camera: Camera = field(default_factory=Camera)
 
     @property
-    def P(self) -> np.ndarray:
+    def P(self) -> NDArray[np.float64]:
         return np.c_[self.R[:, :2], self.t]
 
     def psi(self, r):
         l1, l2 = self.lambdas
         return 1 + l1 * r**2 + l2 * r**4
 
-    def project(self, X: np.ndarray, max_r: float | None = None) -> np.ndarray:
+    def project(
+        self, X: NDArray[np.float64], max_r: float | None = None
+    ) -> NDArray[np.float64]:
         """
         Simulates the projection of board points (X) onto a image plane,
         given the simulation parameters (p).
 
         Args:
 
-        X (np.ndarray):
+        X (NDArray[np.float64]):
             An array of point in the board space, with shape (n, 2),
             where n is the number of points and each point is represented as [x, y].
 
         Returns:
-            x (np.ndarray):
+            x (NDArray[np.float64]):
                 An array of point in the image space, with shape (n, 2),
                 where n is the number of points and each point is represented as [x, y].
         """
@@ -104,19 +107,19 @@ class Projector:
         x /= x[:, 2][:, None]
         return x[:, :2]
 
-    def backproject(self, x: np.ndarray) -> np.ndarray:
+    def backproject(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         """
         Simulates the backprojection of image points (x) onto a board plane,
         given the simulation parameters (p).
 
         Args:
 
-        x (np.ndarray):
+        x (NDArray[np.float64]):
             An array of point in the image space, with shape (n, 2),
             where n is the number of points and each point is represented as [x, y].
 
         Returns:
-            X (np.ndarray):
+            X (NDArray[np.float64]):
                 An array of point in the board space, with shape (n, 2),
                 where n is the number of points and each point is represented as [x, y].
         """

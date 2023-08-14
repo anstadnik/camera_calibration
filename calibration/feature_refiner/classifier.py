@@ -1,14 +1,14 @@
 import numpy as np
+from numpy.typing import NDArray
+import scipy.ndimage as ndi
+from cbdetect_py import hessian_response
 from PIL import ImageOps
 from PIL.Image import Image
-from cbdetect_py import hessian_response
+from sklearn.cluster import MeanShift
 from tqdm.auto import tqdm
+
 from calibration.benchmark.benchmark_result import BenchmarkResult
 from calibration.data.babelcalib.entry import Entry
-from calibration.feature_detector.checkerboard import detect_corners
-import cv2
-from sklearn.cluster import MeanShift, estimate_bandwidth
-import scipy.ndimage as ndi
 
 
 def find_modes_meanshift(hist):
@@ -23,31 +23,29 @@ def find_modes_meanshift(hist):
     labels_unique = np.unique(ms.labels_)
     cluster_centers = ms.cluster_centers_
 
-    modes = sorted(
+    return sorted(
         [
             (cluster_centers[k][0], np.mean(samples[ms.labels_ == k]))
             for k in labels_unique
         ],
-        key=lambda x: x[1],
+        key=lambda x: float(x[1]),
         reverse=True,
     )
 
-    return modes
-
 
 def compute_orientation(img, positions, window_size):
-    def sobel_filters(img):
-        Kx = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], np.float32)
-        Ky = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]], np.float32)
-
-        Ix = ndi.filters.convolve(img, Kx)
-        Iy = ndi.filters.convolve(img, Ky)
-
-        G = np.hypot(Ix, Iy)
-        G = G / G.max() * 255
-        theta = np.arctan2(Iy, Ix)
-
-        return (G, theta)
+    # def sobel_filters(img):
+    #     Kx = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], np.float32)
+    #     Ky = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]], np.float32)
+    #
+    #     Ix = ndi.filters.convolve(img, Kx)
+    #     Iy = ndi.filters.convolve(img, Ky)
+    #
+    #     G = np.hypot(Ix, Iy)
+    #     G = G / G.max() * 255
+    #     theta = np.arctan2(Iy, Ix)
+    #
+    #     return (G, theta)
 
     # G, theta = sobel_filters(img)
     Ix = ndi.sobel(img.astype(int), axis=0)
@@ -80,7 +78,7 @@ def compute_orientation(img, positions, window_size):
                 x - window_size // 2 : x + window_size // 2 + 1,
             ]
 
-            histogram, bin_edges = np.histogram(
+            histogram, _ = np.histogram(
                 window, bins=32, weights=weights, range=(-np.pi, np.pi)
             )
 
@@ -105,8 +103,8 @@ def compute_orientation(img, positions, window_size):
 
 
 def prune_corners(
-    corners: np.ndarray, mask: np.ndarray, image: Image, thr: float
-) -> tuple[np.ndarray, np.ndarray]:
+    corners: NDArray[np.float64], mask_: NDArray[np.bool_], image: Image, thr: float
+) -> tuple[NDArray[np.float64], NDArray[np.int_]]:
     # cornerness = detect_corners(np.array(ImageOps.grayscale(image)))
     cornerness = hessian_response(np.array(ImageOps.grayscale(image)))
     # import plotly.express as px
@@ -116,9 +114,9 @@ def prune_corners(
         cornerness = cornerness.repeat(2, axis=0).repeat(2, axis=1)
     # assert cornerness.shape == ImageOps.grayscale(image).size
 
-    corners = corners.astype(int)[mask]
+    corners = corners.astype(int)[mask_]
     # 0: original, 1: new
-    mask = mask.astype(int)
+    mask = mask_.astype(int)
 
     out_of_img = ((corners < 0) | (corners >= image.size)).any(axis=1).astype(int)
     # Now mask is an array of 0, 1 and 3

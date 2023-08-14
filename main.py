@@ -1,14 +1,12 @@
+import os
 import pickle as pkl
-import numpy as np
 
-from pandas.compat import os
+import numpy as np
 
 from calibration.benchmark.benchmark import (
     BenchmarkResult,
     benchmark_babelcalib,
-    benchmark_simul,
 )
-from calibration.data.babelcalib.babelcalib import load_babelcalib
 from calibration.data.babelcalib.entry import Entry
 from calibration.feature_refiner.refine import refine_features
 from calibration.projector.camera import Camera
@@ -17,15 +15,15 @@ from calibration.solver.optimization.solve import solve
 
 def run_benchmark():
     for aug in [None, "overlay", "prune_corners"]:
-    # for aug in [None]:
+        # for aug in [None]:
         path = f"babelcalib_results_{aug}.pkl"
         if True or not os.path.isfile(path):
-            # babelcalib_results = benchmark_babelcalib(aug=aug)
-            #
-            # with open(path, "wb") as f:
-            #     pkl.dump(babelcalib_results, f)
-            with open(path, "rb") as f:
-                babelcalib_results = pkl.load(f)
+            babelcalib_results = benchmark_babelcalib(aug=aug)
+
+            with open(path, "wb") as f:
+                pkl.dump(babelcalib_results, f)
+            # with open(path, "rb") as f:
+            #     babelcalib_results = pkl.load(f)
             refined_babelcalib_results = refine_features(babelcalib_results)
             with open(f"refined_babelcalib_results_{aug}.pkl", "wb") as f:
                 pkl.dump(refined_babelcalib_results, f)

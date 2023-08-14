@@ -1,9 +1,8 @@
 import jax.numpy as jnp
 import numpy as np
 import jax
+from numpy.typing import NDArray
 from scipy.spatial.transform import Rotation
-from calibration.benchmark.benchmark_result import calc_error
-from calibration.benchmark.features import Features
 from calibration.projector.camera import Camera
 from calibration.projector.projector import Projector
 from calibration.solver.optimization.helpers import params_to_proj
@@ -11,7 +10,7 @@ from calibration.solver.optimization.optimize import optimize_optax
 from calibration.solver.scaramuzza.solve import solve as solve_scaramuzza
 
 jArr = jax.Array
-nArr = np.ndarray
+nArr = NDArray[np.float64]
 
 
 def solve(corners: nArr, board: nArr, camera: Camera) -> Projector | None:
@@ -50,9 +49,9 @@ def solve(corners: nArr, board: nArr, camera: Camera) -> Projector | None:
     #     for th_z in (0.0, jnp.pi)
     # ]
     args = jnp.array(corners), jnp.array(board), jnp.array(resolution)
-    params, hist = optimize_optax(init_params, *args)
+    params, _ = optimize_optax(init_params, *args)
     # losses = [backprojection_loss(params, *args) for params in paramss]
     # params = paramss[np.argmin(losses)]
-    ret = params_to_proj(params, resolution)
     # print(f"Final error: {calc_error(ret, Features(board, corners)):0.3f}")
-    return ret, hist
+    # return ret, hist
+    return params_to_proj(params, resolution)
