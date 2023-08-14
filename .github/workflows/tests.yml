@@ -21,9 +21,7 @@ jobs:
         with:
           micromamba-version: "latest"
           environment-file: environment.yml
-          init-shell: >-
-            bash
-            # powershell
+          init-shell: bash
           cache-environment: true
           post-cleanup: "all"
 
