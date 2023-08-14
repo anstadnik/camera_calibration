@@ -43,11 +43,11 @@
 #                     self.fail("ValueError in benchmark_simul")
 #                 for k, v in kwargs.items():
 #                     for r in results:
-#                         if isinstance(v, np.ndarray):
+#                         if isinstance(v, NDArray[np.float64]):
 #                             np.testing.assert_array_equal(getattr(r.input, k), v)
 #                         else:
 #                             for f in fields(v):
-#                                 if isinstance(getattr(v, f.name), np.ndarray):
+#                                 if isinstance(getattr(v, f.name), NDArray[np.float64]):
 #                                     np.testing.assert_array_equal(
 #                                         getattr(v, f.name), getattr(camera, f.name)
 #                                     )

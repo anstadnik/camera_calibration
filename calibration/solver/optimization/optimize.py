@@ -3,12 +3,9 @@ import numpy as np
 import jax.numpy as jnp
 import optax
 import jax
-from calibration.benchmark.benchmark_result import calc_error
 from calibration.benchmark.features import Features
 
-from calibration.solver.optimization.backproject import backproject, backprojection_loss
-from calibration.solver.optimization.helpers import params_to_proj
-from calibration.solver.optimization.rotation import euler_angles_to_rotation_matrix
+from calibration.solver.optimization.backproject import backprojection_loss
 
 jArr = jax.Array
 
@@ -21,7 +18,7 @@ def optimize_optax(
     # step_size=0.001,
     step_size=0.005,
     patience=100,
-) -> dict[str, jArr]:
+) -> tuple[dict[str, jArr], list]:
     # optimizer = optax.rmsprop(step_size)
     # optimizer = optax.adam(step_size)
     optimizer = optax.amsgrad(step_size)
@@ -76,8 +73,8 @@ def optimize_optax(
     phase = 0
     hist = []
     best_params, best_loss = None, np.inf
-    best_corners_error, best_board_error, best_error = np.inf, np.inf, np.inf
-    features = Features(np.array(board), np.array(corners))
+    # best_corners_error, best_board_error, best_error = np.inf, np.inf, np.inf
+    Features(np.array(board), np.array(corners))
     while True:
         params, opt_state, loss_history = step(
             i, params, opt_state, loss_history, phase
@@ -85,7 +82,7 @@ def optimize_optax(
         loss_val = loss_history[i % patience]
         # if i % 1000 == 0:
         #     proj_ = params_to_proj(params.copy(), np.array(resolution))
-            # if proj_ is not None:
+        #     if proj_ is not None:
             #     try:
             #         corners_ = proj_.project(np.array(board))
             #         corners_error = np.linalg.norm(corners_ - corners)
@@ -94,7 +91,8 @@ def optimize_optax(
             #         corners_error = np.inf
             #         # print("failed projecting")
             #     board_ = proj_.backproject(np.array(corners).astype(np.float32))
-            #     theta = jnp.concatenate([params["theta_x"], params["theta_y"], params["theta_z"]])
+            #     theta = jnp.concatenate([params["theta_x"], params["theta_y"],
+                                           #     params["theta_z"]])
             #     R = euler_angles_to_rotation_matrix(theta)
             #     t = params["t"]
             #     lambdas = params["lambdas"]
@@ -103,14 +101,6 @@ def optimize_optax(
             #     fx, fy = params["focal_length"] / pixel_size
             #     cx, cy = resolution / 2
             #     intrinsic_matrix = jnp.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]])
-            #     # print(f"R: {np.linalg.norm(R - proj_.R)}, "
-            #     #       f"t: {np.linalg.norm(t - proj_.t)}, "
-            #     #       f"lambdas: {np.linalg.norm(lambdas - proj_.lambdas)}, "
-            #     #       f"intrinsics: {np.linalg.norm(intrinsic_matrix - proj_.camera.intrinsic_matrix)}")
-            #     # print(f"Resolution: {np.linalg.norm(resolution - proj_.camera.resolution)}"
-            #     #       f"Sensor size: {np.linalg.norm(params['sensor_size'] - proj_.camera.sensor_size)}"
-            #     #       f"Focal length: {np.linalg.norm(params['focal_length'] - proj_.camera.focal_length)}"
-            #     #       f"Skew: {proj_.camera.skew}")
             #
             #     board__ = backproject(corners, R, t, lambdas, intrinsic_matrix)
             #     # print(f"Board error: {np.linalg.norm(board_ - board__)}")
@@ -125,9 +115,10 @@ def optimize_optax(
             #     )
 
                 # print(
-                #     f"iteration: {i}, loss {loss_val}/{np.array(loss_)}, phase: {phase}, "
-                #     f"corners error: {corners_error:0.3f} vs {best_corners_error:0.3f}, "
-                #     f"board error: {board_error:0.3f} vs {best_board_error:0.3f}, "
+                #     f"iteration: {i}, loss {loss_val}/{np.array(loss_)}, "
+                #     f"phase: {phase}, corners error: {corners_error:0.3f} "
+                #     f"vs {best_corners_error:0.3f}, board error: "
+                #     f""{board_error:0.3f} vs {best_board_error:0.3f}, "
                 #     f"error: {calc_error(proj_, features):0.3f} vs {best_error:0.3f}"
                 # )
 
@@ -156,7 +147,7 @@ def optimize_optax(
 
         i += 1
 
-    assert isinstance(params, dict)
+    assert isinstance(best_params, dict)
     # import plotly.express as px
     # px.line(hist).show()
     return best_params, hist

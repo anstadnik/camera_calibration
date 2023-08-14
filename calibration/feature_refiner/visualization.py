@@ -1,15 +1,16 @@
 import numpy as np
+from numpy.typing import NDArray
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
 
 def show_refined_corners(
-    img: np.ndarray,
-    corners: np.ndarray,
-    board: np.ndarray,
-    mask: np.ndarray,
-    responses: np.ndarray,
+    img: NDArray[np.float64],
+    corners: NDArray[np.float64],
+    board: NDArray[np.float64],
+    mask: NDArray[np.float64],
+    responses: NDArray[np.float64],
 ) -> go.Figure:
     fig1 = px.imshow(img, binary_string=True)
 
@@ -56,6 +57,11 @@ def show_refined_corners(
         "#bcbd22",  ## curry yellow-green
         "#17becf",  ## blue-teal
     ]
+    colors = [
+
+        "#17becf",  ## blue-teal
+            ]
+    df = df[df['mask'] == 'unchanged']
 
     fig2 = px.scatter(
         # df, x="x", y="y", color="resp", symbol="mask", hover_data=["i", "j"]
@@ -67,6 +73,6 @@ def show_refined_corners(
         # df, x="x", y="y", hover_data=["i", "j", "resp"]
         color_discrete_sequence=colors,
         category_orders={"mask": list(mask_mapping.values())},
-    ).update_traces(marker=dict(size=10))
+    ).update_traces(marker=dict(size=15))
     assert isinstance(fig1.data, tuple) and isinstance(fig2.data, tuple)
     return go.Figure(data=fig1.data + fig2.data)

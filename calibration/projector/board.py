@@ -1,8 +1,9 @@
 import numpy as np
+from numpy.typing import NDArray
 import plotly.express as px
 
 
-def gen_checkerboard_grid(h: int, w: int) -> np.ndarray:
+def gen_checkerboard_grid(h: int, w: int) -> NDArray[np.float64]:
     """Generate a checkerboard pattern
 
     Args:
@@ -10,7 +11,7 @@ def gen_checkerboard_grid(h: int, w: int) -> np.ndarray:
         w: width
 
     Returns:
-        np.ndarray: Array of pairs of [x, y]
+        NDArray[np.float64]: Array of pairs of [x, y]
     """
     board = np.array([[x, y] for y in range(h) for x in range(w)], np.float64)
     board /= board.max(axis=0)
@@ -18,7 +19,9 @@ def gen_checkerboard_grid(h: int, w: int) -> np.ndarray:
     return board
 
 
-def gen_charuco_grid(h: int, w: int, s1: float, s2: float | None = None) -> np.ndarray:
+def gen_charuco_grid(
+    h: int, w: int, s1: float, s2: float | None = None
+) -> NDArray[np.float64]:
     """Generate a charruco pattern
 
     Args:
@@ -28,7 +31,7 @@ def gen_charuco_grid(h: int, w: int, s1: float, s2: float | None = None) -> np.n
         s2: step size for y (default: s1)
 
     Returns:
-        np.ndarray: Array of pairs of [x, y]
+        NDArray[np.float64]: Array of pairs of [x, y]
     """
     s2 = s2 if s2 is not None else s1
     x = [i / 2 if i % 2 == 0 else (i - 1) / 2 + s1 for i in range(w)]
@@ -40,7 +43,9 @@ def gen_charuco_grid(h: int, w: int, s1: float, s2: float | None = None) -> np.n
 
 
 def draw_board(
-    board: np.ndarray, title: str | None = None, max_xy: np.ndarray | None = None
+    board: NDArray[np.float64],
+    title: str | None = None,
+    max_xy: NDArray[np.float64] | None = None,
 ):
     range_x = None if max_xy is None else (0, max_xy[0])
     range_y = None if max_xy is None else (0, max_xy[1])

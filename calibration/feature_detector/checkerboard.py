@@ -9,7 +9,7 @@ from numpy import pi
 # import cv2
 #
 # try:
-#     import gputools  
+#     import gputools
 #
 #     GPUTOOLS = True
 # except ImportError:
@@ -113,34 +113,31 @@ def detect_corners(gray, radiuses=RADIUS):
     for angle_1, angle_2 in TPROPS:
         for radius in radiuses:
             temp = create_correlation_patch(angle_1, angle_2, radius)
-            import plotly.express as px
-            # for t_i, t in enumerate(temp):
-            #     px.imshow(t, title=f"{angle_1=}, {angle_2=}, {radius=}, {t_i=}").show()
             corr = detect_corners_template(gray, temp)
             out = np.max([corr, out], axis=0)
 
     return out
 
 
-
 def get_corner_candidates(corr, step=40, thres=0.01):
     out = []
     check = set()
-    for i in range(0, corr.shape[0], step//2):
-        for j in range(0, corr.shape[1], step//2):
-            region = corr[i:i+step, j:j+step]  # type: ignore
+    for i in range(0, corr.shape[0], step // 2):
+        for j in range(0, corr.shape[1], step // 2):
+            region = corr[i : i + step, j : j + step]  # type: ignore
             ix = np.argmax(region)
             r, c = np.unravel_index(ix, region.shape)
             val = region[r, c]
-            if val > thres and (r+i, c+j) not in check:
-                out.append( (r+i, c+j, val) )
-                check.add( (r+i, c+j) )
+            if val > thres and (r + i, c + j) not in check:
+                out.append((r + i, c + j, val))
+                check.add((r + i, c + j))
     return np.array(out)
+
 
 def non_maximum_suppression(corners, dist=40):
     tree = cKDTree(corners[:, :2])
-    good = np.ones(len(corners), dtype='bool')
-    for (a, b) in tree.query_pairs(dist):
+    good = np.ones(len(corners), dtype="bool")
+    for a, b in tree.query_pairs(dist):
         if not good[a] or not good[b]:
             continue
         sa = corners[a, 2]
@@ -151,13 +148,14 @@ def non_maximum_suppression(corners, dist=40):
             good[a] = False
     return corners[good]
 
+
 def solve_patch_corner(dx, dy):
-    matsum = np.zeros((2,2))
+    matsum = np.zeros((2, 2))
     pointsum = np.zeros(2)
     for i in range(dx.shape[0]):
         for j in range(dx.shape[1]):
-            vec = [dy[i,j], dx[i,j]]
-            pos = (i,j)
+            vec = [dy[i, j], dx[i, j]]
+            pos = (i, j)
             mat = np.outer(vec, vec)
             pointsum += mat.dot(pos)
             matsum += mat
@@ -167,8 +165,9 @@ def solve_patch_corner(dx, dy):
     except np.linalg.LinAlgError:
         return None
 
-    newp = minv.dot(pointsum)
-    return newp
+    return minv.dot(pointsum)
+
+
 #
 # def get_angle_modes(corners, gray, winsize=11):
 #     halfwin = (winsize-1)//2
@@ -228,7 +227,7 @@ def solve_patch_corner(dx, dy):
 #
 #
 def refine_corners(corners, gray, winsize=11, check_only=False):
-    halfwin = (winsize-1)//2
+    halfwin = (winsize - 1) // 2
 
     out = []
 
@@ -240,16 +239,16 @@ def refine_corners(corners, gray, winsize=11, check_only=False):
         y = int(round(y))
         x = int(round(x))
 
-        rx = dx[y-halfwin:y+halfwin+1, x-halfwin:x+halfwin+1]
-        ry = dy[y-halfwin:y+halfwin+1, x-halfwin:x+halfwin+1]
+        rx = dx[y - halfwin : y + halfwin + 1, x - halfwin : x + halfwin + 1]
+        ry = dy[y - halfwin : y + halfwin + 1, x - halfwin : x + halfwin + 1]
 
         newp = solve_patch_corner(rx, ry)
         if newp is None:
-            continue # bad point
+            continue  # bad point
 
         newp = newp - [halfwin, halfwin]
-        if np.any(np.abs(newp) > halfwin+1):
-            continue # bad point
+        if np.any(np.abs(newp) > halfwin + 1):
+            continue  # bad point
 
         coord = newp + [y, x]
         if check_only:
@@ -260,40 +259,38 @@ def refine_corners(corners, gray, winsize=11, check_only=False):
     return np.array(out)
 
 
-
 def normalize_image(img):
-    if len(img.shape) > 2:
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    else:
-        gray = img
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) if len(img.shape) > 2 else img
     blur_size = int(np.sqrt(gray.size) / 2)
-    grayb = cv2.GaussianBlur(gray, (3,3), 1)
+    grayb = cv2.GaussianBlur(gray, (3, 3), 1)
     gray_mean = cv2.blur(grayb, (blur_size, blur_size))
-    diff = (np.float32(grayb)-gray_mean) / 255.0
-    diff = np.clip(diff, -0.2, 0.2)+0.2
+    diff = (np.float32(grayb) - gray_mean) / 255.0
+    diff = np.clip(diff, -0.2, 0.2) + 0.2
     diff = (diff - np.min(diff)) / (np.max(diff) - np.min(diff))
     return diff
 
-def checkerboard_score(corners, size=(9,6)):
+
+def checkerboard_score(corners, size=(9, 6)):
     corners_reshaped = corners[:, :2].reshape(*size, 2)
-    maxm = 0
+    maxm = 0.0
     for rownum in range(size[0]):
-        for colnum in range(1,size[1]-1):
-            pts = corners_reshaped[rownum, [colnum-1, colnum, colnum+1]]
-            top = np.linalg.norm(pts[2] + pts[0] - 2*pts[1])
+        for colnum in range(1, size[1] - 1):
+            pts = corners_reshaped[rownum, [colnum - 1, colnum, colnum + 1]]
+            top = np.linalg.norm(pts[2] + pts[0] - 2 * pts[1])
             bot = np.linalg.norm(pts[2] - pts[0])
             if np.abs(bot) < 1e-9:
                 return 1
-            maxm = max(top/bot, maxm)
-    for colnum in range(0,size[1]):
-        for rownum in range(1, size[0]-1):
-            pts = corners_reshaped[[rownum-1, rownum, rownum+1], colnum]
-            top = np.linalg.norm(pts[2] + pts[0] - 2*pts[1])
+            maxm = max(float(top / bot), maxm)
+    for colnum in range(size[1]):
+        for rownum in range(1, size[0] - 1):
+            pts = corners_reshaped[[rownum - 1, rownum, rownum + 1], colnum]
+            top = np.linalg.norm(pts[2] + pts[0] - 2 * pts[1])
             bot = np.linalg.norm(pts[2] - pts[0])
             if np.abs(bot) < 1e-9:
                 return 1
-            maxm = max(top/bot, maxm)
+            maxm = max(float(top / bot), maxm)
     return maxm
+
 
 # def make_mask_line(shape, start, end, thickness=2):
 #     start = tuple([int(x) for x in start])

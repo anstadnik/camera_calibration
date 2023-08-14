@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.typing import NDArray
 
 from calibration.projector.camera import Camera
 from calibration.projector.projector import Projector
@@ -7,7 +8,7 @@ from .extrinsics import solve_extrinsic
 from .intrinsics import solve_intrinsic
 
 
-def solve(x: np.ndarray, X: np.ndarray, camera: Camera) -> Projector:
+def solve(x: NDArray[np.float64], X: NDArray[np.float64], camera: Camera) -> Projector:
     """Find intrinsic and extrinsic parameters for a set of points
 
     Args:

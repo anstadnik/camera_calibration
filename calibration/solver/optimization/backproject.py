@@ -18,12 +18,12 @@ def backproject(
 
     Args:
 
-    x (np.ndarray):
+    x (NDArray[np.float64]):
         An array of point in the image space, with shape (n, 2),
         where n is the number of points and each point is represented as [x, y].
 
     Returns:
-        X (np.ndarray):
+        X (NDArray[np.float64]):
             An array of point in the board space, with shape (n, 2),
             where n is the number of points and each point is represented as [x, y].
     """

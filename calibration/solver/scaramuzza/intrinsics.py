@@ -1,22 +1,25 @@
 import numpy as np
+from numpy.typing import NDArray
 
 
 def solve_intrinsic(
-    x: np.ndarray, X: np.ndarray, p: np.ndarray
-) -> tuple[np.ndarray, np.ndarray]:
+    x: NDArray[np.float64], X: NDArray[np.float64], p: NDArray[np.float64]
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """
     Computes the intrinsic parameters of a camera, given the 2D image points,
     the 3D world points, and the extrinsic parameters.
 
     Args:
-        x (np.ndarray): Points in image space, with shape (n, 2),
+        x (NDArray[np.float64]): Points in image space, with shape (n, 2),
             where n is the number of points and each point is represented as [x, y].
-        X (np.ndarray): Points in the board space, with shape (n, 2),
+        X (NDArray[np.float64]): Points in the board space, with shape (n, 2),
             where n is the number of points and each point is represented as [x, y].
-        p (np.ndarray): A 3x3 array representing the extrinsic parameters of the camera.
+        p (NDArray[np.float64]): A 3x3 array representing the extrinsic parameters
+            of the camera.
 
     Returns:
-        tuple[np.ndarray, np.ndarray]: A tuple containing the intrinsic parameters
+        tuple[NDArray[np.float64], NDArray[np.float64]]: A tuple containing the
+            intrinsic parameters
             (lambdas) and the updated extrinsic parameters (H)
             with the third translation component (t_3).
     """

@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Callable
 import numpy as np
+from numpy.typing import NDArray
 from tqdm.contrib.concurrent import process_map
 
 from calibration.projector.camera import Camera
@@ -9,7 +10,7 @@ from calibration.projector.projector import Projector
 from .features import Features
 
 
-_SOLVER = Callable[[np.ndarray, np.ndarray, Camera], Projector | None]
+_SOLVER = Callable[[NDArray[np.float64], NDArray[np.float64], Camera], Projector | None]
 
 
 def _calibrate_helper(

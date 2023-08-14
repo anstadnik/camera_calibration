@@ -35,8 +35,8 @@ class TestProjectorAndSolverOptimization(unittest.TestCase):
             Camera(135.0, np.array([40, 30]), np.array([1920, 1080]), 1.0),
         ]
         ts_for_cameras = [
-            list(map(np.array, product([-1.0, 0.0], [-0.7, -0.3], [3.0, 4.0]))),
-            list(map(np.array, product([-1.7, -0.8], [-1.2, -0.8], [20.0]))),
+            list(map(np.array, iter(product([-1.0, 0.0], [-0.7, -0.3], [3.0, 4.0])))),
+            list(map(np.array, iter(product([-1.7, -0.8], [-1.2, -0.8], [20.0])))),
         ]
         boards = [gen_checkerboard_grid(7, 9), gen_charuco_grid(7, 9, 0.4, 0.2)]
 
@@ -63,6 +63,7 @@ class TestProjectorAndSolverOptimization(unittest.TestCase):
                 x_ = proj_.project(board)
                 np.testing.assert_allclose(x_, x, atol=1e-10, rtol=1e-5)
 
+        # sourcery skip: no-loop-in-tests
         for solve_name, solve in [
             ("optimization", solve_optimization),
             ("scaramuzza", solve_scaramuzza),

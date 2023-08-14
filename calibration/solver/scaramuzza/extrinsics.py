@@ -1,29 +1,34 @@
 import numpy as np
+from numpy.typing import NDArray
 from scipy.linalg import svd
 
 
-def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> list[np.ndarray]:
+def solve_extrinsic(
+    x: NDArray[np.float64], X: NDArray[np.float64]
+) -> list[NDArray[np.float64]]:
     """
     Computes the extrinsic parameters of a camera, given the 2D image points and
     the 3D world points.
 
     Args:
-        x (np.ndarray): Points in image space, with shape (n, 2),
+        x (NDArray[np.float64]): Points in image space, with shape (n, 2),
             where n is the number of points and each point is represented as [x, y].
-        X (np.ndarray): Points in the board space, with shape (n, 2),
+        X (NDArray[np.float64]): Points in the board space, with shape (n, 2),
             where n is the number of points and each point is represented as [x, y].
         image_center (tuple[float, float]): A tuple representing the
             image center coordinates (x, y).
 
     Returns:
-        np.ndarray: A 3x3 array representing the extrinsic parameters of the camera."""
+        NDArray[np.float64]: A 3x3 array representing the extrinsic parameters of the camera.
+    """
     M = np.vstack(
         [[-v * X_, -v * Y_, u * X_, u * Y_, -v, u] for (u, v), (X_, Y_) in zip(x, X)]
     )
 
-    # _, _, V = np.linalg.svd(M, full_matrices=False)
+    V: NDArray[np.float64]
     _, _, V = svd(M, full_matrices=False)
     assert isinstance(V, np.ndarray)
+    # Assert that it's np array of float
     H = V.T[:, -1]
     r_11, r_12, r_21, r_22, t_1, t_2 = H
 
@@ -79,5 +84,5 @@ def solve_extrinsic(x: np.ndarray, X: np.ndarray) -> list[np.ndarray]:
     #                               not behind it)
     RR_t1_dists = np.linalg.norm(RR[:2, 2, :] - x[0][:, np.newaxis], axis=0)
     min_, max_ = np.min(RR_t1_dists), np.max(RR_t1_dists)
-    min_ids =np.nonzero(RR_t1_dists < min_ + ((max_-min_) / 100) )[0]
+    min_ids = np.nonzero(RR_t1_dists < min_ + ((max_ - min_) / 100))[0]
     return [RR[:, :, i] for i in min_ids]

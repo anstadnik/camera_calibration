@@ -10,12 +10,12 @@ dependencies:
 - ipython
 - ipywidgets
 - isort
-- jaxopt
+# - jaxopt
 - jupyterlab-git
 - jupyterlab-katex
 - jupyterlab-lsp
 - jupyterlab_code_formatter
-- numba
+# - numba
 - numpy
 - opencv
 - optax
