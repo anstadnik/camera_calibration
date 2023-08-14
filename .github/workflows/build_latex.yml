@@ -9,24 +9,13 @@ jobs:
     name: A job to Compile Latex file
     steps:
       - uses: actions/checkout@v3
-      - name: Make a Copy of the Original PDF
-        run: cp paper/paper.pdf original_copy.pdf
-      - name: Make a Copy of the Original PDF
-        run: cp paper/presentation.pdf original_copy.pdf
-      - name: Compilation
-        uses: vinay0410/tectonic-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: wtfjoke/setup-tectonic@v2
         with:
-          tex_path: "paper/paper.tex"
-          push: "no"
-      - name: Compilation
-        uses: vinay0410/tectonic-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tex_path: "paper/presentation.tex"
-          push: "no"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: cp paper/paper.pdf original_copy.pdf
+      - run: cp paper/presentation.pdf original_copy.pdf
+      - run: tectonic paper/paper.pdf
+      - run: tectonic paper/presentation.pdf
       - name: Compare paper/paper.pdf with paper/paper_copy.pdf
         run: |
           if ! cmp --silent paper/paper.pdf paper/paper_copy.pdf; then
