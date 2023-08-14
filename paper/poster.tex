@@ -1,0 +1,337 @@
+\documentclass[
+  twocolumn,
+  % 10pt,
+  % english,
+  % onehalfspacing,
+]{article} % Method A for two-column formatting
+\usepackage{preprint}
+
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{cleveref}
+\usepackage{xfrac}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{cases}
+\usepackage[noblocks]{authblk}
+\usepackage[backend=biber,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
+\addbibresource{references.bib}
+
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+% \title{Corner localization and camera calibration from imaged lattices\\
+% \large supplementary material}
+\title{Corner localization and camera calibration from imaged lattices
+(supplementary material)}
+\author{Andrii Stadnik}
+\affil{Faculty of Computer Science, Ukrainian Catholic University, Lviv, Ukraine}
+\author{James Pritts}
+\affil{Czech Institute of Informatics, Robotics and Cybernetics at Czech Technical University in Prague, Czechia}
+\date{2023}
+
+\begin{document}
+
+\twocolumn[
+	\begin{@twocolumnfalse}
+		\maketitle
+	\end{@twocolumnfalse}
+]
+
+\section{Camera model}\label{sec:camera_model}
+
+\subsection{Notation}\label{sub:notation}
+
+\begin{table}[htbp]
+	\centering
+	\begin{tabularx}{\columnwidth}{lL} % use L for the long text column
+		\toprule
+		Term                           & Description                                                       \\
+		\midrule
+		\(\mathbf{u} = \begin{pmatrix}
+			               u, v, 1
+		               \end{pmatrix}^{T}\) & A point in the image space                                    \\
+		\(\mathbf{x} = \begin{pmatrix}
+			               x, y, z, 1
+		               \end{pmatrix}^{T}\) & A point in the world space                                    \\
+		\(R\)                          & A \(3 \times 3\) rotation matrix                                  \\
+		\(\mathbf{t}\)                 & A  translation vector of length \(3\)                             \\
+		\(\alpha_x, \alpha_y\)         & Scale factor in the x and y direction                             \\
+		\(c_x, c_y\)                   & Coordinates of the principal point                                \\
+		\(\theta\)                     & Angle between the x and y pixel axes                              \\
+		\(f\)                          & Distance from the camera center to the image plane (focal length) \\
+		\(f_x, f_y\)                   & Focal lengths in the x and y directions                           \\
+		\(K\)                          & Intrinsic matrix                                                  \\
+		\(H\)                          & A \(3 \times 3\) matrix viewing \(z=0\)                           \\
+		\(\lambda_n\)                  & Distortion coefficients                                           \\
+		\bottomrule
+	\end{tabularx}
+	\caption{Notation}
+	\label{tab:notation}
+\end{table}
+
+\subsection{Extrinsic parameters}\label{sub:extrinsic_parameters}
+
+The extrinsic parameters represent a rigid transformation from a 3-D world
+coordinate system to the 3-D camera’s coordinate system.
+
+\begin{equation*}
+	\hat{\mathbf{x}} =
+	R \begin{pmatrix}
+		x, y, z
+	\end{pmatrix}^{T} + \mathbf{t} =
+	\begin{bmatrix}
+		R              & \mathbf{t} \\
+		\mathbf{0}^{T} & 1
+	\end{bmatrix} \begin{pmatrix}
+		x, y, z, 1
+	\end{pmatrix}^{T},
+\end{equation*}
+where
+\(\begin{pmatrix}
+	x, y, z
+\end{pmatrix}^{T}\) is a 3D scene point,
+% \(R \begin{pmatrix}
+% 	x, y, z
+% \end{pmatrix}^{T} + \mathbf{t}\), where
+\(R\) is a \(3 \times 3\) rotation matrix
+and \(\mathbf{t}\) is
+a \(3 \times 1\) translation vector.
+
+Assuming coplanar scene points (\(z = 0\)):
+\begin{equation*}
+	\alpha \begin{pmatrix}
+		u \\ v \\ 1
+	\end{pmatrix} = \begin{bmatrix}
+		\mathbf{r_1} & \mathbf{r_2} & \mathbf{r_3} & \mathbf{t}
+	\end{bmatrix} \begin{pmatrix}
+		x \\ y \\ 0 \\ 1
+		% \end{pmatrix} = \begin{bmatrix}
+		%   \mathbf{p_1} & \mathbf{p_2} & \mathbf{p_4}
+		% \end{bmatrix} \begin{pmatrix}
+		%   x \\ y \\ 1
+		% \end{pmatrix}.
+	\end{pmatrix} = \underbrace{\begin{bmatrix}
+			\mathbf{r_1} & \mathbf{r_2} & \mathbf{t}
+		\end{bmatrix}}_{H} \begin{pmatrix}
+		x \\ y \\ 1
+	\end{pmatrix}.
+\end{equation*}
+
+\subsection{Distortion model}
+The distortion of the image is caused by the lens not being perfectly planar.
+We used the division distortion model
+\citep{fitzgibbonSimultaneousLinearEstimation2001} which maps a
+point from a retinal plane to the
+ray direction in the camera coordinates system.
+\begin{equation*}
+	g(\mathbf{\hat{u}}) = \begin{pmatrix}
+		u, v, \psi(r(\mathbf{\hat{u}}))
+	\end{pmatrix}^{T},
+	\psi(\rho) = 1 + \sum_{n = 1}^{N} \lambda_n \rho^{2n},
+\end{equation*}
+where
+\(\mathbf{\hat{u}} = \begin{pmatrix}
+	u, v, 1
+\end{pmatrix}^{T}\) is a point in the retinal plane
+, \(r(\mathbf{\hat{u}}) = \sqrt{u^2 + v^2}\) is the radial distance from the
+principal point and \(\lambda_n\) are the distortion coefficients.
+
+\subsubsection{Back-projection using the Division Model}\label{subsub:back_projection_using_the_division_model}
+
+The function \(\psi(\cdot)\) is not invertible in general.
+Let \(\mathbf{\hat{x}} = \begin{pmatrix}
+	x, y, z
+\end{pmatrix}^{T} = \alpha g(\mathbf{\hat{u}})\) be a ray in the camera coordinate system.
+
+Then,
+\begin{equation} \label{eq:division_derivation1}
+	\frac{\mathbf{x}}{z}  =
+	\begin{pmatrix}
+		\frac{x}{z}, \frac{y}{z}, 1
+	\end{pmatrix}^{T}                                                                      =
+	\begin{pmatrix}
+		\frac{\alpha u}{\alpha \psi(r(\mathbf{\hat{u}}))},
+		\frac{\alpha v}{\alpha \psi(r(\mathbf{\hat{u}}))},
+		1
+	\end{pmatrix}^{T} =
+	\begin{pmatrix}
+		\frac{u}{\psi(r(\mathbf{\hat{u}}))},
+		\frac{v}{\psi(r(\mathbf{\hat{u}}))},
+		1
+	\end{pmatrix}^{T}.
+\end{equation}
+
+From \ref{eq:division_derivation1} we see that
+\begin{equation} \label{eq:division_derivation2}
+	\begin{cases}
+		\frac{x}{z} = \frac{u}{\psi(r(\mathbf{\hat{u}}))} \\
+		\frac{y}{z} = \frac{v}{\psi(r(\mathbf{\hat{u}}))}
+	\end{cases} \implies \\
+	\begin{cases}
+		u = \frac{x \psi(r(\mathbf{\hat{u}}))}{z} \\
+		v = \frac{y \psi(r(\mathbf{\hat{u}}))}{z}
+	\end{cases}.
+\end{equation}
+
+Now, let \(\hat{r}\) be a root of
+\(r(\mathbf{\hat{u}})
+= \sqrt{
+	\frac{x * \psi \left( \hat{r}\right)}{z}^{2} +
+	\frac{y * \psi \left( \hat{r}\right)}{z}^{2}
+} = \hat{r}\), assuming \(0 \leq \hat{r} \leq w\) where \(w\) is a width of
+the image.
+
+Then, \(\mathbf{\hat{u}} = f(\mathbf{x}) =
+\frac{\hat{r}}{r(\mathbf{x})}\mathbf{x}\),
+where \(f(\cdot)\) is the inverse of \(g(\cdot)\).
+
+\subsection{Intrinsic parameters}
+Represent a projective transformation from the 3-D camera’s coordinates into
+the 2-D image coordinates.
+
+\begin{equation*}
+	K = \begin{bmatrix}
+		\alpha_x & \alpha_x \cot \theta & c_x \\
+		0        & \alpha_y             & c_y \\
+		0        & 0                    & 1
+	\end{bmatrix} \begin{bmatrix}
+		f & 0 & 0 \\
+		0 & f & 0 \\
+		0 & 0 & 1
+	\end{bmatrix} = \begin{bmatrix}
+		f_x & k   & c_x \\
+		0   & f_y & c_y \\
+		0   & 0   & 1
+	\end{bmatrix}.
+\end{equation*}
+For a typical camera, \(\theta = \sfrac{\pi}{2}\) and \(\alpha_x = \alpha_y\)
+\citep{hartleyMultipleViewGeometry2004}:
+\begin{equation*}
+	K = \begin{bmatrix}
+		f & 0 & c_x \\
+		0 & f & c_y \\
+		0 & 0 & 1
+	\end{bmatrix}.
+\end{equation*}
+
+\subsection{Complete projection and backprojection}\label{sub:complete_projection_and_backprojection}
+
+\begin{align}
+	\alpha \mathbf{u} & = K f(H\mathbf{x})
+	\tag{Projection} \label{eq:projection}                     \\
+	\alpha \mathbf{x} & = H^{-1} g(K^{-1}\mathbf{u}) \tag{Back
+		projection} \label{eq:back_projection}.
+\end{align}
+
+\section{Approach}\label{sec:approach}
+
+\subsection{Camera calibration}\label{sub:camera_calibration}
+
+\subsubsection{Initial approximation}\label{subsub:initial_approximation}
+
+\subsubsection{Solving for the camera extrinsic parameters}\label{ssub:solving_for_the_camera_extrinsic_parameters}
+
+To derive the solver for the camera extrinsic parameters, start from
+\cref{eq:projection}:
+\begin{align}
+	\alpha \mathbf{u}                                                          & = K f(H\mathbf{x})       \\
+	\alpha K^{-1} \mathbf{u}                                                   & = f(H\mathbf{x})    &  &
+	\text{Move \(K\) to the left side}                                                                    \\
+	\alpha g( K^{-1}\mathbf{u})                                                & = g(f(H\mathbf{x})) &  &
+	\text{Set \(\mathbf{\widehat{u}} = K^{-1}\mathbf{u}\); apply \(g(\cdot)\)}                            \\
+	\alpha \begin{pmatrix}
+		       \widehat{u}_x \\ \widehat{u}_y \\ \psi(r(\mathbf{\widehat{u}}))
+	       \end{pmatrix}^{T} & = H\mathbf{x}.
+\end{align}
+
+To eliminate the dependency on the scale \(\alpha\), multiply both sides
+vectorially by \(g(\mathbf{\widehat{u}})\):
+\begin{equation}
+	\alpha g(\mathbf{\widehat{u}}) \times g(\mathbf{\widehat{u}})
+	= g(\mathbf{\widehat{u}}) \times H\mathbf{x} \implies
+	g(\mathbf{\widehat{u}})
+	% \begin{pmatrix}
+	% 	\widehat{u}, \widehat{v}, \psi(r(\mathbf{\widehat{u}}))
+	% \end{pmatrix}^{T}
+	\times \begin{bmatrix}
+		\mathbf{r_1} & \mathbf{r_2} & \mathbf{t}
+	\end{bmatrix} \mathbf{x} = 0
+	\label{eq:eq_no_multiplier}.
+\end{equation}
+
+From \cref{eq:eq_no_multiplier}, we can see that a point contributes to three
+homogeneous equations:
+\begin{align}
+	\widehat{v} (r_{31}x + r_{32} y + t_3) -
+	g(r(\mathbf{\widehat{u}})) (r_{21}x + r_{22}y + t_2 ) & = 0
+	\label{eq:scaramuzza_system_1}                              \\
+	g(r(\mathbf{\widehat{u}})) (r_{11}x + r_{12}y + t_1) -
+	\widehat{u} (r_{31}x + r_{32} y + t_3)                & = 0
+	\label{eq:scaramuzza_system_2}                              \\
+	\widehat{u} (r_{21}x + r_{22}y + t_2 ) -
+	\widehat{v} (r_{11}x + r_{12}y + t_1)                 & = 0
+	\label{eq:scaramuzza_system_3}.
+\end{align}
+
+Only \cref{eq:scaramuzza_system_3} is linear in the unknowns. Each point gives a
+single equation. Now, by rewriting the equation in the matrix form
+\(M \cdot \mathbf{h} = 0\), where
+\[
+	\mathbf{h} = \begin{pmatrix}
+		r_{11}, r_{12}, r_{21}, r_{22}, r_{31}, r_{32}
+	\end{pmatrix}^{T},
+\]
+we get:
+\begin{equation}
+	M = \begin{bmatrix}
+		-\widehat{v}_1 x_1 & -\widehat{v}_1 y_1 & -\widehat{u}_1 x_1 & -\widehat{u}_1 y_1 & -\widehat{v}_1 & -\widehat{u}_1 \\
+		\vdots             & \vdots             & \vdots             & \vdots             & \vdots         & \vdots         \\
+		-\widehat{v}_N x_N & -\widehat{v}_N y_N & -\widehat{u}_N x_N & -\widehat{u}_N y_N & -\widehat{v}_N & -\widehat{u}_N
+	\end{bmatrix}
+\end{equation}, where \(N\) is the number of points.
+
+The linear estimate of \(\mathbf{h}\) is found by minimizing \(\left\lVert M \cdot
+\mathbf{h} \right\rVert ^{2}\) using SVD. The solution is known up to a scale factor.
+
+To find \(r_{31}\) and \(r_{33}\), note that \(\mathbf{r_1}\) and
+\(\mathbf{r_2}\) are orthonormal. The derivation couldn't fit here, you can find
+it in the thesis paper.
+
+\subsubsection{Extrinsic parameters}\label{subsub:extrinsic_parameters}
+
+Now, to find the rest of the parameters, we substitute the values, found in the
+previous step into \cref{eq:scaramuzza_system_1} and
+\cref{eq:scaramuzza_system_2}. We assumed the number of the division model's
+parameter to be equal to 2, and the scalar multiplier to be equal to 1
+\cref{subsub:back_projection_using_the_division_model}:
+
+\begin{equation}
+	\begin{bmatrix}
+		A_1 \rho_1^{2} & A_1 \rho_1^{4} & -v_1   \\
+		C_1 \rho_1^{2} & C_1 \rho_1^{4} & -v_1   \\
+		\vdots         & \vdots         & \vdots \\
+		A_N \rho_N^{2} & A_N \rho_N^{4} & -v_N   \\
+		C_N \rho_N^{2} & C_N \rho_N^{4} & -v_N
+	\end{bmatrix} \cdot \begin{bmatrix}
+		\lambda_1 \\
+		\lambda_2 \\
+		t_3
+	\end{bmatrix} = \begin{bmatrix}
+		B_1 - A_1 \\
+		D_1 - C_1 \\
+		\vdots    \\
+		B_N - A_N \\
+		D_N - C_N
+	\end{bmatrix},
+\end{equation}
+where
+\begin{align}
+	A_i & = r_{21} x_i + r_{22} y_i + t_2  \\
+	B_i & = v_i (r_{31} x_i + r_{32} y_i)  \\
+	C_i & = r_{11} x_i + r_{12} y_i + t_1  \\
+	D_i & = u_i (r_{31} x_i + r_{32} y_i).
+\end{align}
+
+The solution can be found using the least squares method.
+
+\end{document}

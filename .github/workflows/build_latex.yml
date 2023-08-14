@@ -17,8 +17,10 @@ jobs:
           biber-version: '2.17'
       - run: cp paper/paper.pdf original_copy.pdf
       - run: cp paper/presentation.pdf original_copy.pdf
+      - run: cp paper/poster.pdf original_copy.pdf
       - run: tectonic paper/paper.tex
       - run: tectonic paper/presentation.tex
+      - run: tectonic paper/poster.tex
       - name: Compare paper/paper.pdf with paper/paper_copy.pdf
         run: |
           if ! cmp --silent paper/paper.pdf paper/paper_copy.pdf; then
@@ -29,5 +31,11 @@ jobs:
         run: |
           if ! cmp --silent paper/presentation.pdf paper/presentation_copy.pdf; then
             echo "paper/presentation.pdf and paper/presentation_copy.pdf differ!"
+            exit 1
+          fi
+      - name: Compare paper/poster.pdf with paper/poster_copy.pdf
+        run: |
+          if ! cmp --silent paper/poster.pdf paper/poster_copy.pdf; then
+            echo "paper/poster.pdf and paper/poster_copy.pdf differ!"
             exit 1
           fi
