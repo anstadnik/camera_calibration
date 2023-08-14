@@ -19,7 +19,8 @@ def solve_extrinsic(
             image center coordinates (x, y).
 
     Returns:
-        NDArray[np.float64]: A 3x3 array representing the extrinsic parameters of the camera.
+        NDArray[np.float64]: A 3x3 array representing the extrinsic parameters
+        of the camera.
     """
     M = np.vstack(
         [[-v * X_, -v * Y_, u * X_, u * Y_, -v, u] for (u, v), (X_, Y_) in zip(x, X)]
