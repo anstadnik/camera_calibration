@@ -14,6 +14,7 @@ jobs:
       - uses: wtfjoke/setup-tectonic@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          biber-version: 'latest'
       - run: cp paper/paper.pdf original_copy.pdf
       - run: cp paper/presentation.pdf original_copy.pdf
       - run: tectonic paper/paper.tex
