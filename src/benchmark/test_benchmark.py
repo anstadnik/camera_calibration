@@ -5,8 +5,8 @@
 # import numpy as np
 # from scipy.spatial.transform import Rotation
 #
-# from calibration.benchmark.benchmark import benchmark_simul
-# from calibration.projector.camera import Camera
+# from src.benchmark.benchmark import benchmark_simul
+# from src.projector.camera import Camera
 #
 #
 # class TestBenchmark(TestCase):

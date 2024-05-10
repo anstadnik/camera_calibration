@@ -3,8 +3,8 @@ from typing import Callable
 import numpy as np
 from tqdm.contrib.concurrent import process_map
 
-from calibration.projector.camera import Camera
-from calibration.projector.projector import Projector
+from src.projector.camera import Camera
+from src.projector.projector import Projector
 
 from .features import Features
 

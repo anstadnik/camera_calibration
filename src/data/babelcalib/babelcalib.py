@@ -8,7 +8,7 @@ from glob import glob
 from PIL import Image
 from tqdm.auto import tqdm
 
-from calibration.data.babelcalib.download import assure_babelcalib_downloaded
+from src.data.babelcalib.download import assure_babelcalib_downloaded
 
 from .entry import Entry
 from .target import load_from_dsc_file_tp_file, Target

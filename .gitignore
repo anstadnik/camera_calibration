@@ -189,3 +189,7 @@ pyrightconfig.json
 /data/BabelCalib
 .DS_Store
 .virtual_documents
+# pixi environments
+.pixi
+*.egg-info
+

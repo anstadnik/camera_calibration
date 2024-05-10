@@ -2,12 +2,12 @@ from dataclasses import dataclass, field
 from functools import partial
 import numpy as np
 from tqdm.contrib.concurrent import process_map
-from calibration.benchmark.benchmark_result import BenchmarkResult, calc_error
+from src.benchmark.benchmark_result import BenchmarkResult, calc_error
 
-from calibration.benchmark.features import Features
-from calibration.data.babelcalib.entry import Entry
-from calibration.feature_refiner.classifier import prune_corners
-from calibration.projector.projector import Projector
+from src.benchmark.features import Features
+from src.data.babelcalib.entry import Entry
+from src.feature_refiner.classifier import prune_corners
+from src.projector.projector import Projector
 
 
 @dataclass

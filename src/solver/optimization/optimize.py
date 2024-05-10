@@ -3,12 +3,12 @@ import numpy as np
 import jax.numpy as jnp
 import optax
 import jax
-from calibration.benchmark.benchmark_result import calc_error
-from calibration.benchmark.features import Features
+from src.benchmark.benchmark_result import calc_error
+from src.benchmark.features import Features
 
-from calibration.solver.optimization.backproject import backproject, backprojection_loss
-from calibration.solver.optimization.helpers import params_to_proj
-from calibration.solver.optimization.rotation import euler_angles_to_rotation_matrix
+from src.solver.optimization.backproject import backproject, backprojection_loss
+from src.solver.optimization.helpers import params_to_proj
+from src.solver.optimization.rotation import euler_angles_to_rotation_matrix
 
 jArr = jax.Array
 

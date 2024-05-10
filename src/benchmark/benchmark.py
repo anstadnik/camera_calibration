@@ -1,24 +1,24 @@
 import numpy as np
 from tqdm.contrib.concurrent import process_map
-from calibration.augmentations.augmentations import overlay_img, prune_corners
-from calibration.benchmark.benchmark_result import BenchmarkResult
+from src.augmentations.augmentations import overlay_img, prune_corners
+from src.benchmark.benchmark_result import BenchmarkResult
 
-from calibration.benchmark.calib import calibrate
+from src.benchmark.calib import calibrate
 
-from calibration.benchmark.features import (
+from src.benchmark.features import (
     BABELCALIB_INP,
     SIMUL_INP,
     Features,
     babelcalib_features,
     simul_features,
 )
-from calibration.data.babelcalib.babelcalib import Dataset, load_babelcalib
-from calibration.data.babelcalib.entry import Entry
-from calibration.projector.board import gen_checkerboard_grid
-from calibration.projector.camera import Camera
-from calibration.projector.projector import Projector
-from calibration.solver.optimization.solve import solve as solve_optimization
-from calibration.solver.scaramuzza.solve import solve as solve_scaramuzza
+from src.data.babelcalib.babelcalib import Dataset, load_babelcalib
+from src.data.babelcalib.entry import Entry
+from src.projector.board import gen_checkerboard_grid
+from src.projector.camera import Camera
+from src.projector.projector import Projector
+from src.solver.optimization.solve import solve as solve_optimization
+from src.solver.scaramuzza.solve import solve as solve_scaramuzza
 
 
 def evaluate(

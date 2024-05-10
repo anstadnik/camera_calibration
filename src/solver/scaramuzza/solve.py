@@ -1,7 +1,7 @@
 import numpy as np
 
-from calibration.projector.camera import Camera
-from calibration.projector.projector import Projector
+from src.projector.camera import Camera
+from src.projector.projector import Projector
 
 from .extrinsics import solve_extrinsic
 from .intrinsics import solve_intrinsic

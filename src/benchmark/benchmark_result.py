@@ -1,9 +1,9 @@
 from dataclasses import asdict, dataclass, field
 import numpy as np
 import pandas as pd
-from calibration.benchmark.features import Features
-from calibration.data.babelcalib.entry import Entry
-from calibration.projector.projector import Projector
+from src.benchmark.features import Features
+from src.data.babelcalib.entry import Entry
+from src.projector.projector import Projector
 
 def calc_error(proj: Projector, features: Features) -> float:
     try:

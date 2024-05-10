@@ -3,16 +3,16 @@ import numpy as np
 
 from pandas.compat import os
 
-from calibration.benchmark.benchmark import (
+from src.benchmark.benchmark import (
     BenchmarkResult,
     benchmark_babelcalib,
     benchmark_simul,
 )
-from calibration.data.babelcalib.babelcalib import load_babelcalib
-from calibration.data.babelcalib.entry import Entry
-from calibration.feature_refiner.refine import refine_features
-from calibration.projector.camera import Camera
-from calibration.solver.optimization.solve import solve
+from src.data.babelcalib.babelcalib import load_babelcalib
+from src.data.babelcalib.entry import Entry
+from src.feature_refiner.refine import refine_features
+from src.projector.camera import Camera
+from src.solver.optimization.solve import solve
 
 
 def run_benchmark():

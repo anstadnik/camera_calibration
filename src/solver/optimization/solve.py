@@ -2,13 +2,13 @@ import jax.numpy as jnp
 import numpy as np
 import jax
 from scipy.spatial.transform import Rotation
-from calibration.benchmark.benchmark_result import calc_error
-from calibration.benchmark.features import Features
-from calibration.projector.camera import Camera
-from calibration.projector.projector import Projector
-from calibration.solver.optimization.helpers import params_to_proj
-from calibration.solver.optimization.optimize import optimize_optax
-from calibration.solver.scaramuzza.solve import solve as solve_scaramuzza
+from src.benchmark.benchmark_result import calc_error
+from src.benchmark.features import Features
+from src.projector.camera import Camera
+from src.projector.projector import Projector
+from src.solver.optimization.helpers import params_to_proj
+from src.solver.optimization.optimize import optimize_optax
+from src.solver.scaramuzza.solve import solve as solve_scaramuzza
 
 jArr = jax.Array
 nArr = np.ndarray

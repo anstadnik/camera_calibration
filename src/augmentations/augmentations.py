@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 
-from calibration.benchmark.features import Features
+from src.benchmark.features import Features
 
 
 def overlay_img(img: Image.Image, path: str = "data/octopus.png") -> Image.Image:

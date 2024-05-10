@@ -5,10 +5,10 @@ import numpy as np
 from cbdetect_py import CornerType, Params, boards_from_corners, find_corners
 from tqdm.contrib.concurrent import process_map
 
-from calibration.data.babelcalib.babelcalib import Dataset
-from calibration.data.babelcalib.entry import Entry
-from calibration.data.babelcalib.target import BoardType
-from calibration.projector.projector import Projector
+from src.data.babelcalib.babelcalib import Dataset
+from src.data.babelcalib.entry import Entry
+from src.data.babelcalib.target import BoardType
+from src.projector.projector import Projector
 
 
 @dataclass

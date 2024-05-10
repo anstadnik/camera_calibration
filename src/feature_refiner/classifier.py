@@ -3,9 +3,9 @@ from PIL import ImageOps
 from PIL.Image import Image
 from cbdetect_py import hessian_response
 from tqdm.auto import tqdm
-from calibration.benchmark.benchmark_result import BenchmarkResult
-from calibration.data.babelcalib.entry import Entry
-from calibration.feature_detector.checkerboard import detect_corners
+from src.benchmark.benchmark_result import BenchmarkResult
+from src.data.babelcalib.entry import Entry
+from src.feature_detector.checkerboard import detect_corners
 import cv2
 from sklearn.cluster import MeanShift, estimate_bandwidth
 import scipy.ndimage as ndi
