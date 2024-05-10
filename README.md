@@ -4,11 +4,11 @@
 ![corners2](./paper/images/refined_corners1.png)
 ![corners3](./paper/images/refined_corners2.png)
 
-Recovered pruned points
-![1f77b4](https://placehold.co/15x15/1f77b4/1f77b4.png) unchanged,
+Recovered points
+(![1f77b4](https://placehold.co/15x15/1f77b4/1f77b4.png) unchanged,
 ![ff7f0e](https://placehold.co/15x15/ff7f0e/ff7f0e.png) filtered out,
 ![2ca02c](https://placehold.co/15x15/2ca02c/2ca02c.png) new corner,
-![d62728](https://placehold.co/15x15/d62728/d62728.png) out of image.
+![d62728](https://placehold.co/15x15/d62728/d62728.png) out of image).
 
 This is the code for my master's thesis.
 The code is a bit messy, so I recommend reading the [thesis](https://github.com/anstadnik/camera_calibration/blob/main/paper/paper.pdf) first.
