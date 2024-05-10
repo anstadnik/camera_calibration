@@ -186,4 +186,10 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/jupyternotebooks,python
 
-/data
+/data/BabelCalib
+.DS_Store
+.virtual_documents
+# pixi environments
+.pixi
+*.egg-info
+

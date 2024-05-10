@@ -1,0 +1,145 @@
+\chapter{Related work}\label{cha:related_work}
+
+\section{Camera calibration}\label{sub:camera_calibration}
+
+Getting the correspondence between the spatial
+and the image coordinates requires camera calibration. Camera
+calibration consists of the geometric camera model and the parameters of this
+model. That information makes it possible to obtain the 2d image coordinates
+of any point in the 3d space.
+
+Usually, the geometric camera model is obtained from the domain knowledge of the
+researcher or the camera manufacturer. Often, they choose the simplified model as
+a trade-off between accuracy and complexity. The model's parameters are usually
+obtained by solving the constrained optimization problem, given the set of
+points with known geometry.
+
+\section{Calibration boards}\label{sub:calibration_boards}
+
+To achieve a robust calibration, images with repeating patterns are
+usually used. The camera
+calibration parameters can be found using prior knowledge of the properties of
+the pattern, such that the pattern invariants hold on
+the image. Initially, the chessboard~\citep{OpenCVCameraCalibration,
+	v.douskosAutomaticCalibrationDigital2007} patterns were used
+(\cref{fig:chessboard}).
+
+Later, ArUco
+~\citep{garrido-juradoAutomaticGenerationDetection2014} (\cref{fig:gboriginal}) and
+AprilTag~\citep{olsonAprilTagRobustFlexible2011} (\cref{fig:apriltag})
+allowed detecting the
+orientation of the pattern, as well as uniquely identifying each located pattern
+even under occlusion. Later, based on ArUco pattern,
+ChArUcO~\citep{OpenCVCameraCalibration} (\cref{fig:charuco}) was
+proposed as more robust.
+
+There are also other calibration patterns, some of which are not square (for
+example, Delitlle~\citep{haDeltilleGridsGeometric2017}).
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{chessboard.png}
+		\caption{Chessboard~\cite{OpenCVCameraCalibration}}
+		\label{fig:chessboard}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{gboriginal.png}
+		\caption{ArUco board~\cite{OpenCVDetectionArUco}}
+		\label{fig:gboriginal}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{charuco.png}
+		\caption{Charuco board~\cite{OpenCVDetectionChArUco}}
+		\label{fig:charuco}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{apriltag.png}
+		\caption{AprilTag board~\cite{rosebrockAprilTagPython2020} (right)}
+		\label{fig:apriltag}
+	\end{subfigure}
+	\caption{Calibration boards.}
+\end{figure}
+
+\section{Camera models}\label{sub:camera_models}
+
+The choice of the camera model depends on the camera's physical properties
+and the accuracy required. Usually, the parametric models are simpler to use, as
+they have only a few parameters and deliver good accuracy.
+The most common are the Double Sphere
+model~\citep{usenkoDoubleSphereCamera2018}, the Kannala-Brandt
+model~\citep{kannalaGenericCameraModel2006}, and the Field-of-View
+model~\citep{devernayStraightLinesHave2001}.
+In the ill-posed problem of camera calibration, the common choice
+of the camera model is the division
+model~\citep{fitzgibbonSimultaneousLinearEstimation2001}. This model is
+discussed in details in \cref{sub:distortion}.
+However, \cite{schopsWhyHaving102020} shows that they tend to have
+significantly higher errors than the non-parametric (general) models.
+The \cite{lochmanBabelCalibUniversalApproach2021} suggested a framework for
+converting the parameters of a powerful back-projection
+\cite{zhangFlexibleNewTechnique2000} model to recover different models' parameters.
+
+\section{Camera parameters estimation}\label{sub:camera_parameters_estimation}
+
+Camera calibration using repeating patterns was an important subject for a long
+time, for example, \cite{schaffalitzkyGeometricGroupingRepeated1998} in
+\citeyear{schaffalitzkyGeometricGroupingRepeated1998} and
+\cite{zhangFlexibleNewTechnique2000}.
+
+% Camera calibration is a crucial step for many computer vision tasks,
+% hence many methods were proposed to solve this problem (e.g.,
+% ~\cite{brownCloseRangeCameraCalibration1971,
+% heikkilaFourstepCameraCalibration1997,
+% fitzgibbonSimultaneousLinearEstimation2001,
+% sturmGenericConceptCamera2004,
+% clausRationalFunctionLens2005,
+% meiSingleViewPoint2007,
+% ramalingamUnifyingModelCamera2017}).
+
+Nevertheless, camera calibration is still an open problem; recently,
+multiple new approaches have arisen.
+\cite{scaramuzzaToolboxEasilyCalibrating2006} proposed an automatic algorithm
+for camera calibration, which did not use any model of the specific omnidirectional
+sensor. Is is described in details in \cref{sub:initial_approximation}.
+\cite{lochmanBabelCalibUniversalApproach2021} suggest a universal approach
+to camera calibration, with a separate step of converting between camera models.
+\cite{huDeepChArUcoDark2019} used deep learning to detect ChArUcO boards.
+Recently, on \citedate{duisterhofTartanCalibIterativeWideAngle2022},
+\cite{duisterhofTartanCalibIterativeWideAngle2022} introduced the iterative
+approach to camera calibration, which outperforms the previous state-of-the-art
+approaches for wide-angle cameras.
+
+% The camera calibration depends a lot on the physical camera properties, choice
+% of the camera model, calibration method, number of images used for calibration,
+% prior knowledge of the camera, and many other variables. Therefore, currently,
+% there is no established method of general camera calibration approach
+% comparison, and the state-of-the-art is not well-defined. However, it is possible
+% to compare the methods in the context of specific tasks and datasets.
+
+\section{Boards' features detection}\label{sec:boards_features_detection}
+
+The detection of the calibration board's features is a crucial step in the
+camera calibration pipeline. The detection accuracy directly affects the
+calibration accuracy. Besides feature detection, it's also important to
+associate the detected features with the board's corners.
+
+There are various feature detection methods. Many of them require
+prior knowledge of the board's geometry, such as the number of rows and columns,
+and require the full visibility of the board. For example, the default OpenCV
+implementation of the chessboard detection~\citep{OpenCVCameraCalibration}.
+
+Because of that, other methods were proposed, such as
+\cite{fuersattelOCPADOccludedCheckerboard2016} and
+\cite{geigerAutomaticCameraRange2012} (\cref{sub:corner_detection}). Those methods can detect the board and
+associate the corners with the borders' corners under
+the partial occlusion and do not require prior knowledge of the board's geometry.
+
+\cite{chenNewSubPixelDetector2005} (\cref{sub:corner_detection}) proposed using Hessian to find pixel
+positions of the corners.
